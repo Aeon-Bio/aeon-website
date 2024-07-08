@@ -38,14 +38,6 @@
 		overflow: clip;
 	}
 
-	h1 {
-		background-image: radial-gradient(
-			50% 50% at 50% 50%,
-			hsl(224, 36%, 69%) 0%,
-			rgba(24, 99, 149, 0) 100%
-		);
-	}
-
 	h2 {
 		font-size: calc(0.1em + 1vw + 1vh);
 	}
