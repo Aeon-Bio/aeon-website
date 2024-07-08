@@ -21,9 +21,9 @@
 	</h1>
 
 	<h2>
-		Mapping biomolecules beyond foundation models,
+		<span class="subheader">Mapping biomolecules beyond foundation models,</span>
 		<br />
-		for the future of medicine & longevity.
+		<span class="subheader">for the future of medicine & longevity.</span>
 	</h2>
 </section>
 
@@ -34,6 +34,20 @@
 		justify-content: center;
 		align-items: center;
 		flex: 0.6;
+		max-height: 100vh;
+		overflow: clip;
+	}
+
+	h1 {
+		background-image: radial-gradient(
+			50% 50% at 50% 50%,
+			hsl(224, 36%, 69%) 0%,
+			rgba(24, 99, 149, 0) 100%
+		);
+	}
+
+	h2 {
+		font-size: calc(0.1em + 1vw + 1vh);
 	}
 
 	h1,
@@ -42,6 +56,10 @@
 		font-family: 'Montserrat', sans-serif;
 		color: whitesmoke;
 		text-align: center;
+	}
+
+	.subheader {
+		white-space: nowrap;
 	}
 
 	.welcome {
