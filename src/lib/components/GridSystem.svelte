@@ -1,5 +1,6 @@
 <script lang="ts">
   import { gridActivity } from '../stores/grid';
+  import { spring } from 'svelte/motion';
   
   export let scale = 50;
   export let intensity = 0.15;
@@ -7,6 +8,16 @@
   $: focusPoint = $gridActivity.focusPoint;
   $: baseIntensity = $gridActivity.baseIntensity;
   $: systemActivity = $gridActivity.activity;
+  
+  // Spring-based activity for smooth transitions
+  const activitySpring = spring(0, {
+    stiffness: 0.06,
+    damping: 0.65
+  });
+  
+  $: {
+    activitySpring.set(systemActivity);
+  }
 </script>
 
 <div class="grid-container">
@@ -15,9 +26,7 @@
     style="
       --scale: {scale}px;
       --base-intensity: {baseIntensity};
-      --activity: {systemActivity};
-      --focus-x: {focusPoint ? focusPoint.x + 'px' : '50%'};
-      --focus-y: {focusPoint ? focusPoint.y + 'px' : '50%'};
+      --activity: {$activitySpring};
     "
   />
   <div class="grid-fade" />
@@ -50,23 +59,28 @@
     transform: perspective(1000px) rotateX(60deg) translateZ(0);
     transform-origin: top;
     backface-visibility: hidden;
-    will-change: transform;
-    transition: background-image 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
   }
 
   .grid-pattern::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      circle at var(--focus-x) var(--focus-y),
-      transparent,
-      rgba(76, 201, 240, 0.04) 20%,
-      transparent 40%
-    );
-    opacity: var(--activity);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    background-image: 
+      linear-gradient(
+        rgba(128, 255, 219, calc(var(--activity) * 0.12)) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(128, 255, 219, calc(var(--activity) * 0.12)) 1px,
+        transparent 1px
+      );
+    background-size: var(--scale) var(--scale);
+    filter: blur(0.5px);
     transform: translateZ(0);
+    opacity: 0.8;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .grid-fade {

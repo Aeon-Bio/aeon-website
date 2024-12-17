@@ -34,6 +34,8 @@
     const MIN_LINE_WIDTH = 0.8;
     const MAX_LINE_WIDTH = 2.5;
     const FADE_IN_SPEED = 0.33;
+    const PERSPECTIVE = 1000;
+    const ROTATION = 60;
     
     function createParticle(index: number): Particle {
       const useCluster = Math.random() < 0.4;
@@ -66,9 +68,29 @@
         fadeIn: -fadeDelay
       };
     }
+
+    function projectToGrid(x: number, y: number) {
+        const angle = ROTATION * (Math.PI / 180);
+        const perspectiveFactor = 1 + (y / PERSPECTIVE);
+        
+        return {
+        x: x,
+        y: y * Math.cos(angle) * perspectiveFactor
+        };
+    }
     
     function updateParticles(dt: number) {
       const gridScale = 50;
+
+      function projectToGrid(x: number, y: number) {
+        const angle = ROTATION * (Math.PI / 180);
+        const perspectiveFactor = 1 + (y / PERSPECTIVE);
+        
+        return {
+          x: x,
+          y: y * Math.cos(angle) * perspectiveFactor
+        };
+      }
       
       particles.forEach(p => {
         p.fadeIn = Math.min(1, p.fadeIn + FADE_IN_SPEED);
@@ -80,12 +102,16 @@
         p.x += p.vx * dt * fadeScale;
         p.y += p.vy * dt * fadeScale;
         
-        const gridX = Math.round(p.x / gridScale) * gridScale;
-        const gridY = Math.round(p.y / gridScale) * gridScale;
+        const projected = projectToGrid(p.x, p.y);
+        const gridX = Math.round(projected.x / gridScale) * gridScale;
+        const gridY = Math.round(projected.y / gridScale) * gridScale;
+        
+        const angle = ROTATION * (Math.PI / 180);
+        const perspectiveFactor = 1 + (p.y / PERSPECTIVE);
         const alignmentStrength = 0.001 + (p.energy * 0.003);
         
-        p.vx += (gridX - p.x) * alignmentStrength;
-        p.vy += (gridY - p.y) * alignmentStrength;
+        p.vx += (gridX - projected.x) * alignmentStrength;
+        p.vy += ((gridY / Math.cos(angle)) / perspectiveFactor - p.y) * alignmentStrength;
         
         if (focusPoint) {
           const dx = focusPoint.x - p.x;
@@ -136,8 +162,11 @@
         for (let j = i + 1; j < particles.length; j++) {
           if (particles[i].fadeIn <= 0 || particles[j].fadeIn <= 0) continue;
           
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
+          const p1 = projectToGrid(particles[i].x, particles[i].y);
+          const p2 = projectToGrid(particles[j].x, particles[j].y);
+          
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
           if (dist < CONNECTION_DISTANCE) {
@@ -152,8 +181,8 @@
             const edgeOpacity = baseOpacity * (1 + edgeEmphasis);
             
             const gradient = ctx.createLinearGradient(
-              particles[i].x, particles[i].y,
-              particles[j].x, particles[j].y
+              p1.x, p1.y,
+              p2.x, p2.y
             );
             
             gradient.addColorStop(0, `rgba(76, 201, 240, ${edgeOpacity * 1.2})`);
@@ -170,8 +199,8 @@
             ctx.beginPath();
             ctx.strokeStyle = gradient;
             ctx.lineWidth = width;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }
@@ -180,12 +209,19 @@
       particles.forEach(p => {
         if (p.fadeIn <= 0) return;
         
+        const projected = projectToGrid(p.x, p.y);
         const energyColor = p.energy > 0 
           ? `rgba(128, 255, 219, ${p.opacity * (1 + p.energy * 0.5) * p.fadeIn})`
           : `rgba(76, 201, 240, ${p.opacity * p.fadeIn})`;
           
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius * (1 + p.energy * 0.3), 0, Math.PI * 2);
+        ctx.arc(
+          projected.x,
+          projected.y,
+          p.radius * (1 + p.energy * 0.3) * (1 + (p.y / PERSPECTIVE)),
+          0,
+          Math.PI * 2
+        );
         ctx.fillStyle = energyColor;
         ctx.fill();
       });
@@ -215,6 +251,7 @@
   <canvas
     bind:this={canvas}
     class="particle-field"
+    style="transform: perspective({PERSPECTIVE}px) rotateX({ROTATION}deg)"
   />
   
   <style>
