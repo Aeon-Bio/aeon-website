@@ -1,72 +1,88 @@
-<script>
-	import aeonLogo from '$lib/images/aeon.svg';
-	import '@fontsource/montserrat';
+<script lang="ts">
+	import GridSystem from '$lib/components/GridSystem.svelte';
+	import ParticleField from '$lib/components/ParticleField.svelte';
+	import EnergyFlow from '$lib/components/EnergyFlow.svelte';
+	import MolecularContainer from '$lib/components/MolecularContainer.svelte';
+	import { interactionState } from '$lib/stores/interaction';
+	import AeonLogo from '$lib/images/AeonLogo.svelte';
+	
+	const molecularProps = {
+		scale: 1,
+		intensity: 0.5,
+		interaction: 'attract'
+	};
+
+	function handleContainerHover(event: CustomEvent) {
+		const element = event.detail.element;
+		interactionState.update(state => ({
+			...state,
+			hoveredElement: element,
+			systemActivity: 0.8
+		}));
+	}
+
+	function handleContainerLeave() {
+		interactionState.update(state => ({
+			...state,
+			hoveredElement: null,
+			systemActivity: 0
+		}));
+	}
 </script>
 
-<svelte:head>
-	<title>Aeon</title>
-	<meta name="description" content="Aeon Biosciences Welcome Page" />
-</svelte:head>
+<GridSystem />
+<ParticleField />
+<EnergyFlow />
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={aeonLogo} type="image/svg" />
-				<img src={aeonLogo} alt="Aeon" />
-			</picture>
-		</span>
-
-		Aeon Biosciences
-	</h1>
-
-	<h2>
-		<span class="subheader">Mapping biomolecules beyond foundation models,</span>
-		<br />
-		<span class="subheader">for the future of medicine & longevity.</span>
-	</h2>
-</section>
+<main class="hero">
+	<MolecularContainer 
+		props={molecularProps}
+		on:hover={handleContainerHover}
+		on:leave={handleContainerLeave}
+	>
+		<div class="logo-container">
+			<AeonLogo />
+		</div>
+		<h1>Aeon Biosciences</h1>
+		<p class="tagline">
+			Mapping biomolecules beyond foundation models,
+			<br />
+			for the future of medicine & longevity.
+		</p>
+	</MolecularContainer>
+</main>
 
 <style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-		max-height: 100vh;
-		overflow: clip;
+	.hero {
+		min-height: 100vh;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
 	}
-
-	h2 {
-		font-size: calc(0.1em + 1vw + 1vh);
+	
+	.logo-container {
+		width: 300px;
+		height: 300px;
+		margin: 0 auto;
 	}
-
-	h1,
-	h2 {
-		width: 100%;
-		font-family: 'Montserrat', sans-serif;
-		color: whitesmoke;
+	
+	h1 {
+		font-size: 2.5rem;
+		margin: 2rem 0 1rem;
+		background: linear-gradient(
+			to right,
+			var(--aeon-primary),
+			var(--aeon-biolum)
+		);
+		-webkit-background-clip: text;
+		color: transparent;
 		text-align: center;
 	}
-
-	.subheader {
-		white-space: nowrap;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	
+	.tagline {
+		font-size: 1.2rem;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.8);
+		line-height: 1.6;
 	}
 </style>
