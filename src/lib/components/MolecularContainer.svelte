@@ -26,6 +26,7 @@
 </script>
 
 <div
+  role="group"
   bind:this={container}
   class="molecular-container"
   on:mouseenter={handleMouseEnter}
@@ -38,7 +39,7 @@
     --mouse-y: {mousePosition.y}%;
   "
 >
-  <div class="glow-effect" />
+  <div class="glow-effect"></div>
   <div class="content">
     <slot />
   </div>
@@ -86,7 +87,9 @@
       transparent 40%
     );
     opacity: 0;
-    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s ease-out;
+    transform: translateZ(0);
+    will-change: opacity;
   }
   
   .molecular-container:hover .glow-effect {

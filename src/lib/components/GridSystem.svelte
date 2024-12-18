@@ -3,9 +3,7 @@
   import { spring } from 'svelte/motion';
   
   export let scale = 50;
-  export let intensity = 0.15;
   
-  $: focusPoint = $gridActivity.focusPoint;
   $: baseIntensity = $gridActivity.baseIntensity;
   $: systemActivity = $gridActivity.activity;
   
@@ -28,8 +26,8 @@
       --base-intensity: {baseIntensity};
       --activity: {$activitySpring};
     "
-  />
-  <div class="grid-fade" />
+  ></div>
+  <div class="grid-fade"></div>
 </div>
 
 <style>
@@ -37,7 +35,7 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: -1;
+    z-index: -2;
     overflow: hidden;
   }
 

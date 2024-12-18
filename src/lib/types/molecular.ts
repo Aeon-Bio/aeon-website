@@ -1,4 +1,4 @@
-interface MolecularProps {
+export interface MolecularProps {
   scale: number;
   intensity: number;
   interaction: 'attract' | 'repel' | 'none';
