@@ -1,4 +1,7 @@
 @import '@fontsource/fira-mono';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
 	/* Core Brand Colors */
@@ -32,6 +35,9 @@ body {
 	background: var(--aeon-deep-space);
 	color: whitesmoke;
 	font-family: var(--font-primary);
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-height: 100vh;
 }
 
 h1,

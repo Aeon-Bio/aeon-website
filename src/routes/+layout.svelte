@@ -15,7 +15,6 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
-		overflow: hidden;
 	}
 
 	main {
@@ -26,7 +25,8 @@
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
-		overflow: hidden;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 
 	footer {
