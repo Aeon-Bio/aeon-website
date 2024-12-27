@@ -9,9 +9,18 @@
         };
     };
     export let studyIds: string[] = [];
+    
+    let isDropdownOpen = false;
+    
+    function handleGlobalClick() {
+        isDropdownOpen = false;
+    }
 </script>
 
-<div class="molecular-context">
+<div 
+    class="molecular-context"
+    on:click={handleGlobalClick}
+>
     <div class="content space-y-6">
         <div class="flex items-center justify-between mb-3">
             <h4 class="font-medium flex items-center gap-2 text-white">
@@ -20,7 +29,10 @@
             </h4>
             {#if studyIds.length > 0}
                 <div class="research-links">
-                    <ResearchLinks {studyIds} />
+                    <ResearchLinks 
+                        {studyIds} 
+                        bind:isOpen={isDropdownOpen}
+                    />
                 </div>
             {/if}
         </div>

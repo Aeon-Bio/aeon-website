@@ -1,17 +1,22 @@
 <script lang="ts">
     import { Book, ChevronDown } from 'lucide-svelte';
+    import { slide } from 'svelte/transition';
     
     export let studyIds: string[];
+    export let isOpen = false;
     
-    let isOpen = false;
+    function toggleDropdown(event: MouseEvent) {
+        event.stopPropagation();
+        isOpen = !isOpen;
+    }
     
     function getDOIUrl(doi: string) {
         return `https://doi.org/${doi}`;
     }
     
-    function handleClick(doi: string) {
+    function handleClick(doi: string, event: MouseEvent) {
+        event.stopPropagation();
         window.open(getDOIUrl(doi), '_blank');
-        isOpen = false;
     }
 </script>
 
@@ -19,7 +24,7 @@
     {#if studyIds.length === 1}
         <button
             class="research-btn"
-            on:click={() => handleClick(studyIds[0])}
+            on:click={(e) => handleClick(studyIds[0], e)}
         >
             <Book class="h-4 w-4" />
             <span>View Research</span>
@@ -27,7 +32,7 @@
     {:else}
         <button
             class="research-btn"
-            on:click={() => isOpen = !isOpen}
+            on:click={toggleDropdown}
         >
             <Book class="h-4 w-4" />
             <span>View Research</span>
@@ -42,7 +47,7 @@
                 {#each studyIds as doi, i}
                     <button
                         class="menu-item"
-                        on:click={() => handleClick(doi)}
+                        on:click={(e) => handleClick(doi, e)}
                     >
                         View study {i + 1}
                     </button>

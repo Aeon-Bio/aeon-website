@@ -11,7 +11,7 @@
     
     let isExpanded = false;
     
-    $: studyIds = finding.provenance.personally_associated_regions
+    $: studyIds = finding.provenance.associated_regions
         .flatMap(region => region.studyIds)
         .filter((value, index, self) => self.indexOf(value) === index);
 </script>
@@ -26,7 +26,7 @@
                 <div class="flex items-center gap-2">
                     <BarChart class="h-5 w-5 text-aeon-primary" />
                     <span class="text-sm font-medium text-aeon-biolum">
-                        {finding.pattern.gene_list.join(', ')} Pattern
+                        {finding.pattern.personally_associated_genes.join(', ')} Pattern
                     </span>
                     <span class="px-2 py-1 rounded-full text-xs {
                         finding.pattern.direction === 'hypo' 
