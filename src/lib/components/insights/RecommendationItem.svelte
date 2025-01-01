@@ -1,14 +1,19 @@
 <script lang="ts">
-    import StrengthBadge from './StrengthBadge.svelte';
-    import { Target, Info } from 'lucide-svelte';
+    import type { Recommendation } from '$lib/types/insights';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
-
-    export let recommendation: any; // TODO: Add proper typing
+    import { Target, Info, ChevronRight } from 'lucide-svelte';
     
+    export let recommendation: Recommendation;
     let Icon: any = Target;
     let showStrengthInfo = false;
     let tooltipTimeout: NodeJS.Timeout;
+    
+    const strengthClasses = {
+        strong: 'bg-green-100 text-green-800',
+        moderate: 'bg-blue-100 text-blue-800',
+        preliminary: 'bg-gray-100 text-gray-800'
+    };
     
     const strengthDescriptions = {
         strong: "Backed by multiple high-quality studies with consistent results",
@@ -22,7 +27,6 @@
     }
 
     function handleTooltipLeave() {
-        console.log('handleTooltipLeave');
         tooltipTimeout = setTimeout(() => {
             showStrengthInfo = false;
         }, 100);
@@ -30,17 +34,13 @@
     
     onMount(async () => {
         try {
-            // Use @vite-ignore to allow dynamic imports from lucide-svelte
-            // Convert kebab-case to PascalCase for the import
             const iconName = recommendation.lucideIcon
                 .split('-')
-                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1))
                 .join('');
                 
-            // @ts-ignore
-            // @vite-ignore
-            const module = await import(`lucide-svelte`);
-            Icon = module[iconName];
+            const module = await import('lucide-svelte');
+            Icon = module[iconName as keyof typeof module];
             
             if (!Icon) {
                 console.warn(`Icon ${iconName} not found, using fallback`);
@@ -54,56 +54,74 @@
 </script>
 
 <div class="recommendation-item">
-    <div class="content space-y-4">
-        <div class="flex items-start gap-4">
-            <div class="flex items-start gap-2 w-full">
-                <svelte:component this={Icon} class="h-5 w-5 text-aeon-primary flex-shrink-0" />
-                <div class="w-full">
-                    <div class="flex items-center justify-between gap-2 mb-3">
-                        <p class="text-white font-medium">
-                            {recommendation.recommendation}
-                        </p>
-                        <div class="relative flex items-center gap-2">
-                            <button 
-                                class="text-aeon-primary hover:text-aeon-biolum transition-colors"
-                                on:mouseenter={handleTooltipEnter}
-                                on:mouseleave={handleTooltipLeave}
-                            >
-                                <Info class="h-4 w-4" />
-                            </button>
-                            <!-- <StrengthBadge strength={recommendation.strength} /> -->
-                            
-                            {#if showStrengthInfo}
-                                <div 
-                                    class="strength-tooltip"
-                                    transition:fade={{duration: 100}}
-                                    on:mouseenter={handleTooltipEnter}
-                                    on:mouseleave={handleTooltipLeave}
-                                >
-                                    {strengthDescriptions[recommendation.strength.toLowerCase()] || 
-                                     "Recommendation strength based on available evidence"}
-                                </div>
-                            {/if}
-                        </div>
-                    </div>
-
-                    {#if recommendation.specificActions?.length}
-                        <div class="text-sm text-aeon-biolum space-y-2 mb-3">
-                            {#each recommendation.specificActions as action}
-                                <div class="flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-aeon-primary" />
-                                    {action}
-                                </div>
-                            {/each}
-                        </div>
-                    {/if}
-                    
-                    <p class="text-sm text-gray-400">
-                        {recommendation.rationale}
-                    </p>
-                </div>
+    <div class="space-y-4 p-4">
+        <div class="flex items-start justify-between">
+            <h4 class="font-medium text-lg flex items-center gap-2 text-white">
+                <svelte:component this={Icon} class="h-5 w-5 text-aeon-primary" />
+                {recommendation.recommendation}
+            </h4>
+            
+            <div class="flex items-center gap-2">
+                <button 
+                    class="text-aeon-primary hover:text-aeon-biolum transition-colors"
+                    on:mouseenter={handleTooltipEnter}
+                    on:mouseleave={handleTooltipLeave}
+                >
+                    <Info class="h-4 w-4" />
+                </button>
+                <span class={`px-2 py-1 rounded-full text-xs font-medium ${
+                    strengthClasses[recommendation.strength.toLowerCase() as keyof typeof strengthClasses]
+                }`}>
+                    {recommendation.strength}
+                </span>
             </div>
         </div>
+        
+        <p class="text-gray-400">{recommendation.rationale}</p>
+        
+        {#if recommendation.specificActions?.length}
+            <div>
+                <h5 class="font-medium text-white mb-2">Specific Actions</h5>
+                <div class="space-y-2">
+                    {#each recommendation.specificActions as action}
+                        <div class="flex items-start gap-2">
+                            <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                            <span class="text-sm text-aeon-biolum">{action}</span>
+                        </div>
+                    {/each}
+                </div>
+            </div>
+        {/if}
+
+        {#if recommendation.monitoringMetrics?.length}
+            <div>
+                <h5 class="font-medium text-white mb-2">Monitoring Plan</h5>
+                <div class="grid gap-4">
+                    {#each recommendation.monitoringMetrics as metric}
+                        <div class="bg-aeon-surface-1 p-3 rounded-lg">
+                            <div class="flex items-center gap-2 mb-1">
+                                <Target class="h-4 w-4 text-aeon-primary" />
+                                <span class="font-medium text-white">{metric.metric}</span>
+                            </div>
+                            <div class="text-sm text-aeon-biolum">
+                                Check {metric.frequency.toLowerCase()} • Target: {metric.target}
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+            </div>
+        {/if}
+
+        {#if showStrengthInfo}
+            <div 
+                class="strength-tooltip"
+                transition:fade={{duration: 100}}
+                on:mouseenter={handleTooltipEnter}
+                on:mouseleave={handleTooltipLeave}
+            >
+                {strengthDescriptions[recommendation.strength.toLowerCase() as keyof typeof strengthDescriptions]}
+            </div>
+        {/if}
     </div>
 </div>
 

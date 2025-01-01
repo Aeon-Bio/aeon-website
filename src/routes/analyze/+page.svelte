@@ -1,5 +1,6 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
+    import { FileText } from 'lucide-svelte';
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
     
@@ -32,24 +33,35 @@
 </script>
 
 <main class="analyze-container">
-    <form on:submit|preventDefault={handleSubmit} class="upload-form">
-        <h1>Load Analysis Results</h1>
+    <div class="insight-card p-6 w-[300px]">
+        <h2 class="text-lg font-medium text-white mb-6">Load Analysis</h2>
         
-        <div class="form-group">
-            <label for="file">Upload Results (JSON)</label>
-            <input 
-                type="file" 
-                id="file" 
-                accept=".json"
-                on:change={handleFileSelect}
-                required
-            />
-        </div>
+        <div class="space-y-4">
+            <div>
+                <div class="text-sm text-gray-400 mb-2">Upload Results (JSON)</div>
+                <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-700 bg-aeon-surface-1 cursor-pointer hover:border-aeon-primary transition-colors">
+                    <FileText class="h-4 w-4 text-aeon-primary" />
+                    <input 
+                        type="file" 
+                        accept=".json"
+                        class="hidden"
+                        on:change={handleFileSelect}
+                    />
+                    <span class="text-sm text-aeon-biolum">
+                        {file ? file.name : 'Choose File'}
+                    </span>
+                </label>
+            </div>
 
-        <button type="submit" disabled={isProcessing}>
-            {isProcessing ? 'Loading...' : 'Load Results'}
-        </button>
-    </form>
+            <button 
+                class="w-full px-4 py-2 rounded-lg bg-aeon-primary text-white font-medium hover:bg-aeon-biolum transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!file}
+                on:click={handleSubmit}
+            >
+                Load Results
+            </button>
+        </div>
+    </div>
 
     {#if isProcessing || findings.length > 0}
         <div class="findings-container">
@@ -76,49 +88,34 @@
         grid-template-columns: minmax(300px, 400px) 1fr;
     }
 
-    .upload-form {
-        position: sticky;
-        top: 2rem;
-        background: rgba(0, 0, 0, 0.2);
-        padding: 2rem;
-        border-radius: 1rem;
-        backdrop-filter: blur(10px);
-        height: fit-content;
+    .insight-card {
+        position: relative;
+        border-radius: 0.75rem;
+        background: rgba(17, 24, 39, 0.95);
+        backdrop-filter: blur(20px);
+        overflow: hidden;
+        box-shadow: 
+            0 4px 6px -1px rgba(0, 0, 0, 0.2),
+            0 2px 4px -2px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(76, 201, 240, 0.05);
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--aeon-biolum);
-    }
-
-    input {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.5rem;
-        background: rgba(0, 0, 0, 0.2);
-        color: white;
-    }
-
-    button {
-        width: 100%;
-        padding: 0.75rem;
-        background: var(--aeon-primary);
-        border: none;
-        border-radius: 0.5rem;
-        color: white;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-
-    button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+    .insight-card::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(
+            45deg,
+            rgba(76, 201, 240, 0.15),
+            rgba(128, 255, 219, 0.15)
+        );
+        mask: linear-gradient(#fff 0 0) content-box,
+              linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
     }
 
     .findings-container {

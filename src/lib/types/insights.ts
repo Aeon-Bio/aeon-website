@@ -8,12 +8,51 @@ export interface InsightPattern {
     };
 }
 
+export interface MethylationMetrics {
+    value: number;
+    siteMean: number;
+    siteMedian: number;
+    zScore: number;
+    MAD: number;
+    percentile: number;
+}
+
+export interface ModifyingFactor {
+    factor: string;
+    effect: string;
+    interventionPotential: string;
+}
+
+export interface Region {
+    probe_name: string | null;
+    gene_name: string;
+    description: string;
+    chromosome: string | null;
+    position: number | null;
+    context: string | null;
+    studyIds: string[];
+    direction: 'hyper' | 'hypo';
+    matchStrength: number;
+    methylationMetrics: MethylationMetrics;
+    modifyingFactors: ModifyingFactor[];
+}
+
+export interface MonitoringMetric {
+    metric: string;
+    frequency: string;
+    target: string;
+}
+
 export interface Recommendation {
-    action: string;
+    recommendation: string;
+    lucideIcon: string;
     strength: 'Strong' | 'Moderate' | 'Preliminary';
-    source: 'mechanism' | 'outcome' | 'general';
-    context: string;
+    source: string;
     rationale: string;
+    specificActions: string[];
+    monitoringMetrics: MonitoringMetric[];
+    contraindications: string[];
+    supportingEvidence: string[];
 }
 
 export interface Evidence {
