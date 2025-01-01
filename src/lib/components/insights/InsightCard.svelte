@@ -48,6 +48,10 @@
 
     {#if isExpanded}
         <div class="p-4 space-y-6" transition:slide>
+            <p class="text-aeon-biolum leading-relaxed">
+                {finding.description}
+            </p>
+
             <div>
                 <h4 class="font-medium text-lg mb-4">Personalized Recommendations</h4>
                 <div class="grid gap-4">

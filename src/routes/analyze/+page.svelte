@@ -1,16 +1,16 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
+    import { mockFindings } from './mockFindings';
     
     let file: File | null = null;
-    let findings: any[] = [];
+    let findings: any[] = mockFindings; // Initialize with mock findings
     let isProcessing = false;
 
     async function handleSubmit() {
         if (!file) return;
         
         isProcessing = true;
-        findings = []; // Reset findings
         
         try {
             // Read the JSON file
@@ -55,7 +55,7 @@
         <div class="findings-container">
             <h2>Findings</h2>
             <div class="findings-list">
-                {#each findings as finding (finding.pattern.gene_list.join('-'))}
+                {#each findings as finding, index (index)}
                     <div transition:fade={{duration: 300}}>
                         <InsightCard {finding} />
                     </div>
@@ -67,7 +67,7 @@
 
 <style>
     .analyze-container {
-        max-width: 1200px;
+        max-width: 100vw;
         margin: 0 auto;
         padding: 2rem;
         display: grid;
