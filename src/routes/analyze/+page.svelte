@@ -56,7 +56,7 @@
             <h2>Findings</h2>
             <div class="findings-list">
                 {#each findings as finding, index (index)}
-                    <div transition:fade={{duration: 300}}>
+                    <div class="finding-item" transition:fade={{duration: 300}}>
                         <InsightCard {finding} />
                     </div>
                 {/each}
@@ -64,6 +64,7 @@
         </div>
     {/if}
 </main>
+
 
 <style>
     .analyze-container {
@@ -121,7 +122,7 @@
     }
 
     .findings-container {
-        padding: 1rem;
+        padding: 0;
     }
 
     .findings-list {
@@ -134,7 +135,6 @@
 
     .finding-item {
         background: rgba(0, 0, 0, 0.2);
-        padding: 1.5rem;
         border-radius: 1rem;
         backdrop-filter: blur(10px);
     }

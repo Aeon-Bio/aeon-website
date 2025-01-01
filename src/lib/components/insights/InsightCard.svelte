@@ -1,15 +1,35 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
     import Card from '../ui/Card.svelte';
-    import RecommendationItem from './RecommendationItem.svelte';
-    import ScientificContext from './ScientificContext.svelte';
-    import EvidenceAssessment from './EvidenceAssessment.svelte';
-    import ResearchLinks from './ResearchLinks.svelte';
+    import { onMount } from 'svelte';
+	import { cubicOut } from 'svelte/easing';
     import { BarChart, ChevronDown } from 'lucide-svelte';
-
-    export let finding: any; // TODO: Add proper typing
     
+    export let finding: any;
     let isExpanded = false;
+    let components: any = {};
+    
+    async function loadComponents() {
+        const [
+            RecommendationItem,
+            ScientificContext, 
+            EvidenceAssessment
+        ] = await Promise.all([
+            import('./RecommendationItem.svelte').then(m => m.default),
+            import('./ScientificContext.svelte').then(m => m.default),
+            import('./EvidenceAssessment.svelte').then(m => m.default)
+        ]);
+        
+        components = {
+            RecommendationItem,
+            ScientificContext,
+            EvidenceAssessment
+        };
+    }
+    
+    $: if (isExpanded && !components.RecommendationItem) {
+        loadComponents();
+    }
     
     $: studyIds = finding.provenance.associated_regions
         .flatMap(region => region.studyIds)
@@ -47,25 +67,51 @@
     </div>
 
     {#if isExpanded}
-        <div class="p-4 space-y-6" transition:slide>
+        <div 
+            class="p-4 space-y-6" 
+            transition:slide={{
+                duration: 200,
+                easing: cubicOut
+            }}
+        >
             <p class="text-aeon-biolum leading-relaxed">
                 {finding.description}
             </p>
 
-            <div>
-                <h4 class="font-medium text-lg mb-4">Personalized Recommendations</h4>
-                <div class="grid gap-4">
-                    {#each finding.recommendations as recommendation}
-                        <RecommendationItem {recommendation} />
-                    {/each}
+            {#await loadComponents()}
+                <div class="text-aeon-biolum text-sm">Loading...</div>
+            {:then}
+                <div transition:slide|local={{
+                    duration: 200,
+                    easing: cubicOut
+                }}>
+                    <h4 class="font-medium text-lg mb-4">Personalized Recommendations</h4>
+                    <div class="grid gap-4">
+                        {#each finding.recommendations as recommendation}
+                            <svelte:component this={components.RecommendationItem} {recommendation} />
+                        {/each}
+                    </div>
                 </div>
-            </div>
 
-            <ScientificContext 
-                evidence={finding.evidence}
-                studyIds={studyIds}
-            />
-            <EvidenceAssessment evidence={finding.evidence} />
+                <div transition:slide|local={{
+                    duration: 200,
+                    easing: cubicOut,
+                    delay: 100
+                }}>
+                    <svelte:component this={components.ScientificContext} 
+                        evidence={finding.evidence}
+                        studyIds={studyIds}
+                    />
+                </div>
+                
+                <div transition:slide|local={{
+                    duration: 200,
+                    easing: cubicOut,
+                    delay: 200
+                }}>
+                    <svelte:component this={components.EvidenceAssessment} evidence={finding.evidence} />
+                </div>
+            {/await}
         </div>
     {/if}
 </Card> 
