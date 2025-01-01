@@ -96,7 +96,7 @@
             <div class="space-y-2">
                 <div class="flex items-center gap-2">
                     <span class="text-sm font-medium text-aeon-biolum">
-                        {finding.pattern.gene_list.join(", ")} Pattern
+                        {(finding.pattern.personally_associated_genes?.length ? finding.pattern.personally_associated_genes : finding.pattern.gene_list).join(", ")} Pattern
                     </span>
                     <span class="px-2 py-1 rounded-full text-xs {
                         finding.pattern.direction === 'hypo' 
