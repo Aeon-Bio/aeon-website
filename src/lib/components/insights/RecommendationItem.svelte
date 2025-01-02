@@ -2,9 +2,10 @@
     import type { Recommendation } from '$lib/types/insights';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
-    import { Target, Info, ChevronRight } from 'lucide-svelte';
+    import { Target, Info, ChevronRight, AlertTriangle, FileText } from 'lucide-svelte';
     
     export let recommendation: Recommendation;
+    export let abbreviated = false;
     let Icon: any = Target;
     let showStrengthInfo = false;
     let tooltipTimeout: NodeJS.Timeout;
@@ -54,68 +55,126 @@
 </script>
 
 <div class="recommendation-item">
-    <div class="space-y-4 p-4">
+    <div class="space-y-6">
+        <!-- Header Section -->
         <div class="flex items-start justify-between">
-            <h4 class="font-medium text-lg flex items-center gap-2 text-white">
-                <svelte:component this={Icon} class="h-5 w-5 text-aeon-primary" />
-                {recommendation.recommendation}
-            </h4>
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2 bg-aeon-surface-1 rounded-lg">
+                        <svelte:component this={Icon} class="h-5 w-5 text-aeon-primary" />
+                    </div>
+                    <h4 class="font-medium text-lg text-white">
+                        {recommendation.recommendation}
+                    </h4>
+                </div>
+                <p class="text-aeon-biolum text-sm leading-relaxed">
+                    {recommendation.rationale}
+                </p>
+            </div>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
                 <button 
-                    class="text-aeon-primary hover:text-aeon-biolum transition-colors"
+                    class="p-1.5 hover:bg-aeon-surface-1 rounded-lg transition-colors"
                     on:mouseenter={handleTooltipEnter}
                     on:mouseleave={handleTooltipLeave}
                 >
-                    <Info class="h-4 w-4" />
+                    <Info class="h-4 w-4 text-aeon-primary" />
                 </button>
-                <span class={`px-2 py-1 rounded-full text-xs font-medium ${
+                <span class={`px-3 py-1.5 rounded-full text-xs font-medium ${
                     strengthClasses[recommendation.strength.toLowerCase() as keyof typeof strengthClasses]
                 }`}>
                     {recommendation.strength}
                 </span>
             </div>
         </div>
-        
-        <p class="text-gray-400">{recommendation.rationale}</p>
-        
-        {#if recommendation.specificActions?.length}
-            <div>
-                <h5 class="font-medium text-white mb-2">Specific Actions</h5>
-                <div class="space-y-2">
-                    {#each recommendation.specificActions as action}
-                        <div class="flex items-start gap-2">
-                            <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
-                            <span class="text-sm text-aeon-biolum">{action}</span>
-                        </div>
-                    {/each}
-                </div>
-            </div>
-        {/if}
 
-        {#if recommendation.monitoringMetrics?.length}
-            <div>
-                <h5 class="font-medium text-white mb-2">Monitoring Plan</h5>
-                <div class="grid gap-4">
-                    {#each recommendation.monitoringMetrics as metric}
-                        <div class="bg-aeon-surface-1 p-3 rounded-lg">
-                            <div class="flex items-center gap-2 mb-1">
-                                <Target class="h-4 w-4 text-aeon-primary" />
-                                <span class="font-medium text-white">{metric.metric}</span>
+        {#if !abbreviated}
+            <!-- Specific Actions -->
+            {#if recommendation.specificActions?.length}
+                <div class="space-y-3">
+                    <h5 class="font-medium text-white text-sm">Specific Actions</h5>
+                    <div class="grid gap-2">
+                        {#each recommendation.specificActions as action}
+                            <div class="flex items-start gap-3 bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
+                                <ChevronRight class="h-4 w-4 mt-0.5 text-aeon-primary flex-shrink-0" />
+                                <span class="text-sm text-aeon-biolum">{action}</span>
                             </div>
-                            <div class="text-sm text-aeon-biolum">
-                                Check {metric.frequency.toLowerCase()} • Target: {metric.target}
-                            </div>
-                        </div>
-                    {/each}
+                        {/each}
+                    </div>
                 </div>
+            {/if}
+
+            <!-- Monitoring and Evidence Grid -->
+            <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+                <!-- Monitoring Plan -->
+                {#if recommendation.monitoringMetrics?.length}
+                    <div class="space-y-3">
+                        <h5 class="font-medium text-white text-sm">Monitoring Plan</h5>
+                        <div class="grid gap-2">
+                            {#each recommendation.monitoringMetrics as metric}
+                                <div class="bg-aeon-surface-1/50 p-4 rounded-lg hover:bg-aeon-surface-1 transition-colors">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="p-1.5 bg-aeon-surface-1 rounded-md">
+                                            <Target class="h-4 w-4 text-aeon-primary" />
+                                        </div>
+                                        <span class="font-medium text-white">{metric.metric}</span>
+                                    </div>
+                                    <div class="text-sm text-aeon-biolum ml-10">
+                                        Check {metric.frequency.toLowerCase()} • Target: {metric.target}
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
+                <!-- Supporting Evidence -->
+                {#if recommendation.supportingEvidence?.length}
+                    <div class="space-y-3">
+                        <h5 class="font-medium text-white text-sm">Supporting Evidence</h5>
+                        <div class="space-y-2">
+                            {#each recommendation.supportingEvidence as evidence}
+                                <div class="bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
+                                    <div class="flex items-start gap-3">
+                                        <div class="p-1.5 bg-aeon-surface-1 rounded-md flex-shrink-0">
+                                            <FileText class="h-4 w-4 text-aeon-primary" />
+                                        </div>
+                                        <span class="text-sm text-aeon-biolum leading-normal pt-1">{evidence}</span>
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
             </div>
+
+            <!-- Important Considerations -->
+            {#if recommendation.contraindications?.length}
+                <div class="space-y-3">
+                    <div class="bg-aeon-surface-1 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="p-1.5 rounded-md">
+                                <AlertTriangle class="h-4 w-4 text-yellow-500" />
+                            </div>
+                            <h5 class="font-medium text-white">Important Considerations</h5>
+                        </div>
+                        <div class="space-y-2 ml-10">
+                            {#each recommendation.contraindications as contraindication}
+                                <div class="flex items-start gap-2">
+                                    <ChevronRight class="h-4 w-4 mt-1 text-yellow-500 flex-shrink-0" />
+                                    <span class="text-sm text-aeon-biolum">{contraindication}</span>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                </div>
+            {/if}
         {/if}
 
         {#if showStrengthInfo}
             <div 
                 class="strength-tooltip"
-                transition:fade={{duration: 100}}
+                transition:fade={{duration: 150}}
                 on:mouseenter={handleTooltipEnter}
                 on:mouseleave={handleTooltipLeave}
             >
@@ -128,8 +187,8 @@
 <style>
     .recommendation-item {
         position: relative;
-        padding: 1rem;
-        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border-radius: 1rem;
         background: var(--aeon-surface-0);
         backdrop-filter: blur(20px);
     }
@@ -152,19 +211,13 @@
         pointer-events: none;
     }
 
-    .content {
-        position: relative;
-        z-index: 1;
-    }
-
     .strength-tooltip {
         position: absolute;
-        right: 0;
-        top: 100%;
-        margin-top: 0.5rem;
+        right: 1.5rem;
+        top: 4rem;
         background: var(--aeon-surface-0);
-        border-radius: 0.5rem;
-        padding: 0.75rem;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
         width: max-content;
         max-width: 250px;
         font-size: 0.875rem;

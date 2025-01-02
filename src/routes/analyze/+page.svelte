@@ -5,61 +5,117 @@
     import { mockFindings } from './mockFindings';
     
     let file: File | null = null;
-    let findings: any[] = mockFindings; // Initialize with mock findings
+    let findings: any[] = mockFindings;
     let isProcessing = false;
+    let isDragging = false;
+    let sampleId: string | null = null;
 
-    async function handleSubmit() {
-        if (!file) return;
-        
+    async function processFile(newFile: File) {
         isProcessing = true;
-        
         try {
-            // Read the JSON file
-            const text = await file.text();
+            const gsmMatch = newFile.name.match(/GSM\d+/);
+            sampleId = gsmMatch ? gsmMatch[0] : null;
+            
+            const text = await newFile.text();
             findings = JSON.parse(text);
-            isProcessing = false;
         } catch (error) {
             console.error('Failed to parse JSON:', error);
+        } finally {
             isProcessing = false;
         }
     }
 
-    function handleFileSelect(event: Event) {
+    async function handleFileSelect(event: Event) {
         const input = event.target as HTMLInputElement;
         if (input.files) {
             file = input.files[0];
+            await processFile(file);
+        }
+    }
+
+    async function handleClick() {
+        if ('showOpenFilePicker' in window) {
+            try {
+                const [fileHandle] = await window.showOpenFilePicker({
+                    types: [{
+                        description: 'JSON Files',
+                        accept: {
+                            'application/json': ['.json']
+                        }
+                    }],
+                    multiple: false
+                });
+                file = await fileHandle.getFile();
+                await processFile(file);
+            } catch (err) {
+                return;
+            }
+        } else {
+            document.querySelector('input[type="file"]')?.click();
+        }
+    }
+
+    function handleDragEnter(event: DragEvent) {
+        event.preventDefault();
+        isDragging = true;
+    }
+
+    function handleDragLeave(event: DragEvent) {
+        event.preventDefault();
+        isDragging = false;
+    }
+
+    function handleDragOver(event: DragEvent) {
+        event.preventDefault();
+    }
+
+    async function handleDrop(event: DragEvent) {
+        event.preventDefault();
+        isDragging = false;
+        
+        const droppedFile = event.dataTransfer?.files[0];
+        if (droppedFile?.type === 'application/json') {
+            file = droppedFile;
+            await processFile(file);
         }
     }
 </script>
 
 <main class="analyze-container">
-    <div class="insight-card p-6 w-[300px]">
+    <div class="insight-card p-6 w-[300px] h-fit" style="position: sticky; top: 2rem">
         <h2 class="text-lg font-medium text-white mb-6">Load Analysis</h2>
         
-        <div class="space-y-4">
-            <div>
-                <div class="text-sm text-gray-400 mb-2">Upload Results (JSON)</div>
-                <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-700 bg-aeon-surface-1 cursor-pointer hover:border-aeon-primary transition-colors">
-                    <FileText class="h-4 w-4 text-aeon-primary" />
-                    <input 
-                        type="file" 
-                        accept=".json"
-                        class="hidden"
-                        on:change={handleFileSelect}
-                    />
-                    <span class="text-sm text-aeon-biolum">
-                        {file ? file.name : 'Choose File'}
-                    </span>
-                </label>
-            </div>
-
-            <button 
-                class="w-full px-4 py-2 rounded-lg bg-aeon-primary text-white font-medium hover:bg-aeon-biolum transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!file}
-                on:click={handleSubmit}
+        <div>
+            <div class="text-sm text-gray-400 mb-2">Upload Results (JSON)</div>
+            <label 
+                class="file-drop-zone flex flex-col items-center gap-3 px-6 py-8 rounded-lg border-2 border-dashed transition-all duration-200 {isDragging ? 'border-aeon-primary bg-aeon-primary/10' : 'border-gray-700 bg-aeon-surface-1'} {!isDragging ? 'hover:border-aeon-primary hover:transform hover:translate-y-[-1px] hover:shadow-lg' : ''} cursor-pointer"
+                on:click|preventDefault={handleClick}
+                on:dragenter={handleDragEnter}
+                on:dragleave={handleDragLeave}
+                on:dragover={handleDragOver}
+                on:drop={handleDrop}
             >
-                Load Results
-            </button>
+                <FileText class="h-8 w-8 text-aeon-primary" />
+                <input 
+                    type="file" 
+                    accept=".json"
+                    class="hidden"
+                    on:change={handleFileSelect}
+                />
+                <div class="text-center">
+                    <span class="text-sm text-aeon-biolum block">
+                        {file ? file.name : 'Drop JSON file here'}
+                    </span>
+                    <span class="text-xs text-gray-400 mt-1 block">
+                        or click to browse
+                    </span>
+                </div>
+                {#if sampleId}
+                    <div class="text-sm text-gray-400 mt-2">
+                        Sample ID: <span class="text-aeon-biolum">{sampleId}</span>
+                    </div>
+                {/if}
+            </label>
         </div>
     </div>
 
@@ -159,5 +215,24 @@
 
     .icon {
         color: var(--aeon-primary);
+    }
+
+    .file-drop-zone {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .file-drop-zone:active {
+        transform: translateY(0);
+    }
+
+    /* Optional: Add animation for the icon */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+
+    .file-drop-zone:not(.border-aeon-primary):hover :global(.lucide-file-text) {
+        animation: bounce 1s ease infinite;
     }
 </style> 
