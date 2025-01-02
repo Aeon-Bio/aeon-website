@@ -13,6 +13,7 @@ export type AssociatedRegion = {
     matchStrength: number;
     studyIds: string[];
     probe_name?: string;
+    gene_name?: string;
     context?: string;
     description?: string;
 };
