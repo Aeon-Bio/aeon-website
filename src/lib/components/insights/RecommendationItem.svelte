@@ -214,7 +214,7 @@
     .strength-tooltip {
         position: absolute;
         right: 1.5rem;
-        top: 4rem;
+        top: 2rem;
         background: var(--aeon-surface-0);
         border-radius: 0.75rem;
         padding: 0.75rem 1rem;
