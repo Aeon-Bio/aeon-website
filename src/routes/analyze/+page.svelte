@@ -4,13 +4,20 @@
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
     
-    let file: File | null = null;
+    let csvFile: File | null = null;
+    let jsonFile: File | null = null;
     let findings: any[] = mockFindings;
     let isProcessing = false;
     let isDragging = { csv: false, json: false };
     let sampleId: string | null = null;
     let progress = 0;
     let error: string | null = null;
+    let statusMessage: string | null = null;
+    let uploadProgress = 0;
+    let analysisProgress = 0;
+    let currentPhase: 'uploading' | 'analyzing' | null = null;
+    let processedCount = 0;
+    let totalExpectedFindings = 0;
     
     // Add column configuration
     let csvConfig = {
@@ -18,7 +25,12 @@
         sampleColumn: ''
     };
 
+    // Add a Set to track processed finding IDs
+    let processedFindingIds = new Set<string>();
+
     async function processCSV(newFile: File) {
+        processedFindingIds.clear();
+        csvFile = newFile;
         if (!csvConfig.cpgColumn || !csvConfig.sampleColumn) {
             error = 'Please specify both CpG probe ID and sample columns';
             return;
@@ -27,6 +39,10 @@
         isProcessing = true;
         findings = [];
         error = null;
+        statusMessage = 'Uploading file...';
+        uploadProgress = 0;
+        analysisProgress = 0;
+        currentPhase = 'uploading';
         
         try {
             const formData = new FormData();
@@ -34,51 +50,146 @@
             formData.append('cpgColumn', csvConfig.cpgColumn);
             formData.append('sampleColumn', csvConfig.sampleColumn);
 
-            const response = await fetch('/analyze', {
-                method: 'POST',
-                body: formData
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'text';
+            
+            let eventBuffer = '';
+            
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    uploadProgress = e.loaded / e.total;
+                }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Upload failed');
-            }
+            xhr.upload.addEventListener('load', () => {
+                currentPhase = 'analyzing';
+                statusMessage = 'Waking up server...';
+            });
 
-            // Handle server-sent events
-            const reader = response.body!.getReader();
-            const decoder = new TextDecoder();
-
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
+            xhr.addEventListener('progress', (e) => {
+                const newData = xhr.responseText.slice(eventBuffer.length);
+                eventBuffer += newData;
                 
-                const text = decoder.decode(value);
-                const events = text.split('\n\n').filter(Boolean);
-
-                for (const event of events) {
-                    if (!event.startsWith('data: ')) continue;
+                const lines = eventBuffer.split('\n\n');
+                eventBuffer = lines.pop() || '';
+                
+                for (const line of lines) {
+                    if (!line.trim() || !line.startsWith('data: ')) continue;
                     
-                    const jsonStr = event.slice(6);
-                    const data = JSON.parse(jsonStr);
+                    const jsonStr = line.slice(6).trim();
+                    if (!jsonStr) continue;
+                    
+                    let data;
+                    try {
+                        data = JSON.parse(jsonStr);
+                    } catch (parseError) {
+                        console.debug('Skipping partial message:', jsonStr);
+                        continue;
+                    }
 
-                    if (data.type === 'finding') {
-                        findings = [...findings, data.data];
-                        progress = data.progress;
-                    } else if (data.type === 'status') {
-                        console.log('Status:', data.status);
+                    try {
+                        switch (data.type) {
+                            case 'progress':
+                                const countMatch = data.message.match(/Processing findings \((\d+)\/(\d+)\)/);
+                                if (countMatch) {
+                                    processedCount = parseInt(countMatch[1]);
+                                    totalExpectedFindings = parseInt(countMatch[2]);
+                                }
+                                
+                                statusMessage = data.message;
+                                if (data.progress !== undefined) {
+                                    analysisProgress = data.progress;
+                                }
+                                if (data.status === 'error') {
+                                    error = data.message;
+                                    isProcessing = false;
+                                    currentPhase = null;
+                                    throw new Error(data.message);
+                                }
+                                if (data.status === 'complete') {
+                                    isProcessing = false;
+                                    currentPhase = null;
+                                }
+                                break;
+
+                            case 'finding':
+                                if (!processedFindingIds.has(data.id)) {
+                                    processedFindingIds.add(data.id);
+                                    findings = [...findings, data.data];
+                                }
+                                break;
+
+                            case 'error':
+                                error = data.error;
+                                isProcessing = false;
+                                currentPhase = null;
+                                throw new Error(data.error);
+                        }
+                    } catch (err) {
+                        console.error('Error processing event:', err);
+                        if (err instanceof Error && 
+                            !err.message.includes('JSON') && 
+                            !err.message.includes('parse')) {
+                            error = err.message;
+                        }
                     }
                 }
-            }
+            });
+
+            xhr.addEventListener('error', () => {
+                error = 'Upload failed; try again';
+                isProcessing = false;
+                currentPhase = null;
+                throw new Error('Upload failed');
+            });
+
+            xhr.addEventListener('abort', () => {
+                error = 'Upload aborted';
+                isProcessing = false;
+                currentPhase = null;
+                throw new Error('Upload aborted');
+            });
+
+            await new Promise((resolve, reject) => {
+                xhr.addEventListener('load', () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // Check if we have a JSON error response
+                        try {
+                            const contentType = xhr.getResponseHeader('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response.error) {
+                                    error = response.error;
+                                    reject(new Error(response.error));
+                                    return;
+                                }
+                            }
+                        } catch (e) {
+                            // Not a JSON response, continue with streaming
+                        }
+                        resolve(null);
+                    } else {
+                        const errorMsg = `Upload failed: ${xhr.statusText}`;
+                        error = errorMsg;
+                        reject(new Error(errorMsg));
+                    }
+                });
+                
+                xhr.open('POST', '/analyze');
+                xhr.send(formData);
+            });
 
         } catch (err) {
             console.error('Processing error:', err);
             error = err instanceof Error ? err.message : 'Failed to process file';
         } finally {
             isProcessing = false;
+            currentPhase = null;
         }
     }
 
     async function processJSON(newFile: File) {
+        jsonFile = newFile;
         isProcessing = true;
         try {
             const gsmMatch = newFile.name.match(/GSM\d+/);
@@ -96,11 +207,11 @@
     async function handleFileSelect(event: Event, type: 'csv' | 'json') {
         const input = event.target as HTMLInputElement;
         if (input.files) {
-            file = input.files[0];
+            const selectedFile = input.files[0];
             if (type === 'csv') {
-                await processCSV(file);
+                csvFile = selectedFile;
             } else {
-                await processJSON(file);
+                await processJSON(selectedFile);
             }
         }
     }
@@ -118,11 +229,11 @@
                     }],
                     multiple: false
                 });
-                file = await fileHandle.getFile();
+                const selectedFile = await fileHandle.getFile();
                 if (type === 'csv') {
-                    await processCSV(file);
+                    await processCSV(selectedFile);
                 } else {
-                    await processJSON(file);
+                    await processJSON(selectedFile);
                 }
             } catch (err) {
                 return;
@@ -154,11 +265,10 @@
         
         const droppedFile = event.dataTransfer?.files[0];
         if (droppedFile?.type === (type === 'csv' ? 'text/csv' : 'application/json')) {
-            file = droppedFile;
             if (type === 'csv') {
-                await processCSV(file);
+                csvFile = droppedFile;
             } else {
-                await processJSON(file);
+                await processJSON(droppedFile);
             }
         }
     }
@@ -170,9 +280,6 @@
             <!-- Option 1: CSV Upload -->
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-md font-medium text-white mb-4">Option 1: Analyze New Data</h3>
-                <div class="text-sm text-gray-400 mb-4">
-                    Upload a CSV file containing methylation data for analysis
-                </div>
 
                 <!-- Column Configuration -->
                 <div class="mb-4 space-y-3">
@@ -220,21 +327,28 @@
                     />
                     <div class="text-center">
                         <span class="text-sm text-aeon-biolum block">
-                            Drop CSV file here
+                            {csvFile ? csvFile.name : 'Drop CSV file here'}
                         </span>
                         <span class="text-xs text-gray-400 mt-1 block">
                             or click to browse
                         </span>
                     </div>
                 </label>
+
+                {#if csvFile && !isProcessing}
+                    <button
+                        on:click={() => processCSV(csvFile!)}
+                        class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn}
+                    >
+                        Upload and Analyze
+                    </button>
+                {/if}
             </div>
 
             <!-- Option 2: JSON Upload -->
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-md font-medium text-white mb-4">Option 2: Load Existing Results</h3>
-                <div class="text-sm text-gray-400 mb-4">
-                    Upload a JSON file containing previously generated analysis results
-                </div>
 
                 <!-- JSON Upload Zone -->
                 <label 
@@ -254,7 +368,7 @@
                     />
                     <div class="text-center">
                         <span class="text-sm text-aeon-biolum block">
-                            {file ? file.name : 'Drop JSON file here'}
+                            {jsonFile ? jsonFile.name : 'Drop JSON file here'}
                         </span>
                         <span class="text-xs text-gray-400 mt-1 block">
                             or click to browse
@@ -269,8 +383,33 @@
             </div>
 
             {#if isProcessing}
-                <div class="text-sm text-aeon-biolum mt-2">
-                    Processing... {#if progress}({progress} findings){/if}
+                <div class="text-sm mt-2">
+                    <span class="text-aeon-biolum">{statusMessage}</span>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                        {#if currentPhase === 'uploading'}
+                            <div 
+                                class="bg-aeon-primary h-2 rounded-full transition-all duration-300" 
+                                style="width: {uploadProgress * 100}%"
+                            />
+                        {:else if currentPhase === 'analyzing'}
+                            <div 
+                                class="bg-aeon-biolum h-2 rounded-full transition-all duration-300" 
+                                style="width: {analysisProgress * 100}%"
+                            />
+                        {/if}
+                    </div>
+                    {#if currentPhase === 'uploading'}
+                        <span class="text-xs text-gray-400 mt-1">
+                            Uploading: {Math.round(uploadProgress * 100)}%
+                        </span>
+                    {:else if currentPhase === 'analyzing'}
+                        <span class="text-xs text-gray-400 mt-1">
+                            Analyzing: {Math.round(analysisProgress * 100)}%
+                            {#if totalExpectedFindings > 0}
+                                <span class="ml-2">({processedCount}/{totalExpectedFindings} findings)</span>
+                            {/if}
+                        </span>
+                    {/if}
                 </div>
             {/if}
             {#if error}

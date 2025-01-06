@@ -24,7 +24,8 @@ export interface ModifyingFactor {
 }
 
 export interface Region {
-    probe_name: string | null;
+    matched_probe: string | null;
+    matched_gene: string;
     gene_name: string;
     description: string;
     chromosome: string | null;

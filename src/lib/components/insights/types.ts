@@ -12,7 +12,8 @@ export type AssociatedRegion = {
     methylationMetrics: MethylationMetrics;
     matchStrength: number;
     studyIds: string[];
-    probe_name?: string;
+    matched_probe?: string;
+    matched_gene?: string;
     gene_name?: string;
     context?: string;
     description?: string;

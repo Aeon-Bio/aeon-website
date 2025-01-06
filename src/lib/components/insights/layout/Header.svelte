@@ -12,7 +12,7 @@
         dispatch('toggle');
     }
 
-    $: geneList = [...new Set(finding.provenance.associated_regions.map(region => region.gene_name))]
+    $: geneList = [...new Set(finding.provenance.associated_regions.map(region => region.matched_gene || region.gene_name))]
 </script>
 
 <div 

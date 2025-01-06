@@ -126,11 +126,11 @@
             <div class="space-y-4">
                 <!-- Location Info -->
                 <div class="grid grid-cols-2 gap-4 text-sm">
-                    {#if finding.provenance.associated_regions[0].probe_name}
+                    {#if finding.provenance.associated_regions[0].matched_probe}
                         <div>
                             <div class="text-gray-400">Probe ID</div>
                             <div class="font-medium text-white">
-                                {finding.provenance.associated_regions[0].probe_name}
+                                {finding.provenance.associated_regions[0].matched_probe}
                             </div>
                         </div>
                     {/if}
