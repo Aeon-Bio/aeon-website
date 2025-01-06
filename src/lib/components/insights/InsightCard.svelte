@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Finding, Tab } from './types';
+  import type { Finding, Tab } from '../../types/insights';
   import { BarChart, Target, Beaker, FileSpreadsheet } from 'lucide-svelte';
   import Header from './layout/Header.svelte';
   import OverviewTab from './tabs/OverviewTab.svelte';

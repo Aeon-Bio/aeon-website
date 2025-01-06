@@ -112,14 +112,14 @@
                         <h5 class="font-medium text-white text-sm">Monitoring Plan</h5>
                         <div class="grid gap-2">
                             {#each recommendation.monitoringMetrics as metric}
-                                <div class="bg-aeon-surface-1/50 p-4 rounded-lg hover:bg-aeon-surface-1 transition-colors">
-                                    <div class="flex items-center gap-3 mb-2">
+                                <div class="bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
+                                    <div class="flex items-center gap-3 p-4 pb-2">
                                         <div class="p-1.5 bg-aeon-surface-1 rounded-md">
                                             <Target class="h-4 w-4 text-aeon-primary" />
                                         </div>
                                         <span class="font-medium text-white">{metric.metric}</span>
                                     </div>
-                                    <div class="text-sm text-aeon-biolum ml-10">
+                                    <div class="text-sm text-aeon-biolum px-4 pb-4 ml-10">
                                         Check {metric.frequency.toLowerCase()} • Target: {metric.target}
                                     </div>
                                 </div>
@@ -135,11 +135,11 @@
                         <div class="space-y-2">
                             {#each recommendation.supportingEvidence as evidence}
                                 <div class="bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
-                                    <div class="flex items-start gap-3">
+                                    <div class="flex items-start gap-3 p-4">
                                         <div class="p-1.5 bg-aeon-surface-1 rounded-md flex-shrink-0">
                                             <FileText class="h-4 w-4 text-aeon-primary" />
                                         </div>
-                                        <span class="text-sm text-aeon-biolum leading-normal pt-1">{evidence}</span>
+                                        <span class="text-sm text-aeon-biolum">{evidence}</span>
                                     </div>
                                 </div>
                             {/each}

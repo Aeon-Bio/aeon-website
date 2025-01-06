@@ -1,8 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { MolecularProps } from '../types/molecular';
-  
-  export let props: MolecularProps;
   
   const dispatch = createEventDispatcher();
   let container: HTMLElement;
@@ -33,8 +30,6 @@
   on:mouseleave={handleMouseLeave}
   on:mousemove={handleMouseMove}
   style="
-    --scale: {props.scale}; 
-    --intensity: {props.intensity};
     --mouse-x: {mousePosition.x}%;
     --mouse-y: {mousePosition.y}%;
   "

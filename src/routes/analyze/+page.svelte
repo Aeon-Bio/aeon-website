@@ -3,6 +3,7 @@
     import { FileText, FileJson } from 'lucide-svelte';
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
+	import Papa from 'papaparse';
     
     let csvFile: File | null = null;
     let jsonFile: File | null = null;
@@ -15,7 +16,7 @@
     let statusMessage: string | null = null;
     let uploadProgress = 0;
     let analysisProgress = 0;
-    let currentPhase: 'uploading' | 'analyzing' | null = null;
+    let currentPhase: 'preprocessing' | 'uploading' | 'analyzing' | null = null;
     let processedCount = 0;
     let totalExpectedFindings = 0;
     
@@ -39,149 +40,135 @@
         isProcessing = true;
         findings = [];
         error = null;
-        statusMessage = 'Uploading file...';
-        uploadProgress = 0;
-        analysisProgress = 0;
-        currentPhase = 'uploading';
+        currentPhase = 'preprocessing';
+        statusMessage = 'Preprocessing file...';
+        const requestId = crypto.randomUUID();
         
         try {
             const formData = new FormData();
-            formData.append('file', newFile);
+            formData.append('requestId', requestId);
             formData.append('cpgColumn', csvConfig.cpgColumn);
             formData.append('sampleColumn', csvConfig.sampleColumn);
 
+            let filteredData = [];
+            
+            await new Promise((resolve, reject) => {
+                Papa.parse(newFile, {
+                    header: true,
+                    skipEmptyLines: true,
+                    comments: '#',
+                    step: function(row) {
+                        // Only keep the columns we need
+                        const filteredRow = {
+                            [csvConfig.cpgColumn]: row.data[csvConfig.cpgColumn],
+                            [csvConfig.sampleColumn]: row.data[csvConfig.sampleColumn]
+                        };
+                        filteredData.push(filteredRow);
+                    },
+                    complete: function() {
+                        const filteredCsv = Papa.unparse(filteredData, {
+                            delimiter: ','
+                        });
+                        const filteredBlob = new Blob([filteredCsv], { type: 'text/csv' });
+                        formData.append('file', filteredBlob, 'filtered.csv');
+                        resolve(null);
+                    },
+                    error: function(error) {
+                        reject(error);
+                    },
+                    progress: function(results) {
+                        if (results.meta.cursor && newFile.size) {
+                            uploadProgress = results.meta.cursor / newFile.size;
+                            statusMessage = `Preprocessing file... ${Math.round(uploadProgress * 100)}%`;
+                        }
+                    }
+                });
+            });
+
+            // Reset progress for the upload phase
+            uploadProgress = 0;
+            currentPhase = 'uploading';
+            statusMessage = 'Uploading file...';
+
             const xhr = new XMLHttpRequest();
+            
+            // Set response type to text to handle SSE
             xhr.responseType = 'text';
             
-            let eventBuffer = '';
-            
+            // Handle upload progress separately
             xhr.upload.addEventListener('progress', (e) => {
                 if (e.lengthComputable) {
                     uploadProgress = e.loaded / e.total;
+                    statusMessage = `Uploading file... ${Math.round(uploadProgress * 100)}%`;
                 }
             });
 
+            // Add upload complete handler
             xhr.upload.addEventListener('load', () => {
+                uploadProgress = 1;
+                statusMessage = 'Upload complete, waking AI...';
                 currentPhase = 'analyzing';
-                statusMessage = 'Waking up server...';
             });
 
-            xhr.addEventListener('progress', (e) => {
-                const newData = xhr.responseText.slice(eventBuffer.length);
-                eventBuffer += newData;
-                
-                const lines = eventBuffer.split('\n\n');
-                eventBuffer = lines.pop() || '';
-                
-                for (const line of lines) {
-                    if (!line.trim() || !line.startsWith('data: ')) continue;
+            // Handle the streaming response
+            let buffer = '';
+            xhr.addEventListener('readystatechange', () => {
+                // Check if we have received partial data (readyState 3) or completed (readyState 4)
+                if (xhr.readyState >= 3) {
+                    // Get only the new data
+                    const newData = xhr.responseText.slice(buffer.length);
+                    buffer = xhr.responseText;
                     
-                    const jsonStr = line.slice(6).trim();
-                    if (!jsonStr) continue;
-                    
-                    let data;
-                    try {
-                        data = JSON.parse(jsonStr);
-                    } catch (parseError) {
-                        console.debug('Skipping partial message:', jsonStr);
-                        continue;
-                    }
-
-                    try {
-                        switch (data.type) {
-                            case 'progress':
-                                const countMatch = data.message.match(/Processing findings \((\d+)\/(\d+)\)/);
-                                if (countMatch) {
-                                    processedCount = parseInt(countMatch[1]);
-                                    totalExpectedFindings = parseInt(countMatch[2]);
-                                }
-                                
-                                statusMessage = data.message;
-                                if (data.progress !== undefined) {
-                                    analysisProgress = data.progress;
-                                }
-                                if (data.status === 'error') {
-                                    error = data.message;
-                                    isProcessing = false;
-                                    currentPhase = null;
-                                    throw new Error(data.message);
-                                }
-                                if (data.status === 'complete') {
-                                    isProcessing = false;
-                                    currentPhase = null;
-                                }
-                                break;
-
-                            case 'finding':
-                                if (!processedFindingIds.has(data.id)) {
-                                    processedFindingIds.add(data.id);
-                                    findings = [...findings, data.data];
-                                }
-                                break;
-
-                            case 'error':
-                                error = data.error;
-                                isProcessing = false;
-                                currentPhase = null;
-                                throw new Error(data.error);
-                        }
-                    } catch (err) {
-                        console.error('Error processing event:', err);
-                        if (err instanceof Error && 
-                            !err.message.includes('JSON') && 
-                            !err.message.includes('parse')) {
-                            error = err.message;
+                    // Process any complete SSE messages
+                    const lines = newData.split('\n\n');
+                    for (const line of lines) {
+                        if (!line.trim() || !line.startsWith('data: ')) continue;
+                        
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            console.log(data);
+                            
+                            // Handle different message types
+                            switch (data.type) {
+                                case 'progress':
+                                    currentPhase = 'analyzing';
+                                    analysisProgress = data.progress || 0;
+                                    statusMessage = data.message;
+                                    break;
+                                case 'finding':
+                                    if (!processedFindingIds.has(data.id)) {
+                                        console.log(`updated! ${data.id}`);
+                                        processedFindingIds.add(data.id);
+                                        findings = [...findings, data.data];
+                                        processedCount = findings.length;
+                                    }
+                                    break;
+                                case 'error':
+                                    throw new Error(data.error);
+                            }
+                        } catch (err) {
+                            if (err instanceof Error && 
+                                !err.message.includes('JSON') && 
+                                !err.message.includes('parse')) {
+                                error = err.message;
+                            }
                         }
                     }
                 }
             });
 
-            xhr.addEventListener('error', () => {
-                error = 'Upload failed; try again';
-                isProcessing = false;
-                currentPhase = null;
-                throw new Error('Upload failed');
-            });
-
-            xhr.addEventListener('abort', () => {
-                error = 'Upload aborted';
-                isProcessing = false;
-                currentPhase = null;
-                throw new Error('Upload aborted');
-            });
+            xhr.open('POST', '/analyze');
+            xhr.send(formData);
 
             await new Promise((resolve, reject) => {
-                xhr.addEventListener('load', () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        // Check if we have a JSON error response
-                        try {
-                            const contentType = xhr.getResponseHeader('content-type');
-                            if (contentType && contentType.includes('application/json')) {
-                                const response = JSON.parse(xhr.responseText);
-                                if (response.error) {
-                                    error = response.error;
-                                    reject(new Error(response.error));
-                                    return;
-                                }
-                            }
-                        } catch (e) {
-                            // Not a JSON response, continue with streaming
-                        }
-                        resolve(null);
-                    } else {
-                        const errorMsg = `Upload failed: ${xhr.statusText}`;
-                        error = errorMsg;
-                        reject(new Error(errorMsg));
-                    }
-                });
-                
-                xhr.open('POST', '/analyze');
-                xhr.send(formData);
+                xhr.addEventListener('load', () => resolve(null));
+                xhr.addEventListener('error', reject);
+                xhr.addEventListener('abort', reject);
             });
 
         } catch (err) {
             console.error('Processing error:', err);
-            error = err instanceof Error ? err.message : 'Failed to process file';
+            error = err instanceof Error ? err.message : 'Server error; try again';
         } finally {
             isProcessing = false;
             currentPhase = null;
@@ -209,7 +196,7 @@
         if (input.files) {
             const selectedFile = input.files[0];
             if (type === 'csv') {
-                csvFile = selectedFile;
+                await processCSV(selectedFile);
             } else {
                 await processJSON(selectedFile);
             }
@@ -221,10 +208,10 @@
             try {
                 const [fileHandle] = await window.showOpenFilePicker({
                     types: [{
-                        description: type === 'csv' ? 'CSV Files' : 'JSON Files',
+                        description: type === 'csv' ? 'Text Files' : 'JSON Files',
                         accept: {
-                            [type === 'csv' ? 'text/csv' : 'application/json']: 
-                            [type === 'csv' ? '.csv' : '.json']
+                            [type === 'csv' ? 'text/*' : 'application/json']: 
+                            [type === 'csv' ? '.csv,.tsv,.txt' : '.json']
                         }
                     }],
                     multiple: false
@@ -239,7 +226,7 @@
                 return;
             }
         } else {
-            const selector = `input[type="file"][accept=".${type}"]`;
+            const selector = `input[type="file"][accept="${type === 'csv' ? '.csv,.tsv,.txt' : '.json'}"]`;
             const fileInput = document.querySelector(selector) as HTMLInputElement;
             if (fileInput) fileInput.click();
         }
@@ -264,12 +251,20 @@
         isDragging[type] = false;
         
         const droppedFile = event.dataTransfer?.files[0];
-        if (droppedFile?.type === (type === 'csv' ? 'text/csv' : 'application/json')) {
-            if (type === 'csv') {
-                csvFile = droppedFile;
-            } else {
-                await processJSON(droppedFile);
+        if (type === 'json' && droppedFile?.type !== 'application/json') {
+            return;
+        }
+        
+        // For CSV, accept any text file
+        if (type === 'csv') {
+            if (droppedFile && (
+                droppedFile.type.startsWith('text/') || 
+                /\.(csv|tsv|txt)$/i.test(droppedFile.name)
+            )) {
+                await processCSV(droppedFile);
             }
+        } else if (droppedFile) {
+            await processJSON(droppedFile);
         }
     }
 </script>
@@ -321,13 +316,13 @@
                     <FileText class="h-8 w-8 text-aeon-primary" />
                     <input 
                         type="file" 
-                        accept=".csv"
+                        accept=".csv,.tsv,.txt"
                         class="hidden"
                         on:change={(e) => handleFileSelect(e, 'csv')}
                     />
                     <div class="text-center">
                         <span class="text-sm text-aeon-biolum block">
-                            {csvFile ? csvFile.name : 'Drop CSV file here'}
+                            {csvFile ? csvFile.name : 'Drop CSV/TSV file here'}
                         </span>
                         <span class="text-xs text-gray-400 mt-1 block">
                             or click to browse
@@ -386,7 +381,12 @@
                 <div class="text-sm mt-2">
                     <span class="text-aeon-biolum">{statusMessage}</span>
                     <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                        {#if currentPhase === 'uploading'}
+                        {#if currentPhase === 'preprocessing'}
+                            <div 
+                                class="bg-aeon-primary h-2 rounded-full transition-all duration-300" 
+                                style="width: {uploadProgress * 100}%"
+                            />
+                        {:else if currentPhase === 'uploading'}
                             <div 
                                 class="bg-aeon-primary h-2 rounded-full transition-all duration-300" 
                                 style="width: {uploadProgress * 100}%"
@@ -398,7 +398,11 @@
                             />
                         {/if}
                     </div>
-                    {#if currentPhase === 'uploading'}
+                    {#if currentPhase === 'preprocessing'}
+                        <span class="text-xs text-gray-400 mt-1">
+                            Preprocessing: {Math.round(uploadProgress * 100)}%
+                        </span>
+                    {:else if currentPhase === 'uploading'}
                         <span class="text-xs text-gray-400 mt-1">
                             Uploading: {Math.round(uploadProgress * 100)}%
                         </span>

@@ -1,11 +1,13 @@
 <!-- Overview tab content -->
 <script lang="ts">
   import { Target, FileText, BarChart, Network, ChevronRight, ArrowRight } from 'lucide-svelte';
-  import type { Finding } from '../types';
+  import type { Finding } from '$lib/types/insights';
   import RecommendationItem from '../RecommendationItem.svelte';
   import MethylationStatus from '../visualizations/MethylationStatus.svelte';
+  import RegionSelector from '../RegionSelector.svelte';
   
   export let finding: Finding;
+  let selectedRegionIndex = 0;
   
   // Dispatch event for tab changes
   import { createEventDispatcher } from 'svelte';
@@ -50,11 +52,18 @@
 
   <!-- Technical Details Grid -->
   <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
-    <!-- Methylation Status -->
-    <MethylationStatus 
-      metrics={finding.provenance.associated_regions[0].methylationMetrics}
-      direction={finding.pattern.direction}
-    />
+    <div class="bg-aeon-surface-1 rounded-lg">
+      {#if finding.provenance.associated_regions.length > 1}
+      <RegionSelector 
+        regions={finding.provenance.associated_regions}
+        bind:selectedIndex={selectedRegionIndex}
+        />
+      {/if}
+      <MethylationStatus 
+        metrics={finding.provenance.associated_regions[selectedRegionIndex].methylationMetrics}
+        direction={finding.provenance.associated_regions[selectedRegionIndex].direction}
+      />
+    </div>
 
     <!-- Biological Impact -->
     <div class="bg-aeon-surface-1 p-6 rounded-lg">

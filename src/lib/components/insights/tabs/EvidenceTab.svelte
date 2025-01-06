@@ -1,8 +1,10 @@
 <script lang="ts">
     import { FileText, Network, Dna, ChevronRight, ExternalLink } from 'lucide-svelte';
-    import type { Finding } from '../types';
+    import type { Finding } from '$lib/types/insights';
+    import RegionSelector from '../RegionSelector.svelte';
     
     export let finding: Finding;
+    let selectedRegionIndex = 0;
 
     // Helper to get all unique study IDs across all regions
     $: studyIds = [...new Set(
@@ -117,40 +119,61 @@
     </div>
 
     <!-- Region Details -->
-    {#if finding.provenance.associated_regions[0]}
+    {#if finding.provenance.associated_regions.length}
         <div class="bg-aeon-surface-1 p-4 rounded-lg">
             <h4 class="font-medium text-white flex items-center gap-2 mb-4">
                 <Dna class="h-4 w-4 text-aeon-primary" />
                 Genomic Context
             </h4>
+            {#if finding.provenance.associated_regions.length > 1}
+            <RegionSelector 
+                regions={finding.provenance.associated_regions}
+                bind:selectedIndex={selectedRegionIndex}
+                />
+            {/if}
             <div class="space-y-4">
                 <!-- Location Info -->
                 <div class="grid grid-cols-2 gap-4 text-sm">
-                    {#if finding.provenance.associated_regions[0].matched_probe}
+                    {#if finding.provenance.associated_regions[selectedRegionIndex].matched_probe}
                         <div>
                             <div class="text-gray-400">Probe ID</div>
                             <div class="font-medium text-white">
-                                {finding.provenance.associated_regions[0].matched_probe}
+                                {finding.provenance.associated_regions[selectedRegionIndex].matched_probe}
                             </div>
                         </div>
                     {/if}
-                    {#if finding.provenance.associated_regions[0].context}
+                    {#if finding.provenance.associated_regions[selectedRegionIndex].context}
                         <div>
                             <div class="text-gray-400">Genomic Context</div>
                             <div class="font-medium text-white">
-                                {finding.provenance.associated_regions[0].context}
+                                {finding.provenance.associated_regions[selectedRegionIndex].context}
                             </div>
                         </div>
                     {/if}
                 </div>
 
                 <!-- Region Description -->
-                {#if finding.provenance.associated_regions[0].description}
+                {#if finding.provenance.associated_regions[selectedRegionIndex].description}
                     <div>
                         <div class="text-sm text-gray-400 mb-2">Detailed Description</div>
                         <p class="text-sm text-aeon-biolum">
-                            {finding.provenance.associated_regions[0].description}
+                            {finding.provenance.associated_regions[selectedRegionIndex].description}
                         </p>
+                    </div>
+                {/if}
+
+                <!-- Modifying Factors -->
+                {#if finding.provenance.associated_regions[selectedRegionIndex].modifyingFactors?.length}
+                    <div>
+                        <div class="text-sm text-gray-400 mb-2">Modifying Factors</div>
+                        <div class="space-y-3">
+                            {#each finding.provenance.associated_regions[selectedRegionIndex].modifyingFactors as factor}
+                                <div class="bg-aeon-surface-0 p-3 rounded-lg">
+                                    <div class="text-sm font-medium text-white mb-1">{factor.factor}</div>
+                                    <p class="text-sm text-aeon-biolum">{factor.effect}</p>
+                                </div>
+                            {/each}
+                        </div>
                     </div>
                 {/if}
             </div>

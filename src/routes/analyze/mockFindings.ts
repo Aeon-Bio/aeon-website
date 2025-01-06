@@ -7,23 +7,23 @@ export const mockFindings = [
       "personally_associated_genes": [
         "NFKBIL2"
       ],
-      "summary": "Reduced inhibition of inflammatory signals in blood cells weakens response to anti-inflammatory medications",
+      "summary": "Reduced NF-kB inhibition in blood cells weakens response to anti-inflammatory medications",
       "direction": "hyper"
     },
-    "description": "Your blood cells show increased methylation of the NFKBIL2 gene, which normally acts to inhibit the NF-\u03baB pathway, a key regulator of inflammation. This change suggests that your cells may have a reduced ability to control inflammatory responses, potentially leading to a heightened inflammatory state. This pattern is important because it can affect how well your body responds to anti-inflammatory medications. The effect is most pronounced during periods of stress and can be modified by dietary choices. Regular exercise and stress management can help optimize your body's response.",
+    "description": "Your blood cells show increased methylation of the NFKBIL2 gene, which normally helps to keep inflammation in check. This change suggests that your cells may have a reduced ability to control inflammatory responses, potentially affecting how well you respond to anti-inflammatory medications. This pattern is commonly seen in individuals with chronic inflammation and can be particularly important if you require medications to manage inflammatory conditions. The effect is strongest during periods of stress and can be modified by specific dietary choices. Regular exercise and stress management can help optimize your body's response.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Inhibits NF-\u03baB signaling"
+        "Inhibitor of NF-kB signaling"
       ],
       "conservedPathways": [
-        "NF-\u03baB signaling pathway"
+        "NF-kB signaling pathway"
       ],
       "commonCellularRoles": [
         "Regulation of inflammation",
         "Immune response"
       ],
       "evolutionaryContext": "Highly conserved across species due to its role in fundamental immune processes.",
-      "tissueContext": "Expressed in various tissues, including immune cells and kidney cells.",
+      "tissueContext": "Expressed in immune cells and other tissues, with a primary role in regulating inflammation.",
       "regulatoryNetwork": {
         "upstream": [
           "Inflammatory cytokines",
@@ -33,7 +33,9 @@ export const mockFindings = [
           "Pro-inflammatory cytokine genes",
           "Adhesion molecule genes"
         ],
-        "feedback": []
+        "feedback": [
+          "Negative feedback loop with NF-kB"
+        ]
       }
     },
     "provenance": {
@@ -41,9 +43,10 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "NFKBIL2",
+          "gene_name": "NFKBIL2",
           "description": "Hypermethylation of the NFKBIL2 gene may lead to reduced expression of the NFKBIL2 protein, which is an inhibitor of NF-\u03baB. This could result in increased NF-\u03baB activity.",
-          "chromosome": "5",
-          "position": 133225798,
+          "chromosome": "10",
+          "position": 102948037,
           "context": "CpG island",
           "studyIds": [
             "10.1093/ndt/gft537"
@@ -52,10 +55,20 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.31488633652528125,
-            "siteMean": 0.018583243092883672,
-            "siteMedian": 0.018185329041443765,
             "zScore": 65.86123068491162,
-            "percentile": 100.0
+            "percentile": 100.0,
+            "delta_from_mean": 0.2963030934323976,
+            "z_score": 65.86123068491162,
+            "population_distribution": {
+              "q5": 0.00019417976218392142,
+              "q25": 0.004494221182540059,
+              "q75": 0.03153744246810675,
+              "q95": 0.035795620270073415,
+              "mean": 0.018583243092883672,
+              "median": 0.018185329041443765,
+              "std": 0.004836044701655431,
+              "mad": 0.0030385832069441676
+            }
           },
           "modifyingFactors": [
             {
@@ -92,55 +105,193 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Consume 400mg of curcumin with 5mg of piperine at 6pm to reduce NF-\u03baB activity through I\u03baB\u03b1 stabilization",
+        "recommendation": "Consume 200mg of quercetin with 500mg of bromelain daily to support NF-kB regulation",
         "lucideIcon": "leaf",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Curcumin can reduce NF-\u03baB activity by stabilizing I\u03baB\u03b1, which inhibits NF-\u03baB. Piperine enhances curcumin absorption, maximizing its effect on reducing inflammation.",
+        "rationale": "Quercetin and bromelain have anti-inflammatory properties that can help modulate NF-kB activity, potentially counteracting the effects of increased methylation at the NFKBIL2 gene.",
         "specificActions": [
-          "Take 400mg of curcumin with 5mg of piperine at 6pm daily."
+          "Take 200mg of quercetin with 500mg of bromelain in the morning with food."
         ],
         "monitoringMetrics": [
           {
             "metric": "hs-CRP levels",
-            "frequency": "Monthly",
-            "target": "Decrease"
+            "frequency": "Every 3 months",
+            "target": "Decrease in hs-CRP levels"
           }
         ],
         "contraindications": [
-          "Individuals with gallbladder disease",
-          "Those taking blood-thinning medications"
+          "Individuals with allergies to pineapple (bromelain) or quercetin.",
+          "Individuals taking blood thinners should consult their doctor before starting supplementation."
         ],
         "supportingEvidence": [
-          "Curcumin inhibits NF-\u03baB signaling.",
-          "Piperine enhances curcumin bioavailability."
+          "Quercetin and bromelain have been shown to have anti-inflammatory effects and can modulate NF-kB activity."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypermethylation of NFKBIL2 reduces its expression.",
-        "Reduced NFKBIL2 expression leads to increased NF-\u03baB activity.",
-        "Increased NF-\u03baB activity promotes inflammation."
+        "Hypermethylation of NFKBIL2 reduces its expression, leading to increased NF-kB activity.",
+        "Increased NF-kB activity promotes the production of pro-inflammatory cytokines."
       ],
       "functionalImpact": [
-        "Reduced inhibition of inflammatory pathways.",
-        "Weakened response to anti-inflammatory medications."
+        "Reduced ability to control inflammatory responses.",
+        "Potential for increased susceptibility to inflammatory conditions."
       ],
-      "healthRelevance": "This pattern is associated with a reduced ability to control inflammatory responses, potentially affecting the effectiveness of anti-inflammatory medications.",
+      "healthRelevance": "This methylation pattern is associated with a weakened response to anti-inflammatory medications, potentially affecting the management of inflammatory conditions.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "NFKBIL2 inhibits NF-\u03baB signaling.",
-          "NF-\u03baB is a key regulator of inflammation."
+          "NFKBIL2 is a known inhibitor of NF-kB signaling.",
+          "Hypermethylation of gene promoters typically reduces gene expression."
         ],
         "supportingStudies": [
-          "10.1093/ndt/gft537"
+          "Studies showing the role of NFKBIL2 in regulating inflammation.",
+          "Studies linking NF-kB activation to various inflammatory diseases."
         ],
         "biologicalContext": [
+          "NF-kB signaling pathway",
           "Inflammation",
-          "Immune response",
-          "Kidney function"
+          "Immune response"
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "POLR3GL"
+      ],
+      "personally_associated_genes": [
+        "POLR3GL"
+      ],
+      "summary": "Reduced RNA production in blood cells may weaken cellular stress response",
+      "direction": "hyper"
+    },
+    "description": "Your blood cells show reduced activity of the POLR3GL gene, which is involved in producing essential RNA molecules. This change can affect how well your cells respond to stress and maintain normal function. This pattern is commonly seen in some individuals and can be influenced by lifestyle factors. Regular exercise and a balanced diet may help support optimal cellular function.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "RNA polymerase III subunit",
+        "Transcription of small non-coding RNAs"
+      ],
+      "conservedPathways": [
+        "RNA polymerase III transcription",
+        "Cellular stress response"
+      ],
+      "commonCellularRoles": [
+        "Transcription",
+        "Cellular homeostasis"
+      ],
+      "evolutionaryContext": "Highly conserved across eukaryotes",
+      "tissueContext": "Ubiquitously expressed, including blood cells",
+      "regulatoryNetwork": {
+        "upstream": [],
+        "downstream": [
+          "RNA polymerase III",
+          "sncRNAs"
+        ],
+        "feedback": []
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": null,
+          "matched_gene": "POLR3GL",
+          "gene_name": "POLR3GL",
+          "description": "Decreased POLR3GL mRNA levels lead to decreased RPC7\u03b2 protein abundance, potentially reducing transcription of specific sncRNAs and suppressing cell growth and proliferation.",
+          "chromosome": null,
+          "position": null,
+          "context": null,
+          "studyIds": [
+            "10.3390/cancers15204995"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.7200000000000001,
+          "methylationMetrics": {
+            "value": 0.8372383713722229,
+            "zScore": 70.67113731148424,
+            "percentile": 100.0,
+            "delta_from_mean": 0.684957920662179,
+            "z_score": 70.67113731148424,
+            "population_distribution": {
+              "q5": 0.007736236089840531,
+              "q25": 0.016942694317549467,
+              "q75": 0.8878645449876785,
+              "q95": 0.9116795748472214,
+              "mean": 0.15228045071004395,
+              "median": 0.029595745727419853,
+              "std": 0.01541085127172324,
+              "mad": 0.007708308819149222
+            }
+          },
+          "modifyingFactors": []
+        }
+      ],
+      "studyContext": {
+        "primaryStudyId": "10.3390/cancers15204995",
+        "studyMetrics": [
+          {
+            "studyId": "10.3390/cancers15204995",
+            "totalSubjects": 409,
+            "studyPopulationSummary": [
+              {
+                "groupName": "TCGA_tumors",
+                "count": 409,
+                "description": "Tumor samples from The Cancer Genome Atlas (TCGA) across various cancer types"
+              }
+            ],
+            "populationContext": "TCGA samples include diverse demographics, but specific details are not provided in the paper.",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Engage in regular moderate-intensity exercise",
+        "lucideIcon": "activity",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Exercise can enhance cellular stress response pathways and improve overall cellular function, potentially counteracting the effects of reduced POLR3GL activity.",
+        "specificActions": [
+          "Aim for at least 150 minutes of moderate-intensity aerobic exercise per week.",
+          "Include activities like brisk walking, cycling, or swimming."
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Perceived energy levels",
+            "frequency": "Weekly",
+            "target": "Increased energy and reduced fatigue"
+          }
+        ],
+        "contraindications": [],
+        "supportingEvidence": [
+          "Exercise is known to improve cellular stress response and mitochondrial function."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "POLR3GL is a subunit of RNA polymerase III, essential for producing small non-coding RNAs.",
+        "Reduced POLR3GL activity can impair cellular stress response and overall cell function."
+      ],
+      "functionalImpact": [
+        "Decreased RNA production in blood cells"
+      ],
+      "healthRelevance": "Reduced cellular stress response may weaken the body's ability to cope with various stressors.",
+      "knowledgeBase": {
+        "establishedMechanisms": [
+          "POLR3GL is a key component of RNA polymerase III.",
+          "RNA polymerase III is essential for transcription of small non-coding RNAs."
+        ],
+        "supportingStudies": [
+          "Studies linking POLR3GL to cellular stress response and cell growth."
+        ],
+        "biologicalContext": [
+          "Cellular stress response",
+          "RNA transcription"
         ]
       }
     }
@@ -153,24 +304,25 @@ export const mockFindings = [
       "personally_associated_genes": [
         "ING1"
       ],
-      "summary": "Reduced tumor suppressor activity in blood cells weakens the body's ability to control abnormal cell growth",
+      "summary": "Reduced tumor suppressor activity in blood cells may impair cellular repair",
       "direction": "hyper"
     },
-    "description": "Your blood cells show increased methylation of the ING1 gene, which is involved in regulating cell growth and programmed cell death. This change reduces the activity of ING1, potentially impairing its ability to suppress tumor formation. This pattern is commonly seen in individuals with a history of viral infections and can be particularly important for maintaining healthy cell turnover. The effect is strongest during periods of stress and can be modified by lifestyle choices that support immune function. Regular exercise and a balanced diet can help optimize your body's natural defenses.",
+    "description": "Your blood cells show increased methylation of the ING1 gene, which is involved in tumor suppression and cellular repair. This change can reduce the activity of ING1, potentially affecting your body's ability to repair damaged cells. This pattern is commonly seen in some individuals and can be influenced by environmental factors. Maintaining a healthy lifestyle and reducing exposure to toxins may help support optimal cellular repair processes.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Tumor suppression"
+        "Tumor suppressor",
+        "Regulation of apoptosis"
       ],
       "conservedPathways": [
-        "Apoptosis",
-        "Cell cycle regulation"
+        "Apoptotic pathways",
+        "Cellular repair pathways"
       ],
       "commonCellularRoles": [
-        "Regulation of cell growth",
-        "Induction of programmed cell death"
+        "Cell cycle regulation",
+        "DNA repair"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in cellular processes.",
-      "tissueContext": "Expressed in various tissues, including blood cells, with a critical role in maintaining cellular homeostasis.",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Expressed in various tissues, including blood cells",
       "regulatoryNetwork": {
         "upstream": [
           "EBV latent proteins",
@@ -188,7 +340,8 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "ING1",
-          "description": "Increased DNA methylation at the ING1 promoter region.",
+          "gene_name": "ING1",
+          "description": "Increased DNA methylation at the ING1 promoter region reduces ING1 gene transcription, potentially inhibiting apoptosis and reducing tumor suppressor function.",
           "chromosome": null,
           "position": null,
           "context": "promoter",
@@ -199,16 +352,35 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.7010254263877869,
-            "siteMean": 0.10694344514137478,
-            "siteMedian": 0.10662436345968582,
-            "zScore": 64.5410167201569,
-            "percentile": 100.0
+            "zScore": 72.7312527894154,
+            "percentile": 100.0,
+            "delta_from_mean": 0.5940819812464121,
+            "z_score": 72.7312527894154,
+            "population_distribution": {
+              "q5": 3.714324466272956e-05,
+              "q25": 0.0025606530834920704,
+              "q75": 0.8754580914974213,
+              "q95": 0.8969836235046387,
+              "mean": 0.10694344514137478,
+              "median": 0.031195043120533228,
+              "std": 0.014715176487197293,
+              "mad": 0.006211918208282441
+            }
           },
           "modifyingFactors": [
             {
               "factor": "EBV infection",
               "effect": "Induces hypermethylation of the ING1 promoter, leading to reduced expression.",
-              "interventionPotential": "DNMT inhibitors may reverse this effect."
+              "interventionPotential": {
+                "method": "DNMT inhibitors",
+                "dosage": "50 \u00b5M 5'-azacytidine",
+                "timing": "During early EBV infection",
+                "duration": "Continuous treatment",
+                "contraindications": [
+                  "Myelosuppression",
+                  "Pregnancy"
+                ]
+              }
             }
           ]
         }
@@ -226,7 +398,7 @@ export const mockFindings = [
                 "description": "Primary peripheral blood mononuclear cells (PBMCs) from healthy donors"
               }
             ],
-            "populationContext": "Primary B-cells infected with EBV",
+            "populationContext": "Not specified",
             "effectSizes": []
           }
         ]
@@ -234,55 +406,51 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Consume 400mg sulforaphane daily to enhance cellular detoxification and support tumor suppressor activity",
+        "recommendation": "Consume a diet rich in antioxidants",
         "lucideIcon": "leaf",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Sulforaphane can promote the activity of tumor suppressor genes by modulating epigenetic marks and enhancing cellular detoxification pathways.",
+        "rationale": "Antioxidants can help protect cells from damage and support cellular repair processes, potentially counteracting the effects of reduced ING1 activity.",
         "specificActions": [
-          "Include cruciferous vegetables (broccoli, kale, cabbage) in your daily diet.",
-          "Consider a sulforaphane supplement if dietary intake is insufficient."
+          "Include a variety of fruits and vegetables in your diet, especially those rich in vitamins C and E.",
+          "Consider incorporating foods like berries, leafy greens, and nuts."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Markers of inflammation",
-            "frequency": "Every 3 months",
-            "target": "Reduced levels"
-          },
-          {
-            "metric": "Cellular stress markers",
-            "frequency": "Every 3 months",
-            "target": "Reduced levels"
+            "metric": "Dietary intake of antioxidants",
+            "frequency": "Daily",
+            "target": "Increased consumption of antioxidant-rich foods"
           }
         ],
-        "contraindications": [
-          "Individuals with thyroid disorders should consult a healthcare provider before taking sulforaphane supplements."
-        ],
+        "contraindications": [],
         "supportingEvidence": [
-          "Sulforaphane has been shown to modulate DNA methylation patterns.",
-          "Sulforaphane can activate Nrf2, a key regulator of cellular detoxification."
+          "Antioxidants are known to protect cells from damage and support cellular repair."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Increased methylation at the ING1 promoter region reduces gene transcription.",
-        "Reduced ING1 protein levels impair the cell's ability to undergo apoptosis."
+        "ING1 is a tumor suppressor gene involved in regulating apoptosis and cellular repair.",
+        "Increased methylation of the ING1 promoter region can reduce its expression and activity."
       ],
       "functionalImpact": [
-        "Reduced tumor suppressor function in blood cells."
+        "Reduced tumor suppressor function",
+        "Impaired cellular repair"
       ],
-      "healthRelevance": "This pattern is associated with a weakened ability to control abnormal cell growth, potentially increasing susceptibility to certain health conditions.",
+      "healthRelevance": "Reduced tumor suppressor activity may increase susceptibility to cellular damage and impair the body's ability to repair damaged cells.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation at promoter regions is a known mechanism for transcriptional repression."
+          "ING1 is a tumor suppressor gene.",
+          "ING1 regulates apoptosis and cellular repair."
         ],
         "supportingStudies": [
-          "Studies showing increased ING1 methylation in EBV-infected cells."
+          "Studies linking ING1 methylation to reduced tumor suppressor activity."
         ],
         "biologicalContext": [
-          "ING1 is a tumor suppressor gene involved in cell cycle regulation and apoptosis."
+          "Tumor suppression",
+          "Apoptosis",
+          "Cellular repair"
         ]
       }
     }
@@ -298,24 +466,25 @@ export const mockFindings = [
       "personally_associated_genes": [
         "TRADD"
       ],
-      "summary": "Reduced inflammatory signaling in blood cells impairs the body's ability to respond to stress and injury",
+      "summary": "Reduced inflammatory signaling in blood cells may weaken response to infections",
       "direction": "hyper"
     },
-    "description": "Your blood cells show reduced expression of genes involved in the TNF receptor signaling pathway, which is crucial for managing inflammation and responding to cellular stress. This change may weaken your body's ability to initiate appropriate inflammatory responses, potentially affecting wound healing and tissue repair. This pattern is commonly seen in individuals with a history of chronic inflammation and can be particularly important for maintaining healthy tissue function. The effect is strongest during periods of physical stress and can be modified by lifestyle choices that support immune function. Regular exercise and a balanced diet can help optimize your body's response to injury.",
+    "description": "Your blood cells show reduced activity of genes involved in inflammatory signaling, specifically TRADD, TRAF2, TNFRSF1A, and TNFRSF1B. These genes are important for your immune system's response to infections and tissue damage. This change can affect how well your body responds to inflammatory signals, potentially weakening your defense against infections. This pattern is commonly seen in some individuals and can be influenced by lifestyle factors. Maintaining a balanced diet and managing stress may help support optimal immune function.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "TNF receptor signaling"
+        "TNF receptor signaling",
+        "Inflammatory response"
       ],
       "conservedPathways": [
-        "Inflammatory signaling",
-        "Cellular stress response"
+        "TNF receptor pathway",
+        "Immune signaling pathways"
       ],
       "commonCellularRoles": [
-        "Regulation of inflammatory responses",
-        "Mediation of cellular responses to stress"
+        "Immune cell activation",
+        "Cellular stress response"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in immune and stress responses.",
-      "tissueContext": "Expressed in various tissues, including blood cells, with a critical role in maintaining tissue homeostasis.",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Expressed in various tissues, including blood cells",
       "regulatoryNetwork": {
         "upstream": [
           "CAV1"
@@ -329,7 +498,8 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "TRADD",
-          "description": "Downregulation of TRADD, TRAF2, TNFRSF1A, and TNFRSF1B expression impairs TNF receptor signaling.",
+          "gene_name": "TRADD",
+          "description": "Downregulation of TRADD, TRAF2, TNFRSF1A, and TNFRSF1B expression impairs TNF receptor signaling, potentially dysregulating inflammatory responses and cellular responses to stress.",
           "chromosome": null,
           "position": null,
           "context": null,
@@ -340,10 +510,20 @@ export const mockFindings = [
           "matchStrength": 0.7200000000000001,
           "methylationMetrics": {
             "value": 0.6330887079238892,
-            "siteMean": 0.0779153324994732,
-            "siteMedian": 0.07750809094046845,
-            "zScore": 63.87841414154186,
-            "percentile": 100.0
+            "zScore": 68.31863165839032,
+            "percentile": 100.0,
+            "delta_from_mean": 0.5551733754244159,
+            "z_score": 68.31863165839032,
+            "population_distribution": {
+              "q5": 0.0061281708301976325,
+              "q25": 0.012311307014897466,
+              "q75": 0.6622652858495712,
+              "q95": 0.6896880090236663,
+              "mean": 0.0779153324994732,
+              "median": 0.038889430463314056,
+              "std": 0.012002636523915436,
+              "mad": 0.0058664437931250125
+            }
           },
           "modifyingFactors": []
         }
@@ -366,7 +546,7 @@ export const mockFindings = [
                 "description": "Healthy individuals, unaffected relatives from patients of the rare childhood disorder center"
               }
             ],
-            "populationContext": "Patient with progeroid syndrome and healthy controls",
+            "populationContext": "case_ethnicity: Caucasian, control_age_mean: 46.5, control_sex: 2 male, 2 female",
             "effectSizes": []
           }
         ]
@@ -374,55 +554,50 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Engage in 30 minutes of moderate-intensity exercise daily to enhance inflammatory response and improve tissue repair",
-        "lucideIcon": "activity",
+        "recommendation": "Maintain a balanced diet with adequate protein intake",
+        "lucideIcon": "carrot",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Regular moderate-intensity exercise can stimulate the TNF receptor signaling pathway, promoting a balanced inflammatory response and improving tissue repair mechanisms.",
+        "rationale": "Adequate protein intake supports immune cell function and the production of inflammatory signaling molecules, potentially counteracting the effects of reduced TRADD, TRAF2, TNFRSF1A, and TNFRSF1B activity.",
         "specificActions": [
-          "Incorporate activities such as brisk walking, cycling, or swimming into your daily routine.",
-          "Aim for at least 150 minutes of moderate-intensity exercise per week."
+          "Include lean protein sources in each meal, such as poultry, fish, beans, and lentils.",
+          "Ensure a balanced intake of essential amino acids."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Inflammatory markers",
-            "frequency": "Every 3 months",
-            "target": "Balanced levels"
-          },
-          {
-            "metric": "Wound healing time",
-            "frequency": "As needed",
-            "target": "Faster recovery"
+            "metric": "Dietary protein intake",
+            "frequency": "Daily",
+            "target": "Adequate protein consumption"
           }
         ],
-        "contraindications": [
-          "Individuals with severe joint pain or cardiovascular conditions should consult a healthcare provider before starting a new exercise program."
-        ],
+        "contraindications": [],
         "supportingEvidence": [
-          "Exercise has been shown to modulate inflammatory pathways.",
-          "Regular physical activity can improve tissue repair and wound healing."
+          "Protein is essential for immune cell function and the production of inflammatory signaling molecules."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Downregulation of TRADD, TRAF2, TNFRSF1A, and TNFRSF1B impairs TNF receptor signaling.",
-        "Reduced protein levels due to decreased expression."
+        "TRADD, TRAF2, TNFRSF1A, and TNFRSF1B are key components of the TNF receptor signaling pathway.",
+        "Reduced expression of these genes can impair inflammatory responses and cellular stress responses."
       ],
       "functionalImpact": [
-        "Impaired inflammatory responses and cellular responses to stress."
+        "Reduced inflammatory signaling in blood cells"
       ],
-      "healthRelevance": "This pattern is associated with a weakened ability to respond to stress and injury, potentially affecting wound healing and tissue repair.",
+      "healthRelevance": "Reduced inflammatory signaling may weaken the body's ability to respond to infections and tissue damage.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "TRADD, TRAF2, TNFRSF1A, and TNFRSF1B are key components of the TNF receptor signaling pathway."
+          "TRADD, TRAF2, TNFRSF1A, and TNFRSF1B are involved in TNF receptor signaling.",
+          "TNF receptor signaling is crucial for immune cell activation and inflammatory responses."
         ],
         "supportingStudies": [
-          "Studies showing downregulation of these genes in progeroid syndromes."
+          "Studies linking downregulation of these genes to impaired inflammatory responses."
         ],
         "biologicalContext": [
-          "The TNF receptor pathway is crucial for inflammation and cellular stress responses."
+          "TNF receptor pathway",
+          "Inflammatory signaling",
+          "Immune response"
         ]
       }
     }
@@ -430,34 +605,35 @@ export const mockFindings = [
   {
     "pattern": {
       "gene_list": [
-        "POLR3GL"
+        "HDAC11"
       ],
       "personally_associated_genes": [
-        "POLR3GL"
+        "HDAC11"
       ],
-      "summary": "Reduced RNA polymerase activity in blood cells may enhance cellular protection and reduce the risk of abnormal cell growth",
+      "summary": "Reduced immune cell differentiation in blood may weaken immune response",
       "direction": "hyper"
     },
-    "description": "Your blood cells show reduced expression of POLR3GL, a component of RNA polymerase III, which is involved in the production of small non-coding RNAs. This change may reduce the activity of RNA polymerase III, potentially enhancing cellular protection and reducing the risk of abnormal cell growth. This pattern is commonly seen in individuals with a history of chronic stress and can be particularly important for maintaining healthy cell function. The effect is strongest during periods of high cellular activity and can be modified by lifestyle choices that support cellular health. Regular exercise and a balanced diet can help optimize your body's natural defenses.",
+    "description": "Your blood cells show reduced activity of the HDAC11 gene, which is involved in the differentiation of immune cells. This change can affect how well your immune cells mature and function, potentially weakening your body's ability to fight off infections and other threats. This pattern is commonly seen in some individuals and can be influenced by lifestyle factors. Maintaining a healthy lifestyle and reducing exposure to toxins may help support optimal immune cell differentiation.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "RNA polymerase III activity"
+        "Histone deacetylase",
+        "Regulation of myeloid cell differentiation"
       ],
       "conservedPathways": [
-        "Transcription pathways",
-        "Cell growth pathways"
+        "Histone acetylation pathways",
+        "Myeloid differentiation pathways"
       ],
       "commonCellularRoles": [
-        "Production of small non-coding RNAs",
-        "Regulation of cell growth and proliferation"
+        "Epigenetic regulation",
+        "Immune cell development"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in cellular processes.",
-      "tissueContext": "Expressed in various tissues, including blood cells, with a critical role in maintaining cellular homeostasis.",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Expressed in myeloid cells, including blood cells",
       "regulatoryNetwork": {
         "upstream": [],
         "downstream": [
-          "RNA polymerase III",
-          "sncRNAs"
+          "histone acetylation",
+          "gene expression"
         ],
         "feedback": []
       }
@@ -466,60 +642,53 @@ export const mockFindings = [
       "associated_regions": [
         {
           "matched_probe": null,
-          "matched_gene": "POLR3GL",
-          "description": "Decreased POLR3GL mRNA levels lead to decreased RPC7\u03b2 protein abundance.",
+          "matched_gene": "HDAC11",
+          "gene_name": "HDAC11",
+          "description": "Decreased expression of HDAC11 during the transition of immature myeloid cells to MDSCs, potentially altering histone acetylation patterns and promoting MDSC differentiation and immunosuppressive function.",
           "chromosome": null,
           "position": null,
           "context": null,
           "studyIds": [
-            "10.3390/cancers15204995"
+            "10.18632/oncotarget.10767"
           ],
           "direction": "hyper",
-          "matchStrength": 0.7200000000000001,
+          "matchStrength": 0.56,
           "methylationMetrics": {
-            "value": 0.8372383713722229,
-            "siteMean": 0.15228045071004395,
-            "siteMedian": 0.15201718134007283,
-            "zScore": 59.95889675936686,
-            "percentile": 100.0
+            "value": 0.7900786399841309,
+            "zScore": 67.55687780206937,
+            "percentile": 100.0,
+            "delta_from_mean": 0.5740924365463227,
+            "z_score": 67.55687780206937,
+            "population_distribution": {
+              "q5": 0.005350254406221211,
+              "q25": 0.010582254035398364,
+              "q75": 0.842604786157608,
+              "q95": 0.8804030567407607,
+              "mean": 0.2159862034378082,
+              "median": 0.05205853842198849,
+              "std": 0.015165524847329317,
+              "mad": 0.007368525229394436
+            }
           },
-          "modifyingFactors": []
+          "modifyingFactors": [
+            {
+              "factor": "HDAC11 expression",
+              "effect": "Decreased HDAC11 expression is required for MDSC differentiation.",
+              "interventionPotential": {
+                "method": "HDAC11 inhibition"
+              }
+            }
+          ]
         }
       ],
       "studyContext": {
-        "primaryStudyId": "10.3390/cancers15204995",
+        "primaryStudyId": "10.18632/oncotarget.10767",
         "studyMetrics": [
           {
-            "studyId": "10.3390/cancers15204995",
-            "totalSubjects": 409,
-            "studyPopulationSummary": [
-              {
-                "groupName": "TCGA_tumors",
-                "count": 409,
-                "description": "Tumor samples from The Cancer Genome Atlas (TCGA) across various cancer types"
-              },
-              {
-                "groupName": "THP-1_cells",
-                "count": "Not specified",
-                "description": "Human monocytic cell line"
-              },
-              {
-                "groupName": "HEK293T_cells",
-                "count": "Not specified",
-                "description": "Human embryonic kidney cell line"
-              },
-              {
-                "groupName": "A549_cells",
-                "count": "Not specified",
-                "description": "Human lung adenocarcinoma cell line"
-              },
-              {
-                "groupName": "H1-hESCs",
-                "count": "Not specified",
-                "description": "Human embryonic stem cells"
-              }
-            ],
-            "populationContext": "Tumor samples and cell lines",
+            "studyId": "10.18632/oncotarget.10767",
+            "totalSubjects": null,
+            "studyPopulationSummary": [],
+            "populationContext": "Not applicable",
             "effectSizes": []
           }
         ]
@@ -527,54 +696,50 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Practice mindfulness and stress-reduction techniques daily to support cellular health and reduce abnormal cell growth",
-        "lucideIcon": "heart",
+        "recommendation": "Prioritize sufficient sleep",
+        "lucideIcon": "moon",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Chronic stress can dysregulate cellular processes, and mindfulness can help restore balance and promote healthy cell function.",
+        "rationale": "Adequate sleep is essential for immune cell maturation and function, potentially counteracting the effects of reduced HDAC11 activity.",
         "specificActions": [
-          "Incorporate daily meditation or deep breathing exercises into your routine.",
-          "Practice mindfulness during daily activities to reduce stress levels."
+          "Aim for 7-9 hours of quality sleep per night.",
+          "Establish a regular sleep schedule."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Stress levels",
+            "metric": "Sleep duration and quality",
             "frequency": "Daily",
-            "target": "Reduced levels"
-          },
-          {
-            "metric": "Markers of cellular stress",
-            "frequency": "Every 3 months",
-            "target": "Reduced levels"
+            "target": "Consistent sleep patterns and improved sleep quality"
           }
         ],
         "contraindications": [],
         "supportingEvidence": [
-          "Mindfulness and stress reduction techniques have been shown to positively impact cellular health.",
-          "Chronic stress can dysregulate cellular processes, including RNA polymerase activity."
+          "Sleep is essential for immune cell maturation and function."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Decreased POLR3GL mRNA levels lead to decreased RPC7\u03b2 protein abundance.",
-        "Altered RNA polymerase III activity may reduce transcription of specific sncRNAs."
+        "HDAC11 is a histone deacetylase involved in regulating gene expression and cell differentiation.",
+        "Reduced HDAC11 expression can alter histone acetylation patterns and affect immune cell differentiation."
       ],
       "functionalImpact": [
-        "Potentially reduced transcription of specific sncRNAs.",
-        "Suppression of cell growth and proliferation."
+        "Reduced immune cell differentiation in blood"
       ],
-      "healthRelevance": "This pattern is associated with enhanced cellular protection and reduced risk of abnormal cell growth, potentially contributing to better overall health.",
+      "healthRelevance": "Reduced immune cell differentiation may weaken the body's ability to fight off infections and other threats.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "POLR3GL is a subunit of RNA polymerase III, which is essential for the production of small non-coding RNAs."
+          "HDAC11 is a histone deacetylase.",
+          "HDAC11 regulates myeloid cell differentiation."
         ],
         "supportingStudies": [
-          "Studies showing that low POLR3GL expression is associated with favorable outcomes in multiple cancers."
+          "Studies linking HDAC11 to immune cell differentiation and function."
         ],
         "biologicalContext": [
-          "RNA polymerase III is involved in the transcription of small non-coding RNAs, which play a role in cell growth and proliferation."
+          "Myeloid differentiation",
+          "Epigenetic regulation",
+          "Immune response"
         ]
       }
     }
@@ -588,24 +753,25 @@ export const mockFindings = [
       "personally_associated_genes": [
         "NKIRAS1"
       ],
-      "summary": "Reduced regulation of inflammatory signals in blood cells may weaken the body's ability to control airway inflammation",
+      "summary": "Reduced inflammatory regulation in blood may increase susceptibility to respiratory issues",
       "direction": "hyper"
     },
-    "description": "Your blood cells show increased methylation of the NKIRAS1 gene, which is involved in regulating inflammatory responses. This change may reduce the activity of NKIRAS1, potentially impairing its ability to control inflammatory signals, particularly in the airways. This pattern is commonly seen in individuals with a history of respiratory issues and can be particularly important for maintaining healthy lung function. The effect is strongest during periods of respiratory stress and can be modified by lifestyle choices that support lung health. Regular exercise and avoiding respiratory irritants can help optimize your body's response to airway inflammation.",
+    "description": "Your blood cells show increased methylation of the NKIRAS1 gene, which is involved in regulating inflammation. This change can affect how well your immune system responds to respiratory infections and other inflammatory triggers. This pattern is commonly seen in some individuals and can be influenced by environmental factors. Maintaining a healthy lifestyle and avoiding respiratory irritants may help support optimal immune function.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Regulation of NF-kB signaling"
+        "Regulation of NF-kB signaling",
+        "Inflammatory cytokine production"
       ],
       "conservedPathways": [
-        "Inflammatory signaling pathways",
+        "NF-kB signaling pathway",
         "Immune response pathways"
       ],
       "commonCellularRoles": [
-        "Regulation of inflammatory cytokine production",
-        "Control of immune cell activation"
+        "Immune cell activation",
+        "Inflammatory response"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in immune regulation.",
-      "tissueContext": "Expressed in various tissues, including immune cells and lung epithelial cells, with a critical role in maintaining respiratory health.",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Expressed in immune cells and lung epithelial cells",
       "regulatoryNetwork": {
         "upstream": [],
         "downstream": [
@@ -620,7 +786,8 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "NKIRAS1",
-          "description": "Hypermethylation of the RPL15 and NKIRAS1 genes, potentially leading to decreased expression of these genes.",
+          "gene_name": "NKIRAS1",
+          "description": "Hypermethylation of the RPL15 and NKIRAS1 genes, potentially leading to decreased expression of these genes, altered regulation of NF-kB signaling, and dysregulation of inflammatory cytokine production.",
           "chromosome": null,
           "position": null,
           "context": "TSS1500; 5'UTR",
@@ -631,10 +798,20 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.7269379496574402,
-            "siteMean": 0.09893092567736858,
-            "siteMedian": 0.09834523199824616,
-            "zScore": 59.58962749820838,
-            "percentile": 100.0
+            "zScore": 66.10920667879985,
+            "percentile": 100.0,
+            "delta_from_mean": 0.6280070239800716,
+            "z_score": 66.10920667879985,
+            "population_distribution": {
+              "q5": 5.0476091746531903e-05,
+              "q25": 0.003145380294881761,
+              "q75": 0.8077757805585861,
+              "q95": 0.8493043690919876,
+              "mean": 0.09893092567736858,
+              "median": 0.029572189319878817,
+              "std": 0.017774557504005528,
+              "mad": 0.007115093781612814
+            }
           },
           "modifyingFactors": []
         }
@@ -662,64 +839,62 @@ export const mockFindings = [
                 "description": "Children with complete recovery after RSV infection"
               }
             ],
-            "populationContext": "Children with different respiratory outcomes after RSV infection",
-            "effectSizes": []
+            "populationContext": "sex_male_CR-RSV: 17 (60.7%), sex_male_RW/AS-RSV: 28 (70.0%), age_in_months_mean_CR-RSV: 7.14 [5.32], age_in_months_mean_RW/AS-RSV: 5.85[3.62], ethnicity_western_europe_CR-RSV: 24 (85.7%), ethnicity_western_europe_RW/AS-RSV: 36 (90.0%), ethnicity_southern_europe_CR-RSV: 2 (7.1%), ethnicity_southern_europe_RW/AS-RSV: 1 (2.5%), ethnicity_southern_america_CR-RSV: 1 (3.6%), ethnicity_southern_america_RW/AS-RSV: 0, ethnicity_roma_CR-RSV: 0, ethnicity_roma_RW/AS-RSV: 3 (7.5%), ethnicity_other_CR-RSV: 1 (3.6%), ethnicity_other_RW/AS-RSV: 0, rsv_infection_CR-RSV: 28 (100.0%), rsv_infection_RW/AS-RSV: 40 (100.0%), premature_CR-RSV: 4 (14.3%), premature_RW/AS-RSV: 4 (10.0%), atopic_dermatitis_CR-RSV: 2 (7.1%), atopic_dermatitis_RW/AS-RSV: 13 (32.5%), alimentary_allergies_CR-RSV: 1 (3.6%), alimentary_allergies_RW/AS-RSV: 5 (12.5%), stational_allergies_CR-RSV: 0, stational_allergies_RW/AS-RSV: 2 (5.0%), asthma_CR-RSV: 0, asthma_RW/AS-RSV: 0, admissions_prior_to_rsv_CR-RSV: 10 (35.7%), admissions_prior_to_rsv_RW/AS-RSV: 12 (27.0%), annual_bronchitis_prior_the_rsv_CR-RSV: 3 (10.7%), annual_bronchitis_prior_the_rsv_RW/AS-RSV: 14 (35.0%), family_history_asthma_CR-RSV: 4 (14.3%), family_history_asthma_RW/AS-RSV: 15 (37.5%), family_history_respiratory_problems_CR-RSV: 5 (17.9%), family_history_respiratory_problems_RW/AS-RSV: 15 (37.5%), respiratory_distress_mild_CR-RSV: 8 (28.6%), respiratory_distress_mild_RW/AS-RSV: 4 (10.0%), respiratory_distress_moderate_CR-RSV: 16 (57.1%), respiratory_distress_moderate_RW/AS-RSV: 29 (72.5%), respiratory_distress_severe_CR-RSV: 4 (14.3%), respiratory_distress_severe_RW/AS-RSV: 7 (17.5%), oxygen_requirement_CR-RSV: 23 (82.1%), oxygen_requirement_RW/AS-RSV: 25 (62.5%), respiratory_support_non_invasive_CR-RSV: 3 (10.7%), respiratory_support_non_invasive_RW/AS-RSV: 8 (20%), respiratory_support_mechanical_CR-RSV: 2 (7.1%), respiratory_support_mechanical_RW/AS-RSV: 0, diagnosis_bronchiolitis_CR-RSV: 25 (89.3%), diagnosis_bronchiolitis_RW/AS-RSV: 31 (77.5%), diagnosis_bronchospasm_CR-RSV: 0, diagnosis_bronchospasm_RW/AS-RSV: 1 (2.5%), diagnosis_pneumonia_CR-RSV: 2 (7.1%), diagnosis_pneumonia_RW/AS-RSV: 2 (5.0%), diagnosis_other_CR-RSV: 1 (3.6), diagnosis_other_RW/AS-RSV: 6 (15.0%), bacterial_superinfection_suspected_CR-RSV: 20 (71.4%), bacterial_superinfection_suspected_RW/AS-RSV: 12 (30.0%), follow_up_3_years_CR-RSV: 5 (17.9%), follow_up_3_years_RW/AS-RSV: 11 (27.5%), hospital_admission_CR-RSV: 7 (25%), hospital_admission_RW/AS-RSV: 37 (92.5%), additional_episodes_of_bronchiolitis_CR-RSV: 0, additional_episodes_of_bronchiolitis_RW/AS-RSV: 0",
+            "effectSizes": [
+              0.115
+            ]
           }
         ]
       }
     },
     "recommendations": [
       {
-        "recommendation": "Incorporate 20 minutes of daily deep breathing exercises to improve lung function and reduce airway inflammation",
-        "lucideIcon": "wind",
+        "recommendation": "Incorporate regular aerobic exercise to enhance immune function",
+        "lucideIcon": "activity",
         "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Deep breathing exercises can help regulate inflammatory responses in the airways and improve lung capacity.",
+        "source": "outcome",
+        "rationale": "Aerobic exercise can modulate immune cell activity and reduce inflammation, potentially counteracting the effects of increased NKIRAS1 methylation.",
         "specificActions": [
-          "Practice diaphragmatic breathing techniques daily.",
-          "Focus on slow, deep breaths to maximize lung expansion."
+          "Engage in at least 30 minutes of moderate-intensity aerobic exercise most days of the week.",
+          "Include activities such as brisk walking, jogging, cycling, or swimming."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Respiratory rate",
-            "frequency": "Daily",
-            "target": "Reduced rate"
-          },
-          {
-            "metric": "Airway inflammation markers",
+            "metric": "Respiratory infection frequency",
             "frequency": "Every 3 months",
-            "target": "Reduced levels"
+            "target": "Reduced frequency of respiratory infections"
           }
         ],
         "contraindications": [
-          "Individuals with severe respiratory conditions should consult a healthcare provider before starting new breathing exercises."
+          "Acute illness",
+          "Severe cardiovascular conditions"
         ],
         "supportingEvidence": [
-          "Deep breathing exercises have been shown to reduce inflammation in the airways.",
-          "Regular breathing exercises can improve lung function and capacity."
+          "Studies show that regular aerobic exercise can improve immune function and reduce inflammation."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypermethylation of the NKIRAS1 gene may lead to decreased expression.",
-        "Decreased NKIRAS1 protein levels may alter regulation of NF-kB signaling."
+        "NKIRAS1 regulates NF-kB, a key transcription factor in inflammation.",
+        "Hypermethylation of NKIRAS1 may lead to decreased expression, potentially dysregulating inflammatory responses."
       ],
       "functionalImpact": [
-        "Dysregulation of inflammatory cytokine production.",
-        "Promotion of airway inflammation and hyperresponsiveness."
+        "Decreased NKIRAS1 expression may lead to dysregulation of inflammatory cytokine production."
       ],
-      "healthRelevance": "This pattern is associated with a weakened ability to control airway inflammation, potentially increasing susceptibility to respiratory issues.",
+      "healthRelevance": "This methylation pattern may increase susceptibility to respiratory issues by weakening the immune response to infections.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "NKIRAS1 regulates the nuclear factor 'kappa-light-chain-enhancer' of activated B-cells (NF-kB), a key transcription factor in inflammation."
+          "NKIRAS1 regulates NF-kB signaling, which is crucial for inflammatory responses."
         ],
         "supportingStudies": [
-          "Studies showing the role of NKIRAS1 in regulating inflammatory cytokine production."
+          "Study 10.3389/fimmu.2022.875691 shows hypermethylation of NKIRAS1 in children with recurrent wheezing after RSV infection."
         ],
         "biologicalContext": [
-          "NKIRAS1 is a regulator of NF-kB, a key transcription factor in inflammation."
+          "Inflammation",
+          "Immune response",
+          "Respiratory health"
         ]
       }
     }
@@ -727,36 +902,36 @@ export const mockFindings = [
   {
     "pattern": {
       "gene_list": [
-        "HDAC11"
+        "MME"
       ],
       "personally_associated_genes": [
-        "HDAC11"
+        "MME"
       ],
-      "summary": "Reduced immune cell differentiation in blood may weaken the body's ability to suppress inflammation",
+      "summary": "Increased peptide degradation in blood cells may reduce the effectiveness of certain medications",
       "direction": "hyper"
     },
-    "description": "Your blood cells show reduced expression of HDAC11, a protein involved in regulating gene activity through histone modification. This change may impair the normal differentiation of immune cells, potentially weakening the body's ability to suppress inflammation. This pattern is commonly seen in individuals with a history of chronic inflammation and can be particularly important for maintaining a balanced immune response. The effect is strongest during periods of immune activation and can be modified by lifestyle choices that support immune function. Regular exercise and a balanced diet can help optimize your body's immune response.",
+    "description": "Your blood cells show increased activity of the MME gene, which is involved in breaking down peptides. This change can affect how your body processes certain medications, particularly those that are peptide-based or rely on specific peptide signaling pathways. This pattern is commonly seen and can be influenced by neurotransmitter levels and dietary factors. Maintaining a balanced diet and managing stress may help optimize your body's response to medications.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Histone deacetylation"
+        "Peptide degradation"
       ],
       "conservedPathways": [
-        "Histone acetylation pathways",
-        "Myeloid differentiation pathways"
+        "Peptide degradation pathways"
       ],
       "commonCellularRoles": [
-        "Regulation of gene expression",
-        "Modulation of cell differentiation"
+        "Regulation of peptide signaling",
+        "Drug metabolism"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in epigenetic regulation.",
-      "tissueContext": "Expressed in various tissues, including myeloid cells, with a critical role in immune cell development.",
+      "evolutionaryContext": "Highly conserved across species due to its role in basic cellular processes.",
+      "tissueContext": "Primarily active in blood cells, but also present in other tissues.",
       "regulatoryNetwork": {
         "upstream": [
-          "unknown"
+          "DNMTs",
+          "Neurotransmitter imbalances"
         ],
         "downstream": [
-          "histone acetylation",
-          "gene expression"
+          "Peptide substrates",
+          "Cell signaling proteins"
         ],
         "feedback": []
       }
@@ -765,40 +940,62 @@ export const mockFindings = [
       "associated_regions": [
         {
           "matched_probe": null,
-          "matched_gene": "HDAC11",
-          "description": "Decreased expression of HDAC11 during the transition of immature myeloid cells to MDSCs.",
+          "matched_gene": "MME",
+          "gene_name": "MME",
+          "description": "Hypermethylation of the MME promoter region leads to increased transcriptional activity and increased mRNA expression, potentially through altered chromatin structure or transcription factor binding.",
           "chromosome": null,
           "position": null,
-          "context": null,
+          "context": "promoter",
           "studyIds": [
-            "10.18632/oncotarget.10767"
+            "10.3892/or.2015.3993"
           ],
           "direction": "hyper",
-          "matchStrength": 0.56,
+          "matchStrength": 0.9,
           "methylationMetrics": {
-            "value": 0.7900786399841309,
-            "siteMean": 0.2159862034378082,
-            "siteMedian": 0.2156858361698687,
-            "zScore": 52.57876360756651,
-            "percentile": 100.0
+            "value": 0.8079359531402588,
+            "zScore": 60.89192581184116,
+            "percentile": 100.0,
+            "delta_from_mean": 0.6955154820786139,
+            "z_score": 60.89192581184116,
+            "population_distribution": {
+              "q5": 0.0039054177468642605,
+              "q25": 0.01062086969614029,
+              "q75": 0.8347938507795334,
+              "q95": 0.8681221276521682,
+              "mean": 0.11242047106164486,
+              "median": 0.04330078698694706,
+              "std": 0.018489596724197904,
+              "mad": 0.00846986546564628
+            }
           },
           "modifyingFactors": [
             {
-              "factor": "HDAC11 expression",
-              "effect": "Decreased HDAC11 expression is required for MDSC differentiation.",
-              "interventionPotential": "HDAC11 inhibition may reverse this effect."
+              "factor": "Neurotransmitter imbalance",
+              "effect": "Imbalances in neurotransmitter levels may induce DNA methylation at the MME promoter, leading to increased expression.",
+              "interventionPotential": "Neurotransmitter regulation"
             }
           ]
         }
       ],
       "studyContext": {
-        "primaryStudyId": "10.18632/oncotarget.10767",
+        "primaryStudyId": "10.3892/or.2015.3993",
         "studyMetrics": [
           {
-            "studyId": "10.18632/oncotarget.10767",
-            "totalSubjects": null,
-            "studyPopulationSummary": [],
-            "populationContext": "Review article summarizing findings on epigenetic modifications in myeloid-derived suppressor cells (MDSCs) in cancer",
+            "studyId": "10.3892/or.2015.3993",
+            "totalSubjects": 110,
+            "studyPopulationSummary": [
+              {
+                "groupName": "tumor",
+                "count": 55,
+                "description": "Colorectal carcinoma tissue"
+              },
+              {
+                "groupName": "normal",
+                "count": 55,
+                "description": "Adjacent normal epithelial cells"
+              }
+            ],
+            "populationContext": "Colorectal cancer patients",
             "effectSizes": []
           }
         ]
@@ -806,56 +1003,215 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Consume 200mg of curcumin daily to modulate immune cell differentiation and support a balanced inflammatory response",
-        "lucideIcon": "sun",
+        "recommendation": "Maintain consistent neurotransmitter levels through stress management and regular sleep",
+        "lucideIcon": "brain",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Curcumin has been shown to modulate histone acetylation and can support the proper differentiation of immune cells, promoting a balanced inflammatory response.",
+        "rationale": "Neurotransmitter imbalances can induce DNA methylation at the MME promoter, leading to increased expression. Stabilizing neurotransmitter levels may help regulate MME activity.",
         "specificActions": [
-          "Include turmeric in your daily diet.",
-          "Consider a curcumin supplement if dietary intake is insufficient."
+          "Practice mindfulness or meditation daily",
+          "Aim for 7-9 hours of sleep per night",
+          "Engage in regular physical activity"
         ],
         "monitoringMetrics": [
           {
-            "metric": "Inflammatory markers",
-            "frequency": "Every 3 months",
-            "target": "Balanced levels"
+            "metric": "Sleep quality",
+            "frequency": "Daily",
+            "target": "Consistent sleep patterns"
           },
           {
-            "metric": "Immune cell counts",
-            "frequency": "Every 6 months",
-            "target": "Normal range"
+            "metric": "Stress levels",
+            "frequency": "Daily",
+            "target": "Reduced stress perception"
           }
         ],
-        "contraindications": [
-          "Individuals with gallbladder issues should consult a healthcare provider before taking curcumin supplements."
-        ],
+        "contraindications": [],
         "supportingEvidence": [
-          "Curcumin has been shown to modulate histone acetylation.",
-          "Curcumin can support the proper differentiation of immune cells."
+          "Neurotransmitter imbalances may induce DNA methylation at the MME promoter, leading to increased expression."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Decreased HDAC11 expression alters histone acetylation patterns.",
-        "Changes in gene expression promote MDSC differentiation."
+        "Hypermethylation of the MME promoter region leads to increased transcriptional activity and increased mRNA expression.",
+        "MME is involved in peptide degradation and cell signaling."
       ],
       "functionalImpact": [
-        "Impaired immune cell differentiation.",
-        "Enhanced MDSC immunosuppressive function."
+        "Increased MME protein levels",
+        "Altered peptide degradation",
+        "Potential altered cell signaling pathways"
       ],
-      "healthRelevance": "This pattern is associated with a weakened ability to suppress inflammation, potentially increasing susceptibility to certain health conditions.",
+      "healthRelevance": "MME hypermethylation and upregulation are associated with altered drug metabolism and may affect the effectiveness of certain medications.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "HDAC11 is a histone deacetylase, and its expression changes can affect gene expression and cell differentiation."
+          "MME is a metallopeptidase that degrades various peptides, including neuropeptides and hormones."
         ],
         "supportingStudies": [
-          "Studies showing decreased HDAC11 expression during MDSC differentiation."
+          "Studies linking MME to drug metabolism and peptide signaling."
         ],
         "biologicalContext": [
-          "HDAC11 is a histone deacetylase involved in epigenetic regulation of gene expression."
+          "Peptide degradation",
+          "Drug metabolism"
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "COX4I1"
+      ],
+      "personally_associated_genes": [
+        "COX4I1"
+      ],
+      "summary": "Reduced mitochondrial energy production in blood cells may impair physical performance",
+      "direction": "hyper"
+    },
+    "description": "Your blood cells show reduced activity of the COX4I1 gene, which is essential for energy production in mitochondria. This change can affect your overall energy levels and physical performance, potentially leading to fatigue and reduced exercise capacity. This pattern is commonly seen and can be influenced by environmental factors like air pollution. Regular exercise and a diet rich in antioxidants may help support mitochondrial function.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "Mitochondrial electron transport chain"
+      ],
+      "conservedPathways": [
+        "Mitochondrial function pathways",
+        "Cardiac muscle contraction pathways"
+      ],
+      "commonCellularRoles": [
+        "Energy production",
+        "Cellular respiration"
+      ],
+      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cellular energy production.",
+      "tissueContext": "Primarily active in cells with high energy demands, including blood cells and muscle cells.",
+      "regulatoryNetwork": {
+        "upstream": [
+          "Environmental pollutants (EOM from PM2.5)",
+          "DNMTs"
+        ],
+        "downstream": [
+          "Mitochondrial electron transport chain components",
+          "Cardiac muscle contraction regulators"
+        ],
+        "feedback": []
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": null,
+          "matched_gene": "COX4I1",
+          "gene_name": "COX4I1",
+          "description": "Hypermethylation of the COX4I1 promoter region, which directly inhibits transcription initiation.",
+          "chromosome": null,
+          "position": null,
+          "context": "promoter",
+          "studyIds": [
+            "10.3390/toxics11100840"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.9,
+          "methylationMetrics": {
+            "value": 0.832948625087738,
+            "zScore": 62.92377066070159,
+            "percentile": 100.0,
+            "delta_from_mean": 0.6957645812879363,
+            "z_score": 62.92377066070159,
+            "population_distribution": {
+              "q5": 0.0010796703048981727,
+              "q25": 0.00537511648144573,
+              "q75": 0.8248618841171265,
+              "q95": 0.852923235297203,
+              "mean": 0.13718404379980176,
+              "median": 0.03290141373872757,
+              "std": 0.022140869834657174,
+              "mad": 0.008575961649925872
+            }
+          },
+          "modifyingFactors": [
+            {
+              "factor": "Extractable organic matter (EOM) from PM2.5",
+              "effect": "Induces hypermethylation of the COX4I1 promoter, leading to decreased mRNA expression.",
+              "interventionPotential": {}
+            }
+          ]
+        }
+      ],
+      "studyContext": {
+        "primaryStudyId": "10.3390/toxics11100840",
+        "studyMetrics": [
+          {
+            "studyId": "10.3390/toxics11100840",
+            "totalSubjects": null,
+            "studyPopulationSummary": [
+              {
+                "groupName": "control",
+                "count": null,
+                "description": "hESCs without EOM treatment"
+              },
+              {
+                "groupName": "EOM_treated",
+                "count": null,
+                "description": "hESCs treated with EOM at various concentrations (1 \u00b5g/mL, 5 \u00b5g/mL, 10 \u00b5g/mL)"
+              }
+            ],
+            "populationContext": "Human embryonic stem cells (hESCs)",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Engage in regular aerobic exercise to enhance mitochondrial function",
+        "lucideIcon": "activity",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Regular physical activity can stimulate mitochondrial biogenesis and improve the efficiency of the electron transport chain, potentially counteracting the effects of COX4I1 hypermethylation.",
+        "specificActions": [
+          "Perform at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity aerobic exercise per week",
+          "Include activities like brisk walking, jogging, swimming, or cycling",
+          "Gradually increase the intensity and duration of exercise over time"
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Exercise duration",
+            "frequency": "Weekly",
+            "target": "Consistent exercise duration"
+          },
+          {
+            "metric": "Perceived energy levels",
+            "frequency": "Daily",
+            "target": "Improved energy levels"
+          }
+        ],
+        "contraindications": [],
+        "supportingEvidence": [
+          "Regular physical activity can stimulate mitochondrial biogenesis and improve the efficiency of the electron transport chain."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "Hypermethylation of the COX4I1 promoter region directly inhibits transcription initiation.",
+        "COX4I1 is a key enzyme in the mitochondrial electron transport chain."
+      ],
+      "functionalImpact": [
+        "Reduced COX4I1 mRNA levels",
+        "Potential disruption of cardiac muscle contraction",
+        "Altered mitochondrial function"
+      ],
+      "healthRelevance": "Downregulation of COX4I1 may contribute to impaired energy production and reduced physical performance.",
+      "knowledgeBase": {
+        "establishedMechanisms": [
+          "COX4I1 is a subunit of cytochrome c oxidase, a key enzyme in the mitochondrial electron transport chain."
+        ],
+        "supportingStudies": [
+          "Studies linking COX4I1 to mitochondrial function and energy production."
+        ],
+        "biologicalContext": [
+          "Mitochondrial function",
+          "Cardiac muscle contraction"
         ]
       }
     }
@@ -869,10 +1225,10 @@ export const mockFindings = [
       "personally_associated_genes": [
         "HDGF"
       ],
-      "summary": "Enhanced mRNA stability in blood cells may promote cellular growth and proliferation",
+      "summary": "Increased mRNA stability in blood cells may promote unwanted cell growth",
       "direction": "hyper"
     },
-    "description": "Your blood cells show increased methylation of HDGF mRNA, which is involved in promoting cell growth and proliferation. This change enhances the stability of HDGF mRNA, potentially leading to increased levels of the HDGF protein and promoting cellular growth. This pattern is commonly seen in individuals with a history of chronic inflammation and can be particularly important for maintaining healthy cell turnover. The effect is strongest during periods of cellular stress and can be modified by lifestyle choices that support cellular health. Regular exercise and a balanced diet can help optimize your body's natural defenses.",
+    "description": "Your blood cells show increased stability of HDGF mRNA, which is regulated by the NSUN2 gene. This change can lead to higher levels of HDGF protein, which may promote cell growth and proliferation. This pattern is commonly seen and can be influenced by various cellular factors. Maintaining a healthy lifestyle and balanced diet may help regulate cellular growth processes.",
     "knowledgeContext": {
       "establishedFunctions": [
         "mRNA stability"
@@ -883,10 +1239,10 @@ export const mockFindings = [
       ],
       "commonCellularRoles": [
         "Regulation of mRNA stability",
-        "Promotion of cell growth and proliferation"
+        "Cell growth and proliferation"
       ],
-      "evolutionaryContext": "Highly conserved across species, indicating a fundamental role in cellular processes.",
-      "tissueContext": "Expressed in various tissues, including blood cells, with a critical role in maintaining cellular homeostasis.",
+      "evolutionaryContext": "Conserved across species due to its role in fundamental cellular processes.",
+      "tissueContext": "Primarily active in blood cells, but also present in other tissues.",
       "regulatoryNetwork": {
         "upstream": [],
         "downstream": [
@@ -900,6 +1256,7 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "HDGF",
+          "gene_name": "HDGF",
           "description": "NSUN2-mediated m5C methylation of HDGF mRNA enhances its stability via YBX1 binding.",
           "chromosome": null,
           "position": null,
@@ -911,16 +1268,26 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.6886491477489471,
-            "siteMean": 0.12282335068012057,
-            "siteMedian": 0.12248271408801277,
-            "zScore": 50.76969673057629,
-            "percentile": 100.0
+            "zScore": 59.24251019001913,
+            "percentile": 100.0,
+            "delta_from_mean": 0.5658257970688265,
+            "z_score": 59.24251019001913,
+            "population_distribution": {
+              "q5": 8.651872776681562e-05,
+              "q25": 0.003163705696351826,
+              "q75": 0.794477790594101,
+              "q95": 0.8248783767223358,
+              "mean": 0.12282335068012057,
+              "median": 0.027996772900223732,
+              "std": 0.016923592887306473,
+              "mad": 0.007521795167122036
+            }
           },
           "modifyingFactors": [
             {
               "factor": "Bladder cancer cell type",
               "effect": "NSUN2-mediated m5C methylation of HDGF mRNA and its downstream effects may vary depending on the specific bladder cancer cell type.",
-              "interventionPotential": "Targeted therapies based on specific bladder cancer cell type may be beneficial."
+              "interventionPotential": "Targeted therapies based on specific bladder cancer cell type"
             }
           ]
         }
@@ -932,7 +1299,7 @@ export const mockFindings = [
             "studyId": "10.1007/s10565-021-09627-8",
             "totalSubjects": null,
             "studyPopulationSummary": [],
-            "populationContext": "Review article summarizing findings on RNA methylation",
+            "populationContext": "Bladder cancer patients",
             "effectSizes": []
           }
         ]
@@ -940,54 +1307,196 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Consume 200mg of EGCG daily to modulate RNA methylation and support healthy cell turnover",
-        "lucideIcon": "activity",
+        "recommendation": "Maintain a balanced diet rich in antioxidants to support cellular health",
+        "lucideIcon": "leaf",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "EGCG has been shown to modulate RNA methylation and can support healthy cell turnover by influencing mRNA stability.",
+        "rationale": "A diet rich in antioxidants can help regulate cellular growth processes and may influence mRNA stability. This can help maintain a healthy balance in cell proliferation.",
         "specificActions": [
-          "Take 200mg of EGCG supplement with breakfast."
+          "Increase intake of fruits and vegetables, especially those rich in antioxidants like berries, leafy greens, and citrus fruits",
+          "Include whole grains and lean proteins in your diet",
+          "Limit processed foods, sugary drinks, and unhealthy fats"
         ],
         "monitoringMetrics": [
           {
-            "metric": "Inflammation markers",
-            "frequency": "Quarterly",
-            "target": "Reduced levels"
+            "metric": "Dietary intake",
+            "frequency": "Daily",
+            "target": "Consistent intake of antioxidant-rich foods"
+          },
+          {
+            "metric": "Overall health",
+            "frequency": "Regularly",
+            "target": "Maintenance of good health"
           }
         ],
-        "contraindications": [
-          "Pregnancy",
-          "Breastfeeding",
-          "Iron deficiency"
-        ],
+        "contraindications": [],
         "supportingEvidence": [
-          "Studies showing EGCG's effect on RNA methylation.",
-          "Research on EGCG's role in cellular health."
+          "Antioxidants can help regulate cellular growth processes and may influence mRNA stability."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "NSUN2-mediated m5C methylation of HDGF mRNA enhances its stability.",
-        "YBX1 binding to m5C-methylated HDGF mRNA further stabilizes it."
+        "NSUN2-mediated m5C methylation of HDGF mRNA enhances its stability via YBX1 binding.",
+        "Increased HDGF mRNA stability promotes cell growth and proliferation."
       ],
       "functionalImpact": [
         "Increased HDGF mRNA stability",
-        "Potential promotion of cellular growth and proliferation"
+        "Promotion of cell growth and proliferation"
       ],
-      "healthRelevance": "This pattern is commonly seen in individuals with a history of chronic inflammation and can be particularly important for maintaining healthy cell turnover.",
+      "healthRelevance": "Increased HDGF mRNA stability may contribute to unwanted cell growth and proliferation.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "m5C methylation is a known mechanism for regulating mRNA stability."
+          "NSUN2 is an RNA methyltransferase that modifies mRNA stability."
         ],
         "supportingStudies": [
-          "Studies on NSUN2's role in RNA methylation.",
-          "Research on HDGF's function in cell growth and proliferation."
+          "Studies linking NSUN2 and HDGF to cell growth and cancer progression."
         ],
         "biologicalContext": [
-          "Cellular growth and proliferation",
           "mRNA stability",
+          "Cell growth and proliferation"
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "ANKS3"
+      ],
+      "personally_associated_genes": [
+        "ANKS3"
+      ],
+      "summary": "Altered cellular processes in blood cells may be linked to environmental exposures",
+      "direction": "hyper"
+    },
+    "description": "Your blood cells show altered methylation patterns at the ANKS3 gene, which is associated with environmental exposures like arsenic. This change may affect various cellular processes, though the exact impact is not fully understood. This pattern is commonly seen in individuals with chronic arsenic exposure. Reducing exposure to environmental toxins and maintaining a healthy lifestyle may help mitigate these effects.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "Unknown"
+      ],
+      "conservedPathways": [],
+      "commonCellularRoles": [
+        "Unknown"
+      ],
+      "evolutionaryContext": "Unknown",
+      "tissueContext": "Primarily observed in peripheral blood leukocytes, but potential effects in other tissues.",
+      "regulatoryNetwork": {
+        "upstream": [
+          "Arsenic exposure"
+        ],
+        "downstream": [],
+        "feedback": []
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": null,
+          "matched_gene": "ANKS3",
+          "gene_name": "ANKS3",
+          "description": "Hypermethylation of cg03497652 in ANKS3 may lead to altered expression of ANKS3, a gene with unknown function.",
+          "chromosome": null,
+          "position": null,
+          "context": "Body",
+          "studyIds": [
+            "10.1289/ehp6263"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.9,
+          "methylationMetrics": {
+            "value": 0.7760913372039795,
+            "zScore": 58.38107954005162,
+            "percentile": 100.0,
+            "delta_from_mean": 0.5462443631942178,
+            "z_score": 58.38107954005162,
+            "population_distribution": {
+              "q5": 0.00011643774269032293,
+              "q25": 0.0034832897363230586,
+              "q75": 0.887344554066658,
+              "q95": 0.9060750812292099,
+              "mean": 0.22984697400976167,
+              "median": 0.0459161251783371,
+              "std": 0.016342177067415642,
+              "mad": 0.008436006740393007
+            }
+          },
+          "modifyingFactors": [
+            {
+              "factor": "Arsenic exposure",
+              "effect": "Increased arsenic exposure leads to increased methylation at cg03497652 in ANKS3.",
+              "interventionPotential": "Arsenic reduction"
+            }
+          ]
+        }
+      ],
+      "studyContext": {
+        "primaryStudyId": "10.1289/ehp6263",
+        "studyMetrics": [
+          {
+            "studyId": "10.1289/ehp6263",
+            "totalSubjects": 2325,
+            "studyPopulationSummary": [
+              {
+                "groupName": "American Indian adults",
+                "count": 2325,
+                "description": "Participants from the Strong Heart Study (SHS) cohort, with low-to-moderate arsenic exposure."
+              }
+            ],
+            "populationContext": "Individuals with chronic arsenic exposure",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Reduce exposure to environmental toxins, particularly arsenic",
+        "lucideIcon": "environment",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Arsenic exposure is linked to increased methylation at the ANKS3 gene. Reducing exposure may help mitigate this effect and support overall cellular health.",
+        "specificActions": [
+          "Test your drinking water for arsenic levels and use a filter if necessary",
+          "Be mindful of potential sources of arsenic in your environment",
+          "Consume a diet rich in antioxidants to support detoxification"
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Water quality",
+            "frequency": "Annually",
+            "target": "Arsenic levels below 10 \u00b5g/L"
+          },
+          {
+            "metric": "Dietary intake",
+            "frequency": "Daily",
+            "target": "Consistent intake of antioxidant-rich foods"
+          }
+        ],
+        "contraindications": [],
+        "supportingEvidence": [
+          "Increased arsenic exposure leads to increased methylation at cg03497652 in ANKS3."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "Hypermethylation of cg03497652 in ANKS3 may lead to altered expression of ANKS3, a gene with unknown function.",
+        "Arsenic exposure is an upstream regulator of ANKS3 methylation."
+      ],
+      "functionalImpact": [
+        "Unknown cellular effects due to lack of functional data on ANKS3"
+      ],
+      "healthRelevance": "Altered methylation at ANKS3 may indicate a response to environmental toxins and could affect various cellular processes.",
+      "knowledgeBase": {
+        "establishedMechanisms": [],
+        "supportingStudies": [
+          "Studies linking arsenic exposure to DNA methylation changes."
+        ],
+        "biologicalContext": [
+          "Environmental toxicology",
           "Epigenetic regulation"
         ]
       }
@@ -1002,32 +1511,32 @@ export const mockFindings = [
       "personally_associated_genes": [
         "RPL23AP82"
       ],
-      "summary": "Reduced cell growth in placental tissue may affect nutrient transfer during pregnancy",
+      "summary": "Altered cell growth signals in blood cells may be linked to maternal blood pressure during pregnancy",
       "direction": "hyper"
     },
-    "description": "Your blood cells show increased methylation near the RPL23AP82 and RABL2B genes, which are involved in cell growth. This change suggests a potential reduction in the activity of these genes, which could affect cell growth and development. This pattern is particularly relevant during pregnancy, where proper placental cell growth is essential for nutrient transfer to the fetus. This effect is most pronounced during the second and third trimesters and can be influenced by maternal blood pressure. Maintaining healthy blood pressure levels may help support normal placental function.",
+    "description": "Your blood cells show altered methylation patterns near the RPL23AP82 and RABL2B genes, which are involved in cell growth. This change may be linked to maternal blood pressure during pregnancy, potentially affecting cell growth and development. This pattern is commonly seen and can be influenced by maternal health during pregnancy. Maintaining a healthy lifestyle and managing blood pressure during pregnancy may help mitigate these effects.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Cell growth regulation"
+        "Cell growth"
       ],
       "conservedPathways": [
-        "Cell cycle regulation"
+        "Cell growth"
       ],
       "commonCellularRoles": [
-        "Cell proliferation",
-        "Tissue development"
+        "Regulation of cell growth",
+        "Cell cycle control"
       ],
-      "evolutionaryContext": "RPL23AP82 is a pseudogene, while RABL2B is a conserved gene involved in cell growth across species.",
-      "tissueContext": "Placental tissue, with potential secondary effects on fetal development.",
+      "evolutionaryContext": "Conserved across species due to its fundamental role in cell growth and development.",
+      "tissueContext": "Primarily observed in placental tissue, but may have secondary effects in blood cells.",
       "regulatoryNetwork": {
         "upstream": [
           "Maternal blood pressure",
-          "DNA methyltransferases"
+          "Genetic factors influencing DNA methylation"
         ],
         "downstream": [
           "RPL23AP82",
           "RABL2B",
-          "Placental cell growth"
+          "Placental cells"
         ],
         "feedback": []
       }
@@ -1037,9 +1546,10 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "RPL23AP82",
+          "gene_name": "RPL23AP82",
           "description": "Increased DNA methylation at cg19565306, a CpG site near the RPL23AP82 and RABL2B genes, potentially affecting their expression.",
-          "chromosome": "17",
-          "position": 74846178,
+          "chromosome": null,
+          "position": null,
           "context": "Body; 1stExon; TSS200; 5'UTR",
           "studyIds": [
             "10.1161/HYPERTENSIONAHA.119.14509"
@@ -1048,16 +1558,26 @@ export const mockFindings = [
           "matchStrength": 0.8,
           "methylationMetrics": {
             "value": 0.33358795940876007,
-            "siteMean": 0.05062093448046842,
-            "siteMedian": 0.0502411060863071,
-            "zScore": 47.60712136351135,
-            "percentile": 100.0
+            "zScore": 51.69865228464938,
+            "percentile": 100.0,
+            "delta_from_mean": 0.2829670249282916,
+            "z_score": 51.69865228464938,
+            "population_distribution": {
+              "q5": 0.0003085626085521654,
+              "q25": 0.004890200798399746,
+              "q75": 0.28831737488508224,
+              "q95": 0.3028124898672103,
+              "mean": 0.05062093448046842,
+              "median": 0.025889236479997635,
+              "std": 0.006969590067233265,
+              "mad": 0.004014471933866541
+            }
           },
           "modifyingFactors": [
             {
               "factor": "Maternal blood pressure",
               "effect": "Increased maternal blood pressure during the second and third trimesters is associated with increased methylation at cg19565306.",
-              "interventionPotential": "Blood pressure management during the second and third trimesters of pregnancy."
+              "interventionPotential": "Blood pressure management"
             }
           ]
         }
@@ -1075,7 +1595,7 @@ export const mockFindings = [
                 "description": "Women without major pre-existing medical conditions"
               }
             ],
-            "populationContext": "Pregnant women",
+            "populationContext": "Offspring of mothers with elevated blood pressure during pregnancy",
             "effectSizes": []
           }
         ]
@@ -1083,47 +1603,52 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Maintain healthy blood pressure through regular exercise and a balanced diet",
+        "recommendation": "Maintain a healthy lifestyle and manage blood pressure during pregnancy",
         "lucideIcon": "heart",
         "strength": "Moderate",
         "source": "context",
-        "rationale": "Maintaining healthy blood pressure can help regulate methylation patterns associated with placental cell growth.",
+        "rationale": "Maternal blood pressure during pregnancy is associated with methylation changes at these genes. Managing blood pressure and maintaining a healthy lifestyle may help mitigate these effects.",
         "specificActions": [
-          "Engage in at least 30 minutes of moderate-intensity exercise most days of the week.",
-          "Consume a diet rich in fruits, vegetables, and whole grains, while limiting processed foods and sodium."
+          "Monitor blood pressure regularly during pregnancy",
+          "Follow a balanced diet and engage in moderate exercise",
+          "Consult with a healthcare provider for personalized advice"
         ],
         "monitoringMetrics": [
           {
             "metric": "Blood pressure",
-            "frequency": "Regularly",
-            "target": "<120/80 mmHg"
+            "frequency": "Regularly during pregnancy",
+            "target": "Blood pressure within healthy range"
+          },
+          {
+            "metric": "Dietary intake",
+            "frequency": "Daily",
+            "target": "Balanced diet with essential nutrients"
           }
         ],
-        "contraindications": [
-          "Extreme physical activity without proper guidance"
-        ],
+        "contraindications": [],
         "supportingEvidence": [
-          "Maternal blood pressure is associated with methylation changes at this site."
+          "Increased maternal blood pressure during the second and third trimesters is associated with increased methylation at cg19565306."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Increased methylation at this site may reduce the expression of RPL23AP82 and RABL2B.",
-        "RABL2B is involved in cell growth, and its reduced expression may affect placental development."
+        "Increased DNA methylation at cg19565306, a CpG site near the RPL23AP82 and RABL2B genes, potentially affecting their expression.",
+        "RABL2B is involved in cell growth."
       ],
       "functionalImpact": [
-        "Potential reduction in placental cell growth and nutrient transfer."
+        "Potential altered expression of RPL23AP82, a pseudogene.",
+        "Potential altered expression of RABL2B, a gene involved in cell growth.",
+        "Disruption of normal placental cell growth."
       ],
-      "healthRelevance": "Proper placental cell growth is essential for fetal development and nutrient transfer during pregnancy.",
+      "healthRelevance": "Altered methylation patterns near RPL23AP82 and RABL2B may be linked to maternal blood pressure during pregnancy and could affect cell growth.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation regulates gene expression.",
           "RABL2B is involved in cell growth."
         ],
         "supportingStudies": [
-          "10.1161/HYPERTENSIONAHA.119.14509"
+          "Studies linking maternal blood pressure to epigenetic changes in the placenta."
         ],
         "biologicalContext": [
           "Cell growth",
@@ -1135,35 +1660,38 @@ export const mockFindings = [
   {
     "pattern": {
       "gene_list": [
-        "PMF1"
+        "CD36",
+        "SRA1"
       ],
       "personally_associated_genes": [
-        "PMF1"
+        "SRA1"
       ],
-      "summary": "Enhanced cell growth and death regulation in placental cells may affect placental development",
+      "summary": "Increased lipid uptake in immune cells may elevate cardiovascular risk",
       "direction": "hypo"
     },
-    "description": "Your blood cells show decreased methylation in the promoter region of the PMF1 gene, which is involved in regulating cell growth and death. This suggests a potential increase in PMF1 gene activity, which could affect the balance of cell growth and death in placental tissue. This pattern is particularly relevant during early pregnancy, where proper trophoblast differentiation is crucial for placental development. This effect is most pronounced in early pregnancy and can be influenced by factors affecting trophoblast differentiation. Supporting healthy cell growth and differentiation may help optimize placental function.",
+    "description": "Your immune cells show changes that may affect how they process fats, specifically cholesterol. This involves increased activity of scavenger receptors, which are responsible for taking up modified fats from the blood. This pattern is important because it can lead to the accumulation of fats in the walls of blood vessels, potentially increasing the risk of cardiovascular issues. This effect is influenced by your diet and gut bacteria, and can be modified by dietary changes and exercise.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Regulation of cell growth and death"
+        "Uptake of modified lipids by macrophages"
       ],
       "conservedPathways": [
-        "Cell cycle regulation",
-        "Apoptosis pathways"
+        "Lipid metabolism",
+        "Inflammatory pathways"
       ],
       "commonCellularRoles": [
-        "Trophoblast differentiation",
-        "Placental development"
+        "Immune response",
+        "Atherosclerosis development"
       ],
-      "evolutionaryContext": "PMF1 is a conserved gene involved in cell growth and death across species.",
-      "tissueContext": "Trophoblasts and placental tissue, with potential secondary effects on fetal development.",
+      "evolutionaryContext": "Conserved across species due to the role in lipid homeostasis and immune function.",
+      "tissueContext": "Primarily observed in macrophages and other immune cells.",
       "regulatoryNetwork": {
-        "upstream": [],
+        "upstream": [
+          "TMAO",
+          "Inflammatory signals"
+        ],
         "downstream": [
-          "PMF1",
-          "Genes involved in cell growth and death",
-          "Trophoblast differentiation"
+          "Oxidized LDL",
+          "Foam cell formation"
         ],
         "feedback": []
       }
@@ -1172,50 +1700,45 @@ export const mockFindings = [
       "associated_regions": [
         {
           "matched_probe": null,
-          "matched_gene": "PMF1",
-          "description": "Hypomethylation of the PMF1 promoter region in side-population trophoblasts may lead to increased PMF1 expression, potentially disrupting the regulation of genes involved in cell growth and cell death, and affecting trophoblast differentiation.",
-          "chromosome": "1",
-          "position": 152248176,
-          "context": "promoter region",
+          "matched_gene": "SRA1",
+          "gene_name": "SRA1",
+          "description": "This region is associated with SRA1, a scavenger receptor involved in lipid uptake by macrophages. Hypomethylation in this region may lead to increased SRA1 expression and activity, enhancing the uptake of modified lipids. This can contribute to foam cell formation and atherosclerosis. The effect is influenced by diet and gut microbiota.",
+          "chromosome": "8",
+          "position": 144897000,
+          "context": "gene body",
           "studyIds": [
-            "10.1080/15592294.2018.1549462"
+            "10.3389/fcvm.2021.723886"
           ],
           "direction": "hypo",
-          "matchStrength": 0.9,
+          "matchStrength": 0.7200000000000001,
           "methylationMetrics": {
-            "value": 0.06313037499785423,
-            "siteMean": 0.39151378175582546,
-            "siteMedian": 0.3912078207929739,
-            "zScore": -21.259107365586797,
-            "percentile": 6.887946871557073e-69
+            "value": 0.03433658182621002,
+            "zScore": -33.285314739836096,
+            "percentile": 3.220286073931266e-81,
+            "delta_from_mean": -0.44249399616399904,
+            "z_score": -33.285314739836096,
+            "population_distribution": {
+              "q5": 0.001930460979929194,
+              "q25": 0.006912091746926308,
+              "q75": 0.7968914359807968,
+              "q95": 0.8209348529577255,
+              "mean": 0.47683057799020906,
+              "median": 0.6813777983188629,
+              "std": 0.022938307188310497,
+              "mad": 0.013111767274412241
+            }
           },
           "modifyingFactors": []
         }
       ],
       "studyContext": {
-        "primaryStudyId": "10.1080/15592294.2018.1549462",
+        "primaryStudyId": "10.3389/fcvm.2021.723886",
         "studyMetrics": [
           {
-            "studyId": "10.1080/15592294.2018.1549462",
-            "totalSubjects": 13,
-            "studyPopulationSummary": [
-              {
-                "groupName": "side-population trophoblasts",
-                "count": 13,
-                "description": "Candidate human trophoblast stem cell population"
-              },
-              {
-                "groupName": "cytotrophoblasts",
-                "count": 13,
-                "description": "Intermediate progenitor population"
-              },
-              {
-                "groupName": "extravillous trophoblasts",
-                "count": 13,
-                "description": "Terminally differentiated population"
-              }
-            ],
-            "populationContext": "First trimester placental tissue",
+            "studyId": "10.3389/fcvm.2021.723886",
+            "totalSubjects": null,
+            "studyPopulationSummary": [],
+            "populationContext": "In vitro study using macrophages",
             "effectSizes": []
           }
         ]
@@ -1223,44 +1746,57 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Support healthy cell growth and differentiation through a balanced diet and regular exercise",
-        "lucideIcon": "activity",
+        "recommendation": "Increase intake of soluble fiber to modulate gut microbiota and reduce TMAO production",
+        "lucideIcon": "leaf",
         "strength": "Moderate",
-        "source": "context",
-        "rationale": "Supporting healthy cell growth and differentiation may help optimize placental function.",
+        "source": "mechanism",
+        "rationale": "Soluble fiber can alter gut microbiota composition, reducing TMAO production, which is an upstream regulator of SRA1 expression.",
         "specificActions": [
-          "Consume a diet rich in essential nutrients, including folate, iron, and zinc.",
-          "Engage in regular, moderate-intensity exercise, as recommended by your healthcare provider."
+          "Consume 25-30 grams of soluble fiber daily from sources like oats, legumes, and fruits.",
+          "Include prebiotic-rich foods to support beneficial gut bacteria."
         ],
-        "monitoringMetrics": [],
-        "contraindications": [],
+        "monitoringMetrics": [
+          {
+            "metric": "TMAO levels",
+            "frequency": "Every 3 months",
+            "target": "Decrease to below 5 uM"
+          }
+        ],
+        "contraindications": [
+          "Individuals with severe gastrointestinal disorders should consult a doctor before increasing fiber intake."
+        ],
         "supportingEvidence": [
-          "PMF1 is involved in cell growth and death regulation, and its altered expression may affect trophoblast differentiation."
+          "Studies showing the impact of soluble fiber on gut microbiota composition and TMAO production."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypomethylation of the PMF1 promoter may increase PMF1 expression.",
-        "PMF1 regulates transcription of genes involved in cell growth and death."
+        "TMAO upregulates scavenger receptors CD36 and SRA1 in macrophages.",
+        "Increased expression of these receptors leads to enhanced uptake of oxidized LDL.",
+        "This process contributes to foam cell formation, a key step in atherosclerosis."
       ],
       "functionalImpact": [
-        "Potential disruption of cell cycle regulation and trophoblast differentiation."
+        "Enhanced uptake of oxidized low-density lipoprotein (ox-LDL) by macrophages.",
+        "Increased formation of foam cells.",
+        "Promotion of lipid accumulation in the arterial wall."
       ],
-      "healthRelevance": "Proper trophoblast differentiation is essential for placental development and function during early pregnancy.",
+      "healthRelevance": "Upregulation of CD36 and SRA1 by TMAO promotes foam cell formation, a key step in the development of atherosclerosis.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation regulates gene expression.",
-          "PMF1 regulates transcription of genes involved in cell growth and cell death."
+          "TMAO-induced upregulation of scavenger receptors",
+          "Role of scavenger receptors in lipid uptake",
+          "Contribution of foam cells to atherosclerosis"
         ],
         "supportingStudies": [
-          "10.1080/15592294.2018.1549462"
+          "In vitro studies demonstrating TMAO-induced upregulation of CD36 and SRA1 in macrophages.",
+          "Studies linking foam cell formation to atherosclerosis."
         ],
         "biologicalContext": [
-          "Cell growth regulation",
-          "Cell death regulation",
-          "Trophoblast differentiation"
+          "Lipid metabolism",
+          "Inflammation",
+          "Atherosclerosis"
         ]
       }
     }
@@ -1273,30 +1809,31 @@ export const mockFindings = [
       "personally_associated_genes": [
         "GMDS"
       ],
-      "summary": "Enhanced metabolic signaling in liver and other tissues may improve energy utilization",
+      "summary": "Enhanced GDP-mannose metabolism in blood cells improves immune cell function",
       "direction": "hypo"
     },
-    "description": "Your blood cells show decreased methylation of the GMDS gene, which is involved in GDP-mannose metabolism. This suggests a potential increase in GMDS gene activity, which could affect glycosylation processes and energy utilization. This pattern is linked to changes in gut microbiota composition, particularly increased abundance of Akkermansia. This effect is most pronounced in liver and other tissues and can be influenced by dietary interventions. Supporting a healthy gut microbiome may help optimize metabolic function.",
+    "description": "Your blood cells show decreased methylation at the GMDS gene, which is involved in the production of GDP-mannose, a key molecule for glycosylation. This change suggests an increase in GMDS activity, potentially leading to more efficient glycosylation processes. This is important for proper immune cell function, as glycosylation is crucial for cell signaling and recognition. This effect is influenced by the composition of your gut bacteria, particularly the abundance of Akkermansia, and can be further enhanced by dietary choices that promote a healthy gut microbiome.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "GDP-mannose metabolism"
+        "GDP-mannose biosynthesis"
       ],
       "conservedPathways": [
-        "Glycosylation pathways"
+        "GDP-mannose metabolism",
+        "Glycosylation"
       ],
       "commonCellularRoles": [
-        "Energy metabolism",
-        "Protein modification"
+        "Glycoprotein synthesis",
+        "Cell signaling",
+        "Immune cell function"
       ],
-      "evolutionaryContext": "GMDS is a conserved gene involved in GDP-mannose metabolism across species.",
-      "tissueContext": "Liver and other tissues, with potential systemic effects on metabolism.",
+      "evolutionaryContext": "Conserved across eukaryotes",
+      "tissueContext": "Liver, blood cells, other tissues",
       "regulatoryNetwork": {
         "upstream": [
-          "Akkermansia abundance"
+          "Akkermansia"
         ],
         "downstream": [
-          "GMDS protein",
-          "Glycosylation processes"
+          "GMDS protein"
         ],
         "feedback": []
       }
@@ -1306,9 +1843,10 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "GMDS",
-          "description": "Decreased DNA methylation of GMDS, potentially leading to increased gene expression.",
-          "chromosome": "6",
-          "position": 16988469,
+          "gene_name": "GMDS",
+          "description": "Hypomethylation of GMDS gene associated with increased Akkermansia abundance.",
+          "chromosome": null,
+          "position": null,
           "context": null,
           "studyIds": [
             "10.3390/nu15163588"
@@ -1317,16 +1855,26 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.06305643692612647,
-            "siteMean": 0.45747614659703006,
-            "siteMedian": 0.4583480842023467,
-            "zScore": -20.435492563213813,
-            "percentile": 1.4229412445625292e-70
+            "zScore": -30.52567908823189,
+            "percentile": 1.6492059980765011e-44,
+            "delta_from_mean": -0.39441970967090356,
+            "z_score": -30.52567908823189,
+            "population_distribution": {
+              "q5": 0.0013199333334341647,
+              "q25": 0.005822904291562736,
+              "q75": 0.880373552441597,
+              "q95": 0.9044911682605743,
+              "mean": 0.45747614659703006,
+              "median": 0.6535264700651169,
+              "std": 0.027637052538388857,
+              "mad": 0.013047114732520034
+            }
           },
           "modifyingFactors": [
             {
               "factor": "Gut Microbiota Composition",
               "effect": "Increased Akkermansia abundance is associated with decreased DNA methylation of the GMDS gene.",
-              "interventionPotential": "Dietary intervention to promote Akkermansia growth."
+              "interventionPotential": "Dietary intervention"
             }
           ]
         }
@@ -1352,188 +1900,53 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Promote gut health by consuming a diet rich in fiber and prebiotics",
+        "recommendation": "Consume a diet rich in prebiotic fibers to enhance Akkermansia abundance",
         "lucideIcon": "leaf",
-        "strength": "Preliminary",
-        "source": "context",
-        "rationale": "Supporting a healthy gut microbiome, particularly Akkermansia, may help regulate methylation patterns associated with metabolic function.",
-        "specificActions": [
-          "Increase consumption of high-fiber foods such as fruits, vegetables, and whole grains.",
-          "Include prebiotic-rich foods like garlic, onions, and bananas in your diet."
-        ],
-        "monitoringMetrics": [],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Increased Akkermansia abundance is associated with decreased DNA methylation of the GMDS gene."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "preliminary",
-      "mechanisticInsights": [
-        "Hypomethylation of GMDS may increase its expression.",
-        "GMDS is involved in GDP-mannose metabolism, which affects glycosylation processes."
-      ],
-      "functionalImpact": [
-        "Potential alteration in GDP-mannose metabolism and glycosylation processes."
-      ],
-      "healthRelevance": "Proper metabolic function is essential for energy utilization and overall health.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "DNA methylation regulates gene expression.",
-          "GMDS is involved in GDP-mannose metabolism."
-        ],
-        "supportingStudies": [
-          "10.3390/nu15163588"
-        ],
-        "biologicalContext": [
-          "GDP-mannose metabolism",
-          "Glycosylation",
-          "Gut microbiome"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "GSE1"
-      ],
-      "personally_associated_genes": [
-        "GSE1"
-      ],
-      "summary": "Enhanced cardiac remodeling may affect heart function and insulin sensitivity",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show decreased methylation in an enhancer-like region near the GSE1 gene, which is involved in cardiac function and insulin resistance. This suggests a potential decrease in GSE1 gene activity, which could affect heart function and metabolic health. This pattern is associated with insulin resistance and may contribute to increased left ventricular mass. This effect is most pronounced in cardiac tissue and can be influenced by lifestyle factors such as diet and exercise. Maintaining a healthy lifestyle may help support normal heart function and insulin sensitivity.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Regulation of histone deacetylase complex activity"
-      ],
-      "conservedPathways": [
-        "Cardiac remodeling pathways",
-        "Insulin signaling pathways"
-      ],
-      "commonCellularRoles": [
-        "Chromatin remodeling",
-        "Cardiac function"
-      ],
-      "evolutionaryContext": "GSE1 is a conserved gene involved in histone deacetylase complex activity across species.",
-      "tissueContext": "Epicardial adipose tissue and cardiac tissue, with potential systemic effects on insulin sensitivity.",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Insulin resistance",
-          "Metabolic factors"
-        ],
-        "downstream": [
-          "Histone proteins",
-          "Chromatin remodeling complexes",
-          "Cardiac remodeling"
-        ],
-        "feedback": []
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "GSE1",
-          "description": "Hypomethylation of the GSE1 enhancer-like region may lead to decreased GSE1 expression.",
-          "chromosome": "1",
-          "position": 151379619,
-          "context": "enhancer-like region",
-          "studyIds": [
-            "10.3390/genes13101700"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.7999999999999999,
-          "methylationMetrics": {
-            "value": 0.038600907350579895,
-            "siteMean": 0.3678463799800927,
-            "siteMedian": 0.36765035754069686,
-            "zScore": -19.614516030425644,
-            "percentile": 1.8497855214084385e-76
-          },
-          "modifyingFactors": [
-            {
-              "factor": "Insulin resistance",
-              "effect": "May promote LVH development by altering GSE1 methylation.",
-              "interventionPotential": "Lifestyle modifications (diet and exercise) to improve insulin sensitivity."
-            }
-          ]
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.3390/genes13101700",
-        "studyMetrics": [
-          {
-            "studyId": "10.3390/genes13101700",
-            "totalSubjects": 2504,
-            "studyPopulationSummary": [
-              {
-                "groupName": "HyperGEN",
-                "count": 611,
-                "description": "African American adults from the Hypertension Genetic Epidemiology Network study, enriched for extreme phenotypes of left ventricular mass indexed to height (LVMHT27)"
-              },
-              {
-                "groupName": "JHS",
-                "count": 1054,
-                "description": "African American adults from the Jackson Heart Study, a prospective population-based study"
-              },
-              {
-                "groupName": "GENOA",
-                "count": 839,
-                "description": "African American adults from the Genetic Epidemiology Network of Arteriopathy study, a study of hypertensive sibships"
-              }
-            ],
-            "populationContext": "African Americans with hypertension",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Improve insulin sensitivity through regular physical activity and a balanced diet",
-        "lucideIcon": "heart-pulse",
         "strength": "Moderate",
-        "source": "context",
-        "rationale": "Improving insulin sensitivity may help regulate methylation patterns associated with cardiac function.",
+        "source": "mechanism",
+        "rationale": "Prebiotic fibers promote the growth of Akkermansia, which is associated with decreased methylation of the GMDS gene, potentially increasing its activity and improving immune function.",
         "specificActions": [
-          "Engage in at least 150 minutes of moderate-intensity aerobic exercise per week.",
-          "Consume a diet rich in fiber, omega-3 fatty acids, and whole grains, while limiting processed foods and sugars."
+          "Increase intake of foods like garlic, onions, leeks, asparagus, and bananas.",
+          "Consider a prebiotic supplement containing inulin or fructooligosaccharides (FOS)."
         ],
-        "monitoringMetrics": [],
+        "monitoringMetrics": [
+          {
+            "metric": "Gut microbiome diversity",
+            "frequency": "Every 3-6 months",
+            "target": "Increased abundance of Akkermansia"
+          }
+        ],
         "contraindications": [
-          "Extreme physical activity without proper guidance"
+          "Individuals with severe gastrointestinal issues should consult a healthcare provider before significantly increasing fiber intake."
         ],
         "supportingEvidence": [
-          "Insulin resistance may promote LVH development by altering GSE1 methylation."
+          "Studies linking prebiotic fiber intake to increased Akkermansia abundance.",
+          "Research showing the inverse relationship between Akkermansia and GMDS methylation."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypomethylation of the GSE1 enhancer-like region may decrease GSE1 expression.",
-        "GSE1 encodes a subunit of a histone deacetylase complex, which is involved in chromatin remodeling."
+        "Hypomethylation of GMDS is associated with increased gene activity.",
+        "Increased GMDS activity enhances GDP-mannose production, crucial for glycosylation."
       ],
       "functionalImpact": [
-        "Potential changes in chromatin structure and increased left ventricular mass."
+        "Improved glycosylation processes in blood cells, particularly immune cells."
       ],
-      "healthRelevance": "Proper cardiac function and insulin sensitivity are essential for cardiovascular and metabolic health.",
+      "healthRelevance": "Enhanced immune cell function and improved response to infections.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation regulates gene expression.",
-          "GSE1 is involved in histone deacetylase complex activity."
+          "GMDS is a key enzyme in GDP-mannose biosynthesis.",
+          "GDP-mannose is essential for glycosylation, a critical process for cell signaling and immune function."
         ],
         "supportingStudies": [
-          "10.3390/genes13101700"
+          "Studies showing the role of GMDS in glycosylation.",
+          "Research linking gut microbiota composition to immune function."
         ],
         "biologicalContext": [
-          "Epigenetic regulation",
-          "Cardiac function",
-          "Insulin resistance"
+          "Glycosylation is crucial for cell signaling and recognition.",
+          "Proper immune cell function depends on efficient glycosylation."
         ]
       }
     }
@@ -1546,29 +1959,26 @@ export const mockFindings = [
       "personally_associated_genes": [
         "UACA"
       ],
-      "summary": "Enhanced apoptosis regulation in blood cells may affect cardiovascular health",
+      "summary": "Increased cell turnover in blood may elevate cardiovascular risk",
       "direction": "hypo"
     },
-    "description": "Your blood cells show decreased methylation near the UACA gene, which is involved in apoptosis. This suggests a potential increase in UACA gene activity, which could affect cell death regulation and potentially contribute to cardiovascular disease. This pattern is associated with an increased risk of cardiovascular events. This effect is most pronounced in blood cells and can be influenced by factors affecting apoptosis. Supporting healthy cell death regulation may help maintain cardiovascular health.",
+    "description": "Your blood cells show decreased methylation at the UACA gene, which is involved in regulating apoptosis (programmed cell death). This suggests an increase in UACA activity, potentially leading to altered cell turnover in your blood. While this may seem beneficial, it can also contribute to inflammation and plaque buildup in blood vessels, potentially increasing cardiovascular risk. This effect is consistent with findings in studies of cardiovascular disease and can be influenced by lifestyle factors such as diet and exercise.",
     "knowledgeContext": {
       "establishedFunctions": [
         "Regulation of apoptosis"
       ],
       "conservedPathways": [
-        "Apoptosis pathways"
+        "Apoptosis"
       ],
       "commonCellularRoles": [
-        "Cell death",
-        "Immune response"
+        "Cell turnover",
+        "Cellular homeostasis"
       ],
-      "evolutionaryContext": "UACA is a conserved gene involved in apoptosis across species.",
-      "tissueContext": "Whole blood, with potential secondary effects on cardiovascular tissues.",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Whole blood",
       "regulatoryNetwork": {
         "upstream": [],
-        "downstream": [
-          "UACA protein",
-          "Apoptosis pathways"
-        ],
+        "downstream": [],
         "feedback": []
       }
     },
@@ -1577,9 +1987,10 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "UACA",
+          "gene_name": "UACA",
           "description": "Hypomethylation of cg09306458 in the TSS200 region of the UACA gene may lead to increased UACA gene expression.",
-          "chromosome": "9",
-          "position": 133277917,
+          "chromosome": null,
+          "position": null,
           "context": "TSS200",
           "studyIds": [
             "10.1186/s12872-021-02001-w"
@@ -1588,10 +1999,20 @@ export const mockFindings = [
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.1011626785621047,
-            "siteMean": 0.5776732799612527,
-            "siteMedian": 0.5777128295440485,
-            "zScore": -20.51588597567855,
-            "percentile": 2.1671974356973643e-64
+            "zScore": -27.761108454871646,
+            "percentile": 2.108791650075069e-53,
+            "delta_from_mean": -0.476510601399148,
+            "z_score": -27.761108454871646,
+            "population_distribution": {
+              "q5": 0.006097579281777144,
+              "q25": 0.012225548503920436,
+              "q75": 0.8522228002548218,
+              "q95": 0.873801103234291,
+              "mean": 0.5776732799612527,
+              "median": 0.7460073828697205,
+              "std": 0.030477551549401318,
+              "mad": 0.015667521120870814
+            }
           },
           "modifyingFactors": []
         }
@@ -1632,43 +2053,58 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Support healthy cell death regulation through a balanced diet and regular exercise",
-        "lucideIcon": "shield",
+        "recommendation": "Engage in regular moderate-intensity exercise to support healthy blood cell turnover",
+        "lucideIcon": "heart-pulse",
         "strength": "Moderate",
         "source": "context",
-        "rationale": "Supporting healthy cell death regulation may help maintain cardiovascular health.",
+        "rationale": "Regular exercise can help regulate cell turnover and reduce inflammation, potentially mitigating the cardiovascular risks associated with increased UACA activity.",
         "specificActions": [
-          "Consume a diet rich in antioxidants, such as fruits and vegetables.",
-          "Engage in regular, moderate-intensity exercise, as recommended by your healthcare provider."
+          "Aim for at least 150 minutes of moderate-intensity aerobic activity per week, such as brisk walking, cycling, or swimming.",
+          "Incorporate strength training exercises twice a week to support overall cardiovascular health."
         ],
-        "monitoringMetrics": [],
-        "contraindications": [],
+        "monitoringMetrics": [
+          {
+            "metric": "Resting heart rate",
+            "frequency": "Weekly",
+            "target": "Maintain a healthy resting heart rate"
+          },
+          {
+            "metric": "Blood pressure",
+            "frequency": "Monthly",
+            "target": "Maintain a healthy blood pressure"
+          }
+        ],
+        "contraindications": [
+          "Individuals with pre-existing heart conditions should consult a healthcare provider before starting a new exercise regimen."
+        ],
         "supportingEvidence": [
-          "UACA is involved in apoptosis, and its altered expression may contribute to CVD."
+          "Studies linking regular exercise to improved cardiovascular health.",
+          "Research showing the role of exercise in regulating cell turnover and inflammation."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypomethylation of UACA may increase its expression.",
-        "UACA is involved in apoptosis, and its dysregulation may contribute to CVD."
+        "Hypomethylation of UACA may lead to increased gene expression.",
+        "Increased UACA expression can dysregulate apoptosis, potentially affecting cell turnover."
       ],
       "functionalImpact": [
-        "Potential dysregulation of apoptosis and contribution to CVD pathogenesis."
+        "Altered cell turnover in blood, potentially contributing to inflammation and plaque buildup in blood vessels."
       ],
-      "healthRelevance": "Proper cell death regulation is essential for maintaining cardiovascular health.",
+      "healthRelevance": "Increased risk of cardiovascular disease due to dysregulated apoptosis and inflammation.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation regulates gene expression.",
-          "UACA is involved in apoptosis."
+          "UACA is involved in the regulation of apoptosis.",
+          "Dysregulation of apoptosis can contribute to inflammation and cardiovascular disease."
         ],
         "supportingStudies": [
-          "10.1186/s12872-021-02001-w"
+          "Studies linking UACA methylation to cardiovascular disease.",
+          "Research showing the role of apoptosis in cardiovascular health."
         ],
         "biologicalContext": [
-          "Cardiovascular disease",
-          "Apoptosis"
+          "Apoptosis is a critical process for maintaining cellular homeostasis.",
+          "Dysregulation of apoptosis can contribute to various diseases, including cardiovascular disease."
         ]
       }
     }
@@ -1676,35 +2112,35 @@ export const mockFindings = [
   {
     "pattern": {
       "gene_list": [
-        "VEGFB"
+        "ARMC1",
+        "ARMC3"
       ],
       "personally_associated_genes": [
-        "VEGFB"
+        "ARMC3"
       ],
-      "summary": "Enhanced angiogenesis signaling may affect blood vessel formation and function",
+      "summary": "Altered cell signaling in adipose tissue may affect metabolic health",
       "direction": "hypo"
     },
-    "description": "Your blood cells show decreased methylation near the VEGFB gene, which is involved in angiogenesis. This suggests a potential increase in VEGFB gene activity, which could affect blood vessel formation and function. This pattern is associated with tumor progression and may contribute to resistance to anti-VEGF therapies. This effect is most pronounced in tumor tissue and can be influenced by factors affecting VEGF signaling. Supporting healthy blood vessel function may help maintain overall health.",
+    "description": "Your adipose tissue shows decreased methylation at the ARMC1 and ARMC3 genes, which are involved in cell signaling and adhesion. This suggests an increase in the activity of these genes, potentially altering how your fat cells communicate with each other and with other tissues. This change may affect your metabolic health by influencing how your body processes energy and responds to insulin. This effect is commonly seen in individuals with metabolic imbalances and can be influenced by diet and exercise.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Angiogenesis"
+        "Signal transduction",
+        "Cell adhesion"
       ],
       "conservedPathways": [
-        "VEGF signaling pathway"
+        "Wnt/beta-catenin signaling pathway"
       ],
       "commonCellularRoles": [
-        "Blood vessel formation",
-        "Tumor progression"
+        "Cell signaling",
+        "Cell adhesion",
+        "Metabolic regulation"
       ],
-      "evolutionaryContext": "VEGFB is a conserved gene involved in angiogenesis across species.",
-      "tissueContext": "Liver tumor tissue, with potential secondary effects on blood vessel function.",
+      "evolutionaryContext": "Conserved across eukaryotes",
+      "tissueContext": "Adipose tissue",
       "regulatoryNetwork": {
-        "upstream": [
-          "Tumor microenvironment"
-        ],
+        "upstream": [],
         "downstream": [
-          "VEGFR1",
-          "Angiogenesis pathways"
+          "Wnt/beta-catenin signaling pathway"
         ],
         "feedback": []
       }
@@ -1713,51 +2149,66 @@ export const mockFindings = [
       "associated_regions": [
         {
           "matched_probe": null,
-          "matched_gene": "VEGFB",
-          "description": "Increased VEGFB expression leads to enhanced activation of VEGFR1.",
-          "chromosome": "11",
-          "position": 33678530,
+          "matched_gene": "ARMC3",
+          "gene_name": "ARMC3",
+          "description": "Hypomethylation of ARMC1 and ARMC3 may alter their expression and function in signal transduction and cell adhesion.",
+          "chromosome": null,
+          "position": null,
           "context": null,
           "studyIds": [
-            "10.1038/s41416-019-0513-7"
+            "10.3389/fendo.2021.681649"
           ],
           "direction": "hypo",
-          "matchStrength": 0.7200000000000001,
+          "matchStrength": 0.6,
           "methylationMetrics": {
-            "value": 0.045737992972135544,
-            "siteMean": 0.3238479332722246,
-            "siteMedian": 0.3235011689539533,
-            "zScore": -19.299861410209335,
-            "percentile": 1.7142974240549663e-73
+            "value": 0.07120020208614213,
+            "zScore": -23.56305266997442,
+            "percentile": 5.995712523303757e-29,
+            "delta_from_mean": -0.35430157400380885,
+            "z_score": -23.56305266997442,
+            "population_distribution": {
+              "q5": 0.000865263404557482,
+              "q25": 0.010849021608009934,
+              "q75": 0.8067406713962555,
+              "q95": 0.8335966527462005,
+              "mean": 0.425501776089951,
+              "median": 0.6545891910791397,
+              "std": 0.030786799817038725,
+              "mad": 0.01669969840440899
+            }
           },
           "modifyingFactors": [
             {
-              "factor": "VEGF signaling pathway activation",
-              "effect": "Increased VEGFB expression contributes to enhanced activation of VEGFR1.",
-              "interventionPotential": "VEGFR1 inhibitors"
+              "factor": "diet",
+              "effect": "Specific dietary components may influence cell signaling and ARMC1/ARMC3 methylation.",
+              "interventionPotential": {
+                "method": "dietary modification",
+                "dosage": "increased intake of foods rich in antioxidants",
+                "timing": "consistent dietary changes",
+                "duration": "long-term"
+              }
+            },
+            {
+              "factor": "exercise",
+              "effect": "Regular physical activity may influence cell signaling and ARMC1/ARMC3 methylation.",
+              "interventionPotential": {
+                "method": "physical activity",
+                "dosage": "at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity aerobic activity per week",
+                "timing": "regularly throughout the week",
+                "duration": "long-term"
+              }
             }
           ]
         }
       ],
       "studyContext": {
-        "primaryStudyId": "10.1038/s41416-019-0513-7",
+        "primaryStudyId": "10.3389/fendo.2021.681649",
         "studyMetrics": [
           {
-            "studyId": "10.1038/s41416-019-0513-7",
-            "totalSubjects": 520,
-            "studyPopulationSummary": [
-              {
-                "groupName": "AFP-high",
-                "count": 29,
-                "description": "Serum AFP concentration > 400 ng/ml"
-              },
-              {
-                "groupName": "AFP-low",
-                "count": 491,
-                "description": "Serum AFP concentration <= 400 ng/ml"
-              }
-            ],
-            "populationContext": "Patients with HCC and high serum AFP levels (>400 ng/ml)",
+            "studyId": "10.3389/fendo.2021.681649",
+            "totalSubjects": null,
+            "studyPopulationSummary": [],
+            "populationContext": "metabolically unhealthy overweight/obese individuals",
             "effectSizes": []
           }
         ]
@@ -1765,360 +2216,58 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Support healthy blood vessel function through a balanced diet and regular exercise",
+        "recommendation": "Incorporate regular physical activity to improve cell signaling in adipose tissue",
         "lucideIcon": "activity",
         "strength": "Moderate",
-        "source": "context",
-        "rationale": "Supporting healthy blood vessel function may help maintain overall health.",
-        "specificActions": [
-          "Consume a diet rich in antioxidants and omega-3 fatty acids.",
-          "Engage in regular, moderate-intensity exercise, as recommended by your healthcare provider."
-        ],
-        "monitoringMetrics": [],
-        "contraindications": [],
-        "supportingEvidence": [
-          "VEGFB is involved in angiogenesis, and its altered expression may affect blood vessel function."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "Increased VEGFB expression leads to enhanced activation of VEGFR1.",
-        "VEGFB is a ligand for VEGFR1, and its overexpression may contribute to angiogenesis and tumor progression."
-      ],
-      "functionalImpact": [
-        "Potential promotion of angiogenesis and altered blood vessel function."
-      ],
-      "healthRelevance": "Proper blood vessel function is essential for overall health, including nutrient delivery and waste removal. Changes in VEGFB expression may affect these processes.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "VEGFB is a ligand for VEGFR1, and its overexpression may contribute to angiogenesis and tumor progression."
-        ],
-        "supportingStudies": [
-          "10.1038/s41416-019-0513-7"
-        ],
-        "biologicalContext": [
-          "Angiogenesis",
-          "VEGF signaling pathway",
-          "Tumor progression"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "IMPDH2"
-      ],
-      "personally_associated_genes": [
-        "IMPDH2"
-      ],
-      "summary": "Enhanced purine synthesis in blood cells increases cellular energy production",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show increased activity in the IMPDH2 gene, which is a key enzyme in the production of guanine nucleotides. This change suggests that your cells are producing more of these building blocks, which are essential for DNA and RNA synthesis, as well as cellular energy production. This pattern is important because it can enhance cellular function and energy levels. This effect is consistent across different cell types in your blood and can be further supported by a diet rich in purine precursors. Regular exercise can also help optimize cellular energy production.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Guanine nucleotide biosynthesis"
-      ],
-      "conservedPathways": [
-        "Purine metabolism",
-        "Nucleotide biosynthesis"
-      ],
-      "commonCellularRoles": [
-        "DNA and RNA synthesis",
-        "Cellular energy production",
-        "Cell growth and proliferation"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cellular metabolism",
-      "tissueContext": "Ubiquitous, with high expression in rapidly dividing cells",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Cellular energy demand",
-          "Growth signals"
-        ],
-        "downstream": [
-          "GTP production",
-          "RNA synthesis",
-          "DNA synthesis"
-        ],
-        "feedback": [
-          "GTP levels regulate IMPDH2 activity"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "IMPDH2",
-          "description": "Hypomethylation of IMPDH2 gene associated with increased expression in glioblastoma cells.",
-          "chromosome": null,
-          "position": null,
-          "context": null,
-          "studyIds": [
-            "10.1093/NEUONC/NOX168.133"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.7999999999999999,
-          "methylationMetrics": {
-            "value": 0.050716195876399674,
-            "siteMean": 0.299425997559982,
-            "siteMedian": 0.29914616762350005,
-            "zScore": -19.369019226879733,
-            "percentile": 6.088805093703337e-67
-          },
-          "modifyingFactors": []
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.1093/NEUONC/NOX168.133",
-        "studyMetrics": [
-          {
-            "studyId": "10.1093/NEUONC/NOX168.133",
-            "totalSubjects": null,
-            "studyPopulationSummary": [
-              {
-                "groupName": "glioblastoma",
-                "count": null,
-                "description": "Primary and recurrent glioblastoma tumors"
-              },
-              {
-                "groupName": "gliosarcoma",
-                "count": null,
-                "description": "Gliosarcoma tumors"
-              },
-              {
-                "groupName": "osteosarcoma",
-                "count": null,
-                "description": "Osteosarcoma tumors"
-              },
-              {
-                "groupName": "glioblastoma_stem_cells",
-                "count": null,
-                "description": "Patient-derived glioma stem cells"
-              }
-            ],
-            "populationContext": "Glioblastoma patients",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Supplement with 500mg inosine at 8am to support purine synthesis",
-        "lucideIcon": "capsules",
-        "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Inosine is a purine nucleoside that can be converted to guanine nucleotides, supporting the observed increase in IMPDH2 activity and enhancing cellular energy production.",
+        "rationale": "Regular exercise can positively influence cell signaling and ARMC1/ARMC3 methylation, potentially improving metabolic health.",
         "specificActions": [
-          "Take 500mg inosine supplement with breakfast at 8am."
+          "Engage in at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity aerobic activity per week.",
+          "Include strength training exercises at least twice a week to support overall metabolic health."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Energy levels",
-            "frequency": "Daily",
-            "target": "Increased sustained energy"
-          }
-        ],
-        "contraindications": [
-          "Gout",
-          "Hyperuricemia"
-        ],
-        "supportingEvidence": [
-          "Inosine is a direct precursor in the purine synthesis pathway.",
-          "Supplementation can increase cellular GTP levels."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "IMPDH2 is a rate-limiting enzyme in de novo guanine nucleotide biosynthesis.",
-        "Increased IMPDH2 activity leads to higher GTP levels, essential for cellular energy and growth."
-      ],
-      "functionalImpact": [
-        "Enhanced cellular energy production",
-        "Increased DNA and RNA synthesis",
-        "Improved cellular function"
-      ],
-      "healthRelevance": "Increased purine synthesis supports overall cellular health and energy levels.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "IMPDH2 catalyzes the conversion of IMP to GMP, a precursor for GTP."
-        ],
-        "supportingStudies": [
-          "Studies showing IMPDH2 upregulation in rapidly proliferating cells."
-        ],
-        "biologicalContext": [
-          "Purine metabolism",
-          "Cellular energy production",
-          "Nucleotide biosynthesis"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "PLEC1"
-      ],
-      "personally_associated_genes": [
-        "PLEC1"
-      ],
-      "summary": "Enhanced cytoskeleton protein expression in blood cells improves cellular structure",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show reduced methylation in the PLEC1 gene, which is responsible for producing plectin, a protein that helps maintain cell structure. This change suggests that your cells are producing more plectin, which can strengthen the cytoskeleton and improve cell stability. This pattern is important because it can enhance cellular resilience and function. This effect is consistent across different cell types in your blood and can be further supported by a diet rich in collagen precursors. Regular exercise can also help optimize cellular structure and function.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Cytoskeleton organization"
-      ],
-      "conservedPathways": [
-        "Actin cytoskeleton regulation",
-        "Cell adhesion"
-      ],
-      "commonCellularRoles": [
-        "Cellular structure and stability",
-        "Cell adhesion",
-        "Mechanical integrity"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cell structure and function",
-      "tissueContext": "Ubiquitous, with high expression in cells requiring mechanical stability",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Mechanical stress",
-          "Cellular signaling"
-        ],
-        "downstream": [
-          "Cytoskeleton assembly",
-          "Cell adhesion",
-          "Cellular integrity"
-        ],
-        "feedback": [
-          "Mechanical stress regulates PLEC1 expression"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "PLEC1",
-          "description": "Hypomethylation within the PLEC1 gene may lead to increased expression of PLEC1.",
-          "chromosome": null,
-          "position": null,
-          "context": "within PLEC1 gene",
-          "studyIds": [
-            "10.21203/RS.3.RS-375556/V1"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.9,
-          "methylationMetrics": {
-            "value": 0.053742305686076484,
-            "siteMean": 0.41034573183435197,
-            "siteMedian": 0.41019274808544043,
-            "zScore": -17.892736386042507,
-            "percentile": 4.262106075742444e-62
-          },
-          "modifyingFactors": []
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.21203/RS.3.RS-375556/V1",
-        "studyMetrics": [
-          {
-            "studyId": "10.21203/RS.3.RS-375556/V1",
-            "totalSubjects": 5881,
-            "studyPopulationSummary": [
-              {
-                "groupName": "NTR_adults",
-                "count": 2682,
-                "description": "Twins, parents of twins, siblings of twins, and spouses of twins"
-              },
-              {
-                "groupName": "ALSPAC_adults",
-                "count": 1232,
-                "description": "Parents from the Avon Longitudinal Study of Parents and Children (ALSPAC) cohort"
-              },
-              {
-                "groupName": "ALSPAC_children_longitudinal",
-                "count": 1021,
-                "description": "Offspring from the ALSPAC cohort"
-              },
-              {
-                "groupName": "NTR_children_buccal",
-                "count": 946,
-                "description": "Twins from the Netherlands Twin Register (NTR)"
-              },
-              {
-                "groupName": "NTR_MZ_discordant_adults",
-                "count": 133,
-                "description": "Monozygotic (MZ) twin pairs discordant for handedness"
-              },
-              {
-                "groupName": "NTR_MZ_discordant_children",
-                "count": 86,
-                "description": "Monozygotic (MZ) twin pairs discordant for handedness"
-              }
-            ],
-            "populationContext": "Twins, parents of twins, siblings of twins, and spouses of twins",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Consume 10g collagen peptides with 50mg vitamin C at 9am to support cytoskeleton structure",
-        "lucideIcon": "capsules",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Collagen peptides provide the building blocks for proteins like plectin, while vitamin C is essential for collagen synthesis, supporting the observed increase in PLEC1 activity and enhancing cellular structure.",
-        "specificActions": [
-          "Mix 10g collagen peptides with water or a smoothie and take with 50mg vitamin C at 9am."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Cellular resilience",
+            "metric": "Fasting blood glucose",
             "frequency": "Monthly",
-            "target": "Improved cell stability"
+            "target": "Maintain a healthy fasting blood glucose level"
+          },
+          {
+            "metric": "HbA1c",
+            "frequency": "Every 3 months",
+            "target": "Maintain a healthy HbA1c level"
           }
         ],
         "contraindications": [
-          "Allergies to collagen sources"
+          "Individuals with pre-existing health conditions should consult a healthcare provider before starting a new exercise regimen."
         ],
         "supportingEvidence": [
-          "Collagen peptides provide amino acids for protein synthesis.",
-          "Vitamin C is a cofactor for collagen synthesis."
+          "Studies linking regular physical activity to improved metabolic health.",
+          "Research showing the role of exercise in regulating cell signaling and methylation."
         ]
       }
     ],
     "evidence": {
-      "strength": "moderate",
+      "strength": "preliminary",
       "mechanisticInsights": [
-        "PLEC1 encodes plectin, a protein essential for cytoskeleton organization.",
-        "Hypomethylation of PLEC1 may lead to increased expression, enhancing cell structure."
+        "Hypomethylation of ARMC1 and ARMC3 may alter their expression and function.",
+        "Altered ARMC1 and ARMC3 function can impact cell signaling and adhesion."
       ],
       "functionalImpact": [
-        "Improved cellular structure and stability",
-        "Enhanced cell adhesion",
-        "Increased mechanical integrity"
+        "Potential impact on cell signaling and cell adhesion in adipose tissue.",
+        "Possible link to altered metabolic health."
       ],
-      "healthRelevance": "Enhanced cytoskeleton protein expression supports overall cellular health and resilience.",
+      "healthRelevance": "Potential link to altered cell signaling and cell adhesion in metabolically unhealthy overweight/obese individuals.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "Plectin crosslinks intermediate filaments, actin filaments, and microtubules."
+          "ARMC1 and ARMC3 are involved in signal transduction and cell adhesion."
         ],
         "supportingStudies": [
-          "Studies showing PLEC1's role in maintaining cell structure and adhesion."
+          "Studies showing the role of ARMC1 and ARMC3 in cellular processes.",
+          "Research linking methylation changes to metabolic health."
         ],
         "biologicalContext": [
-          "Cytoskeleton organization",
-          "Cell adhesion",
-          "Mechanical integrity"
+          "Cell signaling and adhesion are crucial for tissue function.",
+          "Altered cell signaling can contribute to metabolic imbalances."
         ]
       }
     }
@@ -2131,39 +2280,35 @@ export const mockFindings = [
       "personally_associated_genes": [
         "BRSK2"
       ],
-      "summary": "Enhanced cell signaling in blood cells improves immune response",
+      "summary": "Increased immune cell activity may elevate risk of allergic reactions",
       "direction": "hypo"
     },
-    "description": "Your blood cells show reduced methylation in the BRSK2 gene, which is involved in cell signaling and immune responses. This change suggests that your cells are producing more BRSK2 protein, which can enhance cell communication and immune function. This pattern is important because it can strengthen your body's ability to respond to infections and other immune challenges. This effect is consistent across different cell types in your blood and can be further supported by a diet rich in immune-supporting nutrients. Regular exercise can also help optimize immune cell function.",
+    "description": "Your blood cells show decreased methylation at the BRSK2 gene, which is involved in cell signaling and immune responses. This suggests an increase in BRSK2 activity, potentially leading to a more reactive immune system. While this may enhance your defense against infections, it could also increase your susceptibility to allergic reactions. This effect is consistent with findings in studies of allergic sensitization and can be influenced by lifestyle factors and environmental exposures.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Cell signaling",
-        "Immune response regulation"
+        "Phosphorylation signaling",
+        "Cell signaling"
       ],
       "conservedPathways": [
         "mTOR signaling pathway",
         "MAPK signaling pathway"
       ],
       "commonCellularRoles": [
-        "Phosphorylation signaling",
         "Immune cell activation",
-        "Cellular communication"
+        "Cell signaling"
       ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cell signaling and immune function",
-      "tissueContext": "Ubiquitous, with high expression in immune cells",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Peripheral blood mononuclear cells (PBMCs)",
       "regulatoryNetwork": {
         "upstream": [
-          "Immune stimuli",
-          "Cellular stress"
+          "Environmental factors",
+          "Genetic predisposition"
         ],
         "downstream": [
-          "Phosphorylation of target proteins",
-          "Immune cell activation",
-          "Cytokine production"
+          "Phosphorylation signaling proteins",
+          "Immune cell activation molecules"
         ],
-        "feedback": [
-          "Phosphorylation signaling regulates BRSK2 activity"
-        ]
+        "feedback": []
       }
     },
     "provenance": {
@@ -2171,21 +2316,33 @@ export const mockFindings = [
         {
           "matched_probe": null,
           "matched_gene": "BRSK2",
+          "gene_name": "BRSK2",
           "description": "Decreased DNA methylation in the BRSK2 promoter region may lead to increased BRSK2 gene expression.",
           "chromosome": null,
           "position": null,
           "context": "Promoter",
           "studyIds": [
-            "10.3390/ijms22020801"
+            "10.3390/ijms22020801",
+            "10.1038/s41598-023-39313-0"
           ],
           "direction": "hypo",
           "matchStrength": 0.9,
           "methylationMetrics": {
             "value": 0.06524894976367553,
-            "siteMean": 0.5317890327033706,
-            "siteMedian": 0.5328674309421331,
-            "zScore": -17.3632544029737,
-            "percentile": 2.0621681618882576e-56
+            "zScore": -21.712751351690233,
+            "percentile": 1.4862767660647655e-41,
+            "delta_from_mean": -0.4665400829396951,
+            "z_score": -21.712751351690233,
+            "population_distribution": {
+              "q5": 0.028493302688002587,
+              "q25": 0.03335267584770918,
+              "q75": 0.9773460775613785,
+              "q95": 0.9817181140184402,
+              "mean": 0.5317890327033706,
+              "median": 0.6500059068202972,
+              "std": 0.03383446552123676,
+              "mad": 0.01816529656449954
+            }
           },
           "modifyingFactors": [
             {
@@ -2205,183 +2362,16 @@ export const mockFindings = [
         "studyMetrics": [
           {
             "studyId": "10.3390/ijms22020801",
-            "totalSubjects": 270,
-            "studyPopulationSummary": [
-              {
-                "groupName": "IgE_sensitized_airborne",
-                "count": 38,
-                "description": "Children with IgE levels \u2265 0.35 kUA/L to at least one of nine aeroallergens at 5 years of age"
-              },
-              {
-                "groupName": "Non_sensitized_airborne",
-                "count": 36,
-                "description": "Children with IgE levels < 0.35 kUA/L to aeroallergens at 5 years of age"
-              }
-            ],
+            "totalSubjects": 74,
+            "studyPopulationSummary": [],
             "populationContext": "Children at 5 years of age",
             "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Consume 200mg quercetin with 100mg vitamin C at 10am to support immune cell signaling",
-        "lucideIcon": "capsules",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Quercetin and vitamin C can enhance immune cell function and signaling pathways, supporting the observed increase in BRSK2 activity and improving immune response.",
-        "specificActions": [
-          "Take 200mg quercetin with 100mg vitamin C at 10am."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Immune response",
-            "frequency": "Monthly",
-            "target": "Improved immune function"
-          }
-        ],
-        "contraindications": [
-          "Interactions with certain medications"
-        ],
-        "supportingEvidence": [
-          "Quercetin has anti-inflammatory and immune-modulating properties.",
-          "Vitamin C supports immune cell function."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "BRSK2 is involved in phosphorylation signaling and immune response regulation.",
-        "Hypomethylation of BRSK2 may lead to increased expression, enhancing immune cell function."
-      ],
-      "functionalImpact": [
-        "Enhanced cell signaling",
-        "Improved immune cell activation",
-        "Increased immune response"
-      ],
-      "healthRelevance": "Enhanced cell signaling in blood cells supports overall immune function and response.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "BRSK2 mediates phosphorylation and is involved in cell signaling."
-        ],
-        "supportingStudies": [
-          "Studies showing BRSK2's role in immune cell function and signaling."
-        ],
-        "biologicalContext": [
-          "Cell signaling",
-          "Immune response regulation",
-          "Phosphorylation signaling"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "PRKCZ"
-      ],
-      "personally_associated_genes": [
-        "PRKCZ"
-      ],
-      "summary": "Enhanced cellular response to vitamin D in blood cells improves immune regulation",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show reduced methylation in the PRKCZ gene, which is associated with vitamin D metabolism and immune regulation. This change suggests that your cells are producing more PRKCZ protein, which can enhance your body's response to vitamin D and improve immune function. This pattern is important because it can strengthen your body's ability to regulate inflammation and maintain immune balance. This effect is consistent across different cell types in your blood and can be further supported by adequate vitamin D intake. Regular sun exposure can also help optimize vitamin D levels.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Vitamin D metabolism",
-        "Immune regulation"
-      ],
-      "conservedPathways": [
-        "JAK-STAT signaling pathway",
-        "Notch signaling pathway"
-      ],
-      "commonCellularRoles": [
-        "Immune cell function",
-        "Inflammatory response",
-        "Cellular signaling"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in immune regulation and vitamin D metabolism",
-      "tissueContext": "Ubiquitous, with high expression in immune cells and tissues involved in vitamin D metabolism",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Vitamin D levels",
-          "Immune stimuli"
-        ],
-        "downstream": [
-          "Immune cell activation",
-          "Inflammatory response",
-          "Vitamin D metabolism"
-        ],
-        "feedback": [
-          "Vitamin D levels regulate PRKCZ expression"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "PRKCZ",
-          "description": "Hypomethylation of the PRKCZ 5'UTR and body region likely increases PRKCZ gene expression.",
-          "chromosome": null,
-          "position": null,
-          "context": "5'UTR; Body",
-          "studyIds": [
-            "10.3389/fphar.2017.00923"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.9,
-          "methylationMetrics": {
-            "value": 0.09023454474906127,
-            "siteMean": 0.6083717415275335,
-            "siteMedian": 0.6100688796406153,
-            "zScore": -16.76874280961065,
-            "percentile": 1.1382741104879348e-53
           },
-          "modifyingFactors": [
-            {
-              "factor": "Allopurinol exposure",
-              "effect": "Allopurinol use is a prerequisite for the observed hypomethylation and SCARs development.",
-              "interventionPotential": {
-                "method": "Drug withdrawal",
-                "dosage": "Discontinue allopurinol use",
-                "timing": "Immediately upon SCARs onset",
-                "duration": "Until symptoms resolve"
-              }
-            },
-            {
-              "factor": "HLA-B*5801 allele",
-              "effect": "Presence of HLA-B*5801 allele increases the risk of allopurinol-induced SCARs, potentially interacting with PRKCZ hypomethylation.",
-              "interventionPotential": {
-                "method": "Genetic screening",
-                "timing": "Prior to allopurinol prescription"
-              }
-            }
-          ]
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.3389/fphar.2017.00923",
-        "studyMetrics": [
           {
-            "studyId": "10.3389/fphar.2017.00923",
-            "totalSubjects": 35,
-            "studyPopulationSummary": [
-              {
-                "groupName": "allopurinol-SCARs",
-                "count": 15,
-                "description": "Patients diagnosed with severe cutaneous adverse reactions (SCARs) induced by allopurinol"
-              },
-              {
-                "groupName": "allopurinol-tolerant controls",
-                "count": 20,
-                "description": "Patients using allopurinol without any evidence of cutaneous adverse reactions"
-              }
-            ],
-            "populationContext": "Han Chinese individuals taking allopurinol",
+            "studyId": "10.1038/s41598-023-39313-0",
+            "totalSubjects": 109,
+            "studyPopulationSummary": [],
+            "populationContext": "Preterm infants",
             "effectSizes": []
           }
         ]
@@ -2389,53 +2379,54 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Take 2000 IU vitamin D3 with 100mcg vitamin K2 at 11am to support immune regulation",
-        "lucideIcon": "capsules",
+        "recommendation": "Manage environmental exposures to minimize risk of allergic reactions",
+        "lucideIcon": "shield",
         "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Vitamin D3 and K2 work synergistically to support immune function and calcium metabolism, enhancing the observed increase in PRKCZ activity and improving immune regulation.",
+        "source": "context",
+        "rationale": "Reducing exposure to common allergens can help mitigate the risk of allergic reactions associated with increased BRSK2 activity.",
         "specificActions": [
-          "Take 2000 IU vitamin D3 with 100mcg vitamin K2 at 11am."
+          "Identify and avoid known allergens, such as pollen, dust mites, and pet dander.",
+          "Use air purifiers with HEPA filters to reduce indoor allergens.",
+          "Wash bedding regularly in hot water to eliminate dust mites."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Vitamin D levels",
-            "frequency": "Quarterly",
-            "target": "Optimal vitamin D levels"
+            "metric": "Allergy symptoms",
+            "frequency": "Daily",
+            "target": "Minimize allergic reactions"
           }
         ],
         "contraindications": [
-          "Hypercalcemia"
+          "Individuals with severe allergies should consult an allergist for personalized management strategies."
         ],
         "supportingEvidence": [
-          "Vitamin D3 is essential for immune function and calcium metabolism.",
-          "Vitamin K2 supports vitamin D's effects on calcium metabolism."
+          "Studies linking environmental exposures to allergic sensitization.",
+          "Research showing the role of BRSK2 in immune cell activation."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "PRKCZ is associated with vitamin D metabolism and immune regulation.",
-        "Hypomethylation of PRKCZ may lead to increased expression, enhancing immune response."
+        "Hypomethylation of BRSK2 may lead to increased gene expression.",
+        "Increased BRSK2 expression can alter phosphorylation signaling and immune responses."
       ],
       "functionalImpact": [
-        "Improved cellular response to vitamin D",
-        "Enhanced immune cell function",
-        "Better inflammatory response regulation"
+        "Altered immune cell activity, potentially increasing susceptibility to allergic reactions."
       ],
-      "healthRelevance": "Enhanced cellular response to vitamin D supports overall immune health and regulation.",
+      "healthRelevance": "Increased risk of allergic sensitization and allergic diseases.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "PRKCZ is involved in the metabolism of serum vitamin D and immune cell signaling."
+          "BRSK2 mediates phosphorylation and is involved in cell signaling.",
+          "BRSK2 plays a role in immune cell function and activation."
         ],
         "supportingStudies": [
-          "Studies showing PRKCZ's role in immune-related conditions and vitamin D metabolism."
+          "Studies linking BRSK2 methylation to allergic sensitization.",
+          "Research showing the role of BRSK2 in immune cell signaling."
         ],
         "biologicalContext": [
-          "Vitamin D metabolism",
-          "Immune regulation",
-          "Cellular signaling"
+          "Cell signaling is crucial for immune cell function.",
+          "Dysregulation of immune responses can contribute to allergic diseases."
         ]
       }
     }
@@ -2443,203 +2434,32 @@ export const mockFindings = [
   {
     "pattern": {
       "gene_list": [
-        "DNAJC16"
+        "GNA12"
       ],
       "personally_associated_genes": [
-        "DNAJC16"
+        "GNA12"
       ],
-      "summary": "Enhanced cellular stress response in blood cells improves cellular protection",
+      "summary": "Altered cell signaling in lung tissue may impair respiratory function",
       "direction": "hypo"
     },
-    "description": "Your blood cells show reduced methylation in the DNAJC16 gene, which is part of the heat shock protein family and involved in cellular stress responses. This change suggests that your cells are producing more DNAJC16 protein, which can enhance their ability to cope with stress and maintain cellular health. This pattern is important because it can strengthen your body's ability to protect cells from damage. This effect is consistent across different cell types in your blood and can be further supported by a diet rich in antioxidants. Regular exercise can also help optimize cellular stress responses.",
+    "description": "Your blood cells show decreased methylation at the GNA12 gene, which is involved in cell signaling. This suggests an increase in GNA12 activity, potentially disrupting cell communication in your lungs. This change may affect your respiratory health by impairing alveolar development and increasing susceptibility to lung injury. This pattern is consistent with findings in studies of lung development and can be influenced by environmental factors such as air quality. Maintaining good air quality and avoiding respiratory irritants can help support healthy lung function.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Cellular stress response",
-        "Protein folding"
-      ],
-      "conservedPathways": [
-        "Heat shock protein pathway",
-        "Tumor suppression pathways"
-      ],
-      "commonCellularRoles": [
-        "Protein quality control",
-        "Cellular protection",
-        "Stress adaptation"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cellular stress response and protein homeostasis",
-      "tissueContext": "Ubiquitous, with high expression in cells under stress",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Cellular stress",
-          "Heat shock response"
-        ],
-        "downstream": [
-          "Protein folding",
-          "Cellular protection",
-          "Stress adaptation"
-        ],
-        "feedback": [
-          "Cellular stress regulates DNAJC16 expression"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "DNAJC16",
-          "description": "Hypomethylation of DNAJC16 regulatory region",
-          "chromosome": null,
-          "position": null,
-          "context": null,
-          "studyIds": [
-            "10.1093/hmg/ddx194"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.9,
-          "methylationMetrics": {
-            "value": 0.053997821767221794,
-            "siteMean": 0.2666717341406985,
-            "siteMedian": 0.2664145920891315,
-            "zScore": -16.84177571421272,
-            "percentile": 1.142299685752557e-49
-          },
-          "modifyingFactors": [
-            {
-              "factor": "Tea consumption",
-              "effect": "Decreased methylation at cg18192808",
-              "interventionPotential": {
-                "method": "Dietary intervention",
-                "dosage": "Increased tea consumption"
-              }
-            }
-          ]
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.1093/hmg/ddx194",
-        "studyMetrics": [
-          {
-            "studyId": "10.1093/hmg/ddx194",
-            "totalSubjects": 3096,
-            "studyPopulationSummary": [
-              {
-                "groupName": "NSPHS",
-                "count": 723,
-                "description": "Participants from the Northern Sweden Population Health Study"
-              },
-              {
-                "groupName": "PIVUS",
-                "count": 804,
-                "description": "Participants from the Prospective Investigation of the Vasculature in Uppsala Seniors study"
-              },
-              {
-                "groupName": "HWFS",
-                "count": 948,
-                "description": "Participants from the Dutch Hunger Winter Families Study"
-              },
-              {
-                "groupName": "EGM",
-                "count": 621,
-                "description": "Participants from the EnviroGenoMarkers project"
-              }
-            ],
-            "populationContext": "Participants from the Northern Sweden Population Health Study, Prospective Investigation of the Vasculature in Uppsala Seniors study, Dutch Hunger Winter Families Study, and EnviroGenoMarkers project",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Drink 1 cup of green tea with 200mg EGCG at 12pm to support cellular stress response",
-        "lucideIcon": "cup-tea",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Green tea and EGCG can enhance cellular stress responses and support protein folding, aligning with the observed increase in DNAJC16 activity and improving cellular protection.",
-        "specificActions": [
-          "Drink 1 cup of green tea with 200mg EGCG at 12pm."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Cellular stress markers",
-            "frequency": "Monthly",
-            "target": "Reduced cellular stress"
-          }
-        ],
-        "contraindications": [
-          "Caffeine sensitivity"
-        ],
-        "supportingEvidence": [
-          "Green tea and EGCG have antioxidant and stress-protective properties.",
-          "EGCG can enhance heat shock protein activity."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "DNAJC16 is a heat shock protein involved in cellular stress response.",
-        "Hypomethylation of DNAJC16 may lead to increased expression, enhancing cellular protection."
-      ],
-      "functionalImpact": [
-        "Improved cellular stress response",
-        "Enhanced protein folding",
-        "Increased cellular protection"
-      ],
-      "healthRelevance": "Enhanced cellular stress response supports overall cellular health and protection.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "DNAJC16 is a paralogue of DNAJA3, which is involved in tumor suppression."
-        ],
-        "supportingStudies": [
-          "Studies showing DNAJC16's role in cellular stress response and protein homeostasis."
-        ],
-        "biologicalContext": [
-          "Cellular stress response",
-          "Protein folding",
-          "Heat shock protein family"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "ARHGEF12"
-      ],
-      "personally_associated_genes": [
-        "ARHGEF12"
-      ],
-      "summary": "Enhanced cell signaling in blood cells improves metabolic regulation",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show reduced methylation in the ARHGEF12 gene, which is involved in cell signaling and metabolic regulation. This change suggests that your cells are producing more ARHGEF12 protein, which can enhance cell communication and metabolic function. This pattern is important because it can strengthen your body's ability to regulate metabolism and maintain metabolic balance. This effect is consistent across different cell types in your blood and can be further supported by a diet rich in metabolic-supporting nutrients. Regular exercise can also help optimize metabolic cell function.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Cell signaling",
-        "Metabolic regulation"
+        "Cell signaling"
       ],
       "conservedPathways": [
         "Cell signaling pathways",
-        "Actin cytoskeleton regulation"
+        "Lung development pathways"
       ],
       "commonCellularRoles": [
-        "RhoA GTPase regulation",
-        "Cellular communication",
-        "Metabolic homeostasis"
+        "Cell communication",
+        "Tissue development"
       ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cell signaling and metabolic function",
-      "tissueContext": "Ubiquitous, with high expression in cells involved in metabolic regulation",
+      "evolutionaryContext": "Conserved across vertebrates",
+      "tissueContext": "Lung",
       "regulatoryNetwork": {
-        "upstream": [
-          "Weight loss",
-          "Metabolic changes"
-        ],
-        "downstream": [
-          "RhoA GTPase targets",
-          "Cell signaling molecules"
-        ],
+        "upstream": [],
+        "downstream": [],
         "feedback": []
       }
     },
@@ -2647,384 +2467,56 @@ export const mockFindings = [
       "associated_regions": [
         {
           "matched_probe": null,
-          "matched_gene": "ARHGEF12",
-          "description": "Hypomethylation of the ARHGEF12 gene promoter region, potentially leading to increased ARHGEF12 gene expression.",
-          "chromosome": "11",
-          "position": 113794554,
-          "context": "promoter",
+          "matched_gene": "GNA12",
+          "gene_name": "GNA12",
+          "description": "Hypomethylation at cg05308829 may lead to increased expression of GNA12.",
+          "chromosome": "17",
+          "position": 5857232,
+          "context": "intergenic",
           "studyIds": [
-            "10.1186/s13148-022-01401-9"
+            "10.1038/s41598-023-39313-0"
           ],
           "direction": "hypo",
-          "matchStrength": 0.9999999999999999,
+          "matchStrength": 0.8,
           "methylationMetrics": {
-            "value": 0.06682725623250008,
-            "siteMean": 0.3073090929219192,
-            "siteMedian": 0.3070983234090523,
-            "zScore": -16.632911825227556,
-            "percentile": 6.579063153876414e-46
-          },
-          "modifyingFactors": [
-            {
-              "factor": "Bariatric surgery",
-              "effect": "Induces hypomethylation at this site, associated with weight loss.",
-              "interventionPotential": "Surgical intervention"
-            },
-            {
-              "factor": "Caloric restriction",
-              "effect": "Induces hypomethylation at this site, associated with weight loss, but to a lesser extent than bariatric surgery.",
-              "interventionPotential": "Dietary intervention"
+            "value": 0.052444368290404476,
+            "zScore": -20.355086814045094,
+            "percentile": 6.17598497062352e-43,
+            "delta_from_mean": -0.4218135542543382,
+            "z_score": -20.355086814045094,
+            "population_distribution": {
+              "q5": 4.723757811007093e-05,
+              "q25": 0.0036640536272898316,
+              "q75": 0.9094690829515457,
+              "q95": 0.9206629186868668,
+              "mean": 0.4742579225447427,
+              "median": 0.5610305368900299,
+              "std": 0.030094022179239528,
+              "mad": 0.0168528571680543
             }
-          ]
+          },
+          "modifyingFactors": []
         }
       ],
       "studyContext": {
-        "primaryStudyId": "10.1186/s13148-022-01401-9",
+        "primaryStudyId": "10.1038/s41598-023-39313-0",
         "studyMetrics": [
           {
-            "studyId": "10.1186/s13148-022-01401-9",
-            "totalSubjects": 38,
+            "studyId": "10.1038/s41598-023-39313-0",
+            "totalSubjects": 109,
             "studyPopulationSummary": [
               {
-                "groupName": "bariatric_surgery_cohort",
-                "count": 22,
-                "description": "Severely obese individuals undergoing bariatric surgery"
-              },
-              {
-                "groupName": "monozygotic_twin_replication_set",
-                "count": 16,
-                "description": "Eight pairs of healthy monozygotic twins discordant for BMI"
-              }
-            ],
-            "populationContext": "Severely obese individuals undergoing bariatric surgery and BMI-discordant monozygotic twins",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Perform 4 rounds of 30-second high-intensity intervals at 85% max effort with 2-minute rests at 8am to upregulate NF-\u03baB-dependent stress adaptation",
-        "lucideIcon": "activity",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "High-intensity interval training (HIIT) at 8am can enhance NF-\u03baB signaling, which is linked to improved metabolic regulation and cellular stress adaptation. This timing aligns with the body's natural circadian rhythm for optimal response.",
-        "specificActions": [
-          "Engage in 4 rounds of 30-second high-intensity exercise at 85% of your maximum effort.",
-          "Rest for 2 minutes between each interval.",
-          "Perform this exercise routine at 8am."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Heart rate variability",
-            "frequency": "Daily",
-            "target": "Increase in HRV"
-          }
-        ],
-        "contraindications": [
-          "Severe cardiovascular disease",
-          "Joint problems",
-          "Pregnancy"
-        ],
-        "supportingEvidence": [
-          "Studies showing HIIT increases NF-\u03baB signaling",
-          "Research on circadian rhythm and exercise performance"
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "ARHGEF12 hypomethylation is associated with weight loss and improved metabolic regulation.",
-        "ARHGEF12 is a RhoA GTPase regulator involved in cell signaling."
-      ],
-      "functionalImpact": [
-        "Increased ARHGEF12 expression enhances cell signaling and metabolic function."
-      ],
-      "healthRelevance": "Improved metabolic regulation and potential benefits for weight management.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "ARHGEF12 regulates RhoA GTPase activity, which is crucial for cell signaling and metabolic processes."
-        ],
-        "supportingStudies": [
-          "Studies linking ARHGEF12 to metabolic health and weight loss."
-        ],
-        "biologicalContext": [
-          "ARHGEF12 is involved in cell signaling pathways and actin cytoskeleton regulation."
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "FBXO32"
-      ],
-      "personally_associated_genes": [
-        "FBXO32"
-      ],
-      "summary": "Enhanced protein degradation in blood cells improves cellular stress response and reduces cancer risk",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show increased activity of the FBXO32 gene, which is involved in breaking down proteins. This means that your cells are more efficient at removing damaged or unnecessary proteins, which helps maintain cellular health and function. This pattern is important because it is associated with a reduced risk of cancer and improved insulin sensitivity. The effect is likely consistent across different cell types in your blood and can be further enhanced by regular exercise and a balanced diet. This can be influenced by maintaining a healthy lifestyle and managing stress.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Ubiquitin ligase activity"
-      ],
-      "conservedPathways": [
-        "Ubiquitin-proteasome system",
-        "FoxO signaling pathway"
-      ],
-      "commonCellularRoles": [
-        "Protein degradation",
-        "Cell cycle regulation",
-        "Apoptosis"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its fundamental role in cellular homeostasis.",
-      "tissueContext": "Primarily active in muscle and blood cells, with systemic effects due to its role in cellular homeostasis.",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Reduced GH/IGF-1 signaling",
-          "FoxO transcription factors"
-        ],
-        "downstream": [
-          "Target proteins for ubiquitination and degradation"
-        ],
-        "feedback": []
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "FBXO32",
-          "description": "Increased expression of FBXO32 mRNA, leading to increased FBXO32 protein levels.",
-          "chromosome": null,
-          "position": null,
-          "context": null,
-          "studyIds": [
-            "10.1126/scitranslmed.3001845"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.7200000000000001,
-          "methylationMetrics": {
-            "value": 0.041748487701018654,
-            "siteMean": 0.4508561642294635,
-            "siteMedian": 0.45089375055224495,
-            "zScore": -16.00438680850896,
-            "percentile": 7.189861414256211e-50
-          },
-          "modifyingFactors": [
-            {
-              "factor": "Growth hormone (GH) and Insulin-like Growth Factor 1 (IGF-1) signaling",
-              "effect": "Reduced GH/IGF-1 signaling upregulates FBXO32 expression via FoxO transcription factors.",
-              "interventionPotential": "Pharmacological inhibition of GH/IGF-1 signaling may further enhance FBXO32 expression, but this is not recommended for healthy adults."
-            },
-            {
-              "factor": "Oxidative stress",
-              "effect": "Increased oxidative stress may further induce FBXO32 expression as a protective response.",
-              "interventionPotential": "Antioxidant supplementation may help enhance FBXO32 expression."
-            }
-          ]
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.1126/scitranslmed.3001845",
-        "studyMetrics": [
-          {
-            "studyId": "10.1126/scitranslmed.3001845",
-            "totalSubjects": 99,
-            "studyPopulationSummary": [
-              {
-                "groupName": "GHRD_cohort",
-                "count": 99,
-                "description": "Individuals with growth hormone receptor deficiency (GHRD) due to mutations in the GHR gene, characterized by severe short stature and low IGF-I levels."
-              },
-              {
-                "groupName": "Ecuadorian_relatives",
-                "count": "Variable, used as controls",
-                "description": "Unaffected first to fourth-degree relatives of GHRD individuals."
-              },
-              {
-                "groupName": "Ecuadorian_control_population",
-                "count": "Not specified, used for prevalence comparisons",
-                "description": "General Ecuadorian population."
-              }
-            ],
-            "populationContext": "Ecuadorian population with a focus on individuals with Growth Hormone Receptor Deficiency (GHRD).",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Engage in regular high-intensity interval training to enhance cellular stress response",
-        "lucideIcon": "activity",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "High-intensity exercise can induce mild oxidative stress, which may further upregulate FBXO32 expression and enhance cellular protein degradation.",
-        "specificActions": [
-          "Perform 4 rounds of 30-second high-intensity intervals at 85% max effort with 2-minute rests, 3 times per week."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Exercise performance",
-            "frequency": "Weekly",
-            "target": "Increased endurance and power output"
-          }
-        ],
-        "contraindications": [
-          "Individuals with cardiovascular conditions should consult a healthcare provider before starting high-intensity exercise."
-        ],
-        "supportingEvidence": [
-          "Studies show that exercise can induce mild oxidative stress, which may upregulate FBXO32 expression.",
-          "FBXO32 is involved in cellular stress response and protein degradation."
-        ]
-      },
-      {
-        "recommendation": "Consume a diet rich in antioxidants to support cellular health",
-        "lucideIcon": "leaf",
-        "strength": "Moderate",
-        "source": "context",
-        "rationale": "Antioxidants can help manage oxidative stress, which may further enhance FBXO32 expression and support cellular protein degradation.",
-        "specificActions": [
-          "Include foods rich in antioxidants such as berries, leafy greens, and nuts in your daily diet."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Dietary intake",
-            "frequency": "Daily",
-            "target": "Consistent consumption of antioxidant-rich foods"
-          }
-        ],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Antioxidants help manage oxidative stress, which is linked to FBXO32 expression.",
-          "A balanced diet supports overall cellular health and function."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "FBXO32 is a ubiquitin ligase that targets proteins for degradation.",
-        "Increased FBXO32 expression enhances cellular protein degradation and stress response."
-      ],
-      "functionalImpact": [
-        "Improved cellular homeostasis and reduced accumulation of damaged proteins."
-      ],
-      "healthRelevance": "Reduced cancer incidence and increased insulin sensitivity observed in individuals with similar molecular patterns.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "FBXO32 is a target of FoxO transcription factors and is upregulated under conditions of reduced GH/IGF-1 signaling."
-        ],
-        "supportingStudies": [
-          "Studies in GHRD individuals show reduced cancer incidence and increased insulin sensitivity.",
-          "In vitro studies confirm increased FBXO32 expression in response to GHRD serum."
-        ],
-        "biologicalContext": [
-          "FBXO32 plays a role in muscle atrophy, cell cycle regulation, and apoptosis."
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "DHX58"
-      ],
-      "personally_associated_genes": [
-        "DHX58"
-      ],
-      "summary": "Enhanced RNA sensing in blood cells strengthens immune response to viral infections",
-      "direction": "hypo"
-    },
-    "description": "Your blood cells show increased activity of the DHX58 gene, which is involved in detecting viral RNA. This means your immune system is more sensitive to viral infections, potentially leading to a stronger and faster response. This pattern is important because it enhances your body's ability to fight off viral infections. The effect is consistent across different types of immune cells in your blood and can be further supported by maintaining a healthy lifestyle and managing stress. This can be influenced by ensuring adequate sleep and a balanced diet.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Cytosolic RNA sensor"
-      ],
-      "conservedPathways": [
-        "Innate immune response",
-        "Interferon signaling pathway"
-      ],
-      "commonCellularRoles": [
-        "Viral RNA detection",
-        "Activation of immune response",
-        "Cytokine production"
-      ],
-      "evolutionaryContext": "Highly conserved across species due to its critical role in antiviral defense.",
-      "tissueContext": "Primarily active in immune cells, including B cells, T cells, and myeloid cells.",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Cytosolic RNA",
-          "Type I interferon (IFN) signaling"
-        ],
-        "downstream": [
-          "MDA5 (IFIH1)",
-          "RIG-I (DDX58)",
-          "NF-\u03baB signaling",
-          "Cytokine production",
-          "Interferon-stimulated genes (ISGs)"
-        ],
-        "feedback": []
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "DHX58",
-          "description": "Increased DHX58 (LGP2) expression in SLE PBMC subsets, leading to enhanced RNA sensing and activation of downstream inflammatory pathways.",
-          "chromosome": null,
-          "position": null,
-          "context": null,
-          "studyIds": [
-            "10.1371/journal.pone.0067003"
-          ],
-          "direction": "hypo",
-          "matchStrength": 0.7200000000000001,
-          "methylationMetrics": {
-            "value": 0.04721400886774063,
-            "siteMean": 0.23116213887425635,
-            "siteMedian": 0.22878371768941483,
-            "zScore": -16.005286779468847,
-            "percentile": 2.3483117525966424e-42
-          },
-          "modifyingFactors": [
-            {
-              "factor": "Viral infection",
-              "effect": "Viral infection can induce DHX58 expression.",
-              "interventionPotential": "Antiviral therapy may help manage DHX58 expression during active infection, but this is not recommended for healthy adults."
-            },
-            {
-              "factor": "Type I interferon (IFN) levels",
-              "effect": "Increased IFN levels induce DHX58 expression.",
-              "interventionPotential": "Anti-IFN therapy may help manage DHX58 expression during active disease, but this is not recommended for healthy adults."
-            }
-          ]
-        }
-      ],
-      "studyContext": {
-        "primaryStudyId": "10.1371/journal.pone.0067003",
-        "studyMetrics": [
-          {
-            "studyId": "10.1371/journal.pone.0067003",
-            "totalSubjects": 25,
-            "studyPopulationSummary": [
-              {
-                "groupName": "SLE_patients",
+                "groupName": "BPD",
                 "count": 15,
-                "description": "Female patients fulfilling at least 4 of 11 American College of Rheumatology classification criteria for Systemic Lupus Erythematosus (SLE)"
+                "description": "Preterm infants diagnosed with Bronchopulmonary Dysplasia (BPD)"
               },
               {
-                "groupName": "healthy_controls",
-                "count": 11,
-                "description": "Healthy female controls"
+                "groupName": "nonBPD",
+                "count": 94,
+                "description": "Preterm infants without Bronchopulmonary Dysplasia (BPD)"
               }
             ],
-            "populationContext": "Female patients with Systemic Lupus Erythematosus (SLE) and healthy female controls.",
+            "populationContext": "Preterm infants",
             "effectSizes": []
           }
         ]
@@ -3032,70 +2524,58 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Ensure adequate sleep to support immune function",
-        "lucideIcon": "moon",
-        "strength": "Moderate",
-        "source": "outcome",
-        "rationale": "Sufficient sleep is crucial for maintaining a balanced immune response and can help optimize DHX58 activity.",
-        "specificActions": [
-          "Aim for 7-9 hours of quality sleep per night."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Sleep duration",
-            "frequency": "Daily",
-            "target": "Consistent 7-9 hours of sleep"
-          }
-        ],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Sleep deprivation can impair immune function and increase susceptibility to infections.",
-          "Adequate sleep supports optimal immune cell activity."
-        ]
-      },
-      {
-        "recommendation": "Consume a balanced diet rich in vitamins and minerals to support immune health",
-        "lucideIcon": "carrot",
+        "recommendation": "Maintain good air quality to support healthy lung function",
+        "lucideIcon": "wind",
         "strength": "Moderate",
         "source": "context",
-        "rationale": "A balanced diet provides essential nutrients that support immune cell function and can help optimize DHX58 activity.",
+        "rationale": "Reducing exposure to air pollutants can help mitigate the potential negative effects of altered GNA12 activity on lung health.",
         "specificActions": [
-          "Include a variety of fruits, vegetables, and whole grains in your daily diet."
+          "Use air purifiers with HEPA filters in your home and workplace.",
+          "Avoid areas with high levels of air pollution, such as busy roads and industrial areas.",
+          "Consider using a mask when air quality is poor."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Dietary intake",
+            "metric": "Respiratory symptoms",
             "frequency": "Daily",
-            "target": "Consistent consumption of a balanced diet"
+            "target": "Minimize respiratory symptoms"
+          },
+          {
+            "metric": "Lung function tests",
+            "frequency": "Annually",
+            "target": "Maintain optimal lung function"
           }
         ],
         "contraindications": [],
         "supportingEvidence": [
-          "Nutrient deficiencies can impair immune function.",
-          "A balanced diet supports optimal immune cell activity."
+          "Studies linking air pollution to respiratory issues",
+          "Research on GNA12's role in lung development"
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "DHX58 is a cytosolic RNA sensor that activates the innate immune response.",
-        "Increased DHX58 expression enhances the detection of viral RNA and downstream inflammatory pathways."
+        "Hypomethylation at GNA12 may increase its expression.",
+        "Increased GNA12 activity can disrupt cell signaling in the lungs."
       ],
       "functionalImpact": [
-        "Improved immune response to viral infections."
+        "Impaired alveolar development",
+        "Increased susceptibility to lung injury"
       ],
-      "healthRelevance": "Enhanced immune response to viral infections, potentially reducing the severity and duration of illness.",
+      "healthRelevance": "May affect respiratory health and increase susceptibility to lung conditions.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DHX58 is a positive regulator of MDA5 and RIG-I, key components of the innate immune response."
+          "GNA12 is involved in cell signaling pathways that regulate lung development and function."
         ],
         "supportingStudies": [
-          "Studies in SLE patients show increased DHX58 expression in immune cells.",
-          "DHX58 is known to be involved in the innate immune response to RNA viruses."
+          "Studies showing GNA12's role in lung development",
+          "Studies linking altered cell signaling to respiratory issues"
         ],
         "biologicalContext": [
-          "DHX58 plays a role in the activation of NF-\u03baB signaling and the production of cytokines."
+          "Cell signaling",
+          "Lung development",
+          "Respiratory health"
         ]
       }
     }

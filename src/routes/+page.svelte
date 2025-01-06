@@ -1,20 +1,13 @@
 <script lang="ts">
 	import GridSystem from '$lib/components/GridSystem.svelte';
 	import ParticleField from '$lib/components/ParticleField.svelte';
-	import EnergyFlow from '$lib/components/EnergyFlow.svelte';
 	import MolecularContainer from '$lib/components/MolecularContainer.svelte';
 	import { interactionState } from '$lib/stores/interaction';
 	import AeonLogo from '$lib/images/AeonLogo.svelte';
-	import type { MolecularProps } from '$lib/types/molecular';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
-	
-	const molecularProps: MolecularProps = {
-		scale: 1,
-		intensity: 0.5,
-		interaction: 'attract' as const
-	};
+
 
 	function handleContainerHover(event: CustomEvent) {
 		const element = event.detail.element;
@@ -68,7 +61,6 @@
 <main class="hero" style="pointer-events: none;">
 	<div class="container-wrapper" style="pointer-events: all;">
 		<MolecularContainer 
-			props={molecularProps}
 			on:hover={handleContainerHover}
 			on:leave={handleContainerLeave}
 		>
