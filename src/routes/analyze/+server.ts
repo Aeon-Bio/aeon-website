@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
         // Send directly to Azure function
         const uploadResponse = await fetch(
-            `${AZURE_FUNCTION_URL}/api/methylation-analysis?` + 
+            `${AZURE_FUNCTION_URL}/methylation-analysis?` + 
             new URLSearchParams({
                 sample_id: sampleColumn,
                 probe_id_col: cpgColumn

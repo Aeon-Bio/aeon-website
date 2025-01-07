@@ -106,7 +106,7 @@
             // Add upload complete handler
             xhr.upload.addEventListener('load', () => {
                 uploadProgress = 1;
-                statusMessage = 'Upload complete, waking AI...';
+                statusMessage = 'Server verifying file...';
                 currentPhase = 'analyzing';
             });
 
