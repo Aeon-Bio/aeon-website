@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import type { Finding, Tab } from '../../types/insights';
   import { BarChart, Target, Beaker, FileSpreadsheet } from 'lucide-svelte';
   import Header from './layout/Header.svelte';
@@ -6,6 +7,8 @@
   import RecommendationsTab from './tabs/RecommendationsTab.svelte';
   import ScienceTab from './tabs/ScienceTab.svelte';
   import EvidenceTab from './tabs/EvidenceTab.svelte';
+
+  const dispatch = createEventDispatcher();
 
   export let finding: Finding;
   export let expanded = false;
@@ -27,9 +30,12 @@
   function toggleExpanded() {
     expanded = !expanded;
     if (expanded) {
+        dispatch('expand');
         setTimeout(() => {  // Wait for the next tick so the page height is updated
             cardElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 0);
+    } else {
+        dispatch('collapse');
     }
   }
 </script>

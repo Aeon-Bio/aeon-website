@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import { FileText, FileJson } from 'lucide-svelte';
+    import { FileText, FileJson, Download } from 'lucide-svelte';
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
 	import Papa from 'papaparse';
@@ -11,7 +11,6 @@
     let isProcessing = false;
     let isDragging = { csv: false, json: false };
     let sampleId: string | null = null;
-    let progress = 0;
     let error: string | null = null;
     let statusMessage: string | null = null;
     let uploadProgress = 0;
@@ -28,6 +27,9 @@
 
     // Add a Set to track processed finding IDs
     let processedFindingIds = new Set<string>();
+
+    // Add a store to track if any card is expanded
+    let isAnyCardExpanded = false;
 
     async function processCSV(newFile: File) {
         processedFindingIds.clear();
@@ -267,10 +269,36 @@
             await processJSON(droppedFile);
         }
     }
+
+    function downloadFindings() {
+        if (findings.length === 0) return;
+        
+        const dataStr = JSON.stringify(findings, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        // Determine filename based on source
+        let filename = 'findings_sample.json';
+        if (csvFile) {
+            filename = `findings_${csvFile.name.replace(/\.(csv|tsv|txt)$/, '')}.json`;
+        } else if (jsonFile) {
+            filename = jsonFile.name;
+        }
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 </script>
 
-<main class="analyze-container">
-    <div class="insight-card p-6 w-[300px] h-fit" style="position: sticky; top: 2rem">
+<main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
+    <div class="insight-card p-6 w-[300px] h-fit transition-all duration-300 ease-in-out" 
+         style="position: sticky; top: 2rem; {isAnyCardExpanded ? 'sm:transform: translateX(-120%);' : ''}"
+    >
         <div class="flex flex-col gap-6">
             <!-- Option 1: CSV Upload -->
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
@@ -306,14 +334,14 @@
 
                 <!-- CSV Upload Zone -->
                 <label 
-                    class="file-drop-zone flex flex-col items-center gap-3 px-6 py-8 rounded-lg border-2 border-dashed transition-all duration-200 {isDragging.csv ? 'border-aeon-primary bg-aeon-primary/10' : 'border-gray-700 bg-aeon-surface-1'} {!isDragging.csv ? 'hover:border-aeon-primary hover:transform hover:translate-y-[-1px] hover:shadow-lg' : ''} cursor-pointer"
+                    class="file-drop-zone flex flex-col items-center gap-2 px-4 py-6 rounded-lg border-2 border-dashed transition-all duration-200 {isDragging.csv ? 'border-aeon-primary bg-aeon-primary/10' : 'border-gray-700 bg-aeon-surface-1'} {!isDragging.csv ? 'hover:border-aeon-primary hover:transform hover:translate-y-[-1px] hover:shadow-lg' : ''} cursor-pointer"
                     on:click|preventDefault={() => handleClick('csv')}
                     on:dragenter={(e) => handleDragEnter(e, 'csv')}
                     on:dragleave={(e) => handleDragLeave(e, 'csv')}
                     on:dragover={handleDragOver}
                     on:drop={(e) => handleDrop(e, 'csv')}
                 >
-                    <FileText class="h-8 w-8 text-aeon-primary" />
+                    <FileText class="h-6 w-6 text-aeon-primary" />
                     <input 
                         type="file" 
                         accept=".csv,.tsv,.txt"
@@ -321,10 +349,10 @@
                         on:change={(e) => handleFileSelect(e, 'csv')}
                     />
                     <div class="text-center">
-                        <span class="text-sm text-aeon-biolum block">
+                        <span class="text-sm text-aeon-biolum block truncate max-w-[200px]">
                             {csvFile ? csvFile.name : 'Drop CSV/TSV file here'}
                         </span>
-                        <span class="text-xs text-gray-400 mt-1 block">
+                        <span class="text-xs text-gray-400 mt-0.5 block">
                             or click to browse
                         </span>
                     </div>
@@ -341,9 +369,51 @@
                 {/if}
             </div>
 
+            {#if isProcessing}
+                <div class="text-xs space-y-1.5 mt-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-aeon-biolum truncate pr-2">{statusMessage}</span>
+                        {#if currentPhase === 'preprocessing'}
+                            <span class="text-gray-400 whitespace-nowrap">
+                                {Math.round(uploadProgress * 100)}%
+                            </span>
+                        {:else if currentPhase === 'uploading'}
+                            <span class="text-gray-400 whitespace-nowrap">
+                                {Math.round(uploadProgress * 100)}%
+                            </span>
+                        {:else if currentPhase === 'analyzing'}
+                            <span class="text-gray-400 whitespace-nowrap">
+                                {Math.round(analysisProgress * 100)}%
+                                {#if totalExpectedFindings > 0}
+                                    ({processedCount}/{totalExpectedFindings})
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-1.5">
+                        {#if currentPhase === 'preprocessing' || currentPhase === 'uploading'}
+                            <div 
+                                class="bg-aeon-primary h-1.5 rounded-full transition-all duration-300" 
+                                style="width: {uploadProgress * 100}%"
+                            />
+                        {:else if currentPhase === 'analyzing'}
+                            <div 
+                                class="bg-aeon-biolum h-1.5 rounded-full transition-all duration-300" 
+                                style="width: {analysisProgress * 100}%"
+                            />
+                        {/if}
+                    </div>
+                </div>
+            {/if}
+            {#if error}
+                <div class="text-sm text-red-500 mt-2">
+                    {error}
+                </div>
+            {/if}
+
             <!-- Option 2: JSON Upload -->
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
-                <h3 class="text-md font-medium text-white mb-4">Option 2: Load Existing Results</h3>
+                <h3 class="text-sm font-medium text-white mb-4">Option 2: Load Existing Results</h3>
 
                 <!-- JSON Upload Zone -->
                 <label 
@@ -376,61 +446,37 @@
                     {/if}
                 </label>
             </div>
-
-            {#if isProcessing}
-                <div class="text-sm mt-2">
-                    <span class="text-aeon-biolum">{statusMessage}</span>
-                    <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                        {#if currentPhase === 'preprocessing'}
-                            <div 
-                                class="bg-aeon-primary h-2 rounded-full transition-all duration-300" 
-                                style="width: {uploadProgress * 100}%"
-                            />
-                        {:else if currentPhase === 'uploading'}
-                            <div 
-                                class="bg-aeon-primary h-2 rounded-full transition-all duration-300" 
-                                style="width: {uploadProgress * 100}%"
-                            />
-                        {:else if currentPhase === 'analyzing'}
-                            <div 
-                                class="bg-aeon-biolum h-2 rounded-full transition-all duration-300" 
-                                style="width: {analysisProgress * 100}%"
-                            />
-                        {/if}
-                    </div>
-                    {#if currentPhase === 'preprocessing'}
-                        <span class="text-xs text-gray-400 mt-1">
-                            Preprocessing: {Math.round(uploadProgress * 100)}%
-                        </span>
-                    {:else if currentPhase === 'uploading'}
-                        <span class="text-xs text-gray-400 mt-1">
-                            Uploading: {Math.round(uploadProgress * 100)}%
-                        </span>
-                    {:else if currentPhase === 'analyzing'}
-                        <span class="text-xs text-gray-400 mt-1">
-                            Analyzing: {Math.round(analysisProgress * 100)}%
-                            {#if totalExpectedFindings > 0}
-                                <span class="ml-2">({processedCount}/{totalExpectedFindings} findings)</span>
-                            {/if}
-                        </span>
-                    {/if}
-                </div>
-            {/if}
-            {#if error}
-                <div class="text-sm text-red-500 mt-2">
-                    {error}
-                </div>
-            {/if}
         </div>
     </div>
 
     {#if findings.length > 0}
         <div class="findings-container">
-            <h2>Findings</h2>
+            <div class="findings-header">
+                <div class="findings-header-content">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-medium text-white">Findings</h2>
+                        <span class="text-sm text-gray-400">({findings.length})</span>
+                    </div>
+                    {#if findings.length > 0}
+                        <button
+                            on:click={downloadFindings}
+                            class="download-btn"
+                            title="Download findings as JSON"
+                        >
+                            <Download class="h-4 w-4" />
+                            <span>Download</span>
+                        </button>
+                    {/if}
+                </div>
+            </div>
             <div class="findings-list">
                 {#each findings as finding, index (index)}
                     <div class="finding-item" transition:fade={{duration: 300}}>
-                        <InsightCard {finding} />
+                        <InsightCard 
+                            {finding} 
+                            on:expand={() => isAnyCardExpanded = true}
+                            on:collapse={() => isAnyCardExpanded = false}
+                        />
                     </div>
                 {/each}
             </div>
@@ -443,8 +489,16 @@
         max-width: 100vw;
         margin: 0 auto;
         padding: 2rem;
+        padding-top: 0;
         display: grid;
-        grid-template-columns: minmax(300px, 400px) 1fr;
+        grid-template-columns: minmax(300px, 333px) 1fr;
+        transition: grid-template-columns 0.3s ease-in-out;
+    }
+
+    @media (min-width: 640px) {
+        .analyze-container.expanded {
+            grid-template-columns: 0 1fr;
+        }
     }
 
     .insight-card {
@@ -537,5 +591,55 @@
 
     .file-drop-zone:not(.border-aeon-primary):hover :global(.lucide-file-text) {
         animation: bounce 1s ease infinite;
+    }
+
+    .findings-header {
+        margin-bottom: 1rem;
+    }
+
+    .findings-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(76, 201, 240, 0.2) 50%,
+            transparent
+        );
+    }
+
+    .findings-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+    }
+
+    .download-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(76, 201, 240, 0.1);
+        border: 1px solid rgba(76, 201, 240, 0.2);
+        border-radius: 0.5rem;
+        color: var(--aeon-biolum);
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .download-btn:hover {
+        background: rgba(76, 201, 240, 0.15);
+        border-color: rgba(76, 201, 240, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 201, 240, 0.1);
+    }
+
+    .download-btn:active {
+        transform: translateY(0);
     }
 </style> 
