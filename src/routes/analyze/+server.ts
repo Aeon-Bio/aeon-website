@@ -1,6 +1,20 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { AZURE_FUNCTION_URL } from '$env/static/private';
+import { ANALYSIS_SERVER_URL } from '$env/static/private';
+import { GoogleAuth } from 'google-auth-library';
+import { GOOGLE_SERVICE_KEY } from '$env/static/private';
+
+async function getAuthToken() {
+    const auth = new GoogleAuth({
+        credentials: JSON.parse(
+            Buffer.from(GOOGLE_SERVICE_KEY, 'base64').toString()
+        ),
+        scopes: ['https://www.googleapis.com/auth/cloud-platform']
+    });
+    const client = await auth.getClient();
+    const token = await client.getAccessToken();
+    return token.token;
+}
 
 export const POST: RequestHandler = async ({ request }) => {
     try {
@@ -16,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
         // Send directly to Azure function
         const uploadResponse = await fetch(
-            `${AZURE_FUNCTION_URL}/methylation-analysis?` + 
+            `${ANALYSIS_SERVER_URL}/methylation-analysis?` + 
             new URLSearchParams({
                 sample_id: sampleColumn,
                 probe_id_col: cpgColumn
@@ -26,7 +40,8 @@ export const POST: RequestHandler = async ({ request }) => {
                 body: file,
                 headers: {
                     'Content-Type': 'text/csv',
-                    'x-request-id': requestId
+                    'x-request-id': requestId,
+                    'Authorization': `Bearer ${await getAuthToken()}`
                 },
                 signal: AbortSignal.timeout(1800000)
             }

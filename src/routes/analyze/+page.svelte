@@ -444,7 +444,6 @@
         margin: 0 auto;
         padding: 2rem;
         display: grid;
-        gap: 2rem;
         grid-template-columns: minmax(300px, 400px) 1fr;
     }
 

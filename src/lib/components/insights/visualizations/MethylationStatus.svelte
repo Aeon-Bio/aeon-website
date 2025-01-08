@@ -114,6 +114,9 @@
             showStatsInfo = false;
         }, 100);
     }
+
+    // Add minimum MAD threshold to prevent division by zero issues
+    const MIN_MAD = 0.001; // 0.1%
 </script>
 
 <div class="bg-aeon-surface-1 rounded-lg">
@@ -250,13 +253,21 @@
             <div>
                 <div class="text-gray-500 text-sm mb-1">Median Absolute Deviation</div>
                 <div class="text-white text-2xl font-medium flex items-baseline gap-2">
-                    <span>{Math.abs(metrics.z_score).toFixed(1)}</span>
-                    <span class="text-gray-400 text-base">
-                        {direction === 'hyper' ? 'higher' : 'lower'}
+                    <span>
+                        {metrics.population_distribution.mad < MIN_MAD 
+                            ? '—' 
+                            : Math.abs(metrics.z_score).toFixed(1)}
                     </span>
+                    {#if metrics.population_distribution.mad >= MIN_MAD}
+                        <span class="text-gray-400 text-base">
+                            {direction === 'hyper' ? 'higher' : 'lower'}
+                        </span>
+                    {/if}
                 </div>
                 <div class="text-gray-400 text-sm">
-                    1 MAD = {(metrics.population_distribution.mad * 100).toFixed(1)}%
+                    1 MAD = {metrics.population_distribution.mad < MIN_MAD 
+                        ? '< 0.1' 
+                        : (metrics.population_distribution.mad * 100).toFixed(1)}%
                 </div>
             </div>
             <div>
