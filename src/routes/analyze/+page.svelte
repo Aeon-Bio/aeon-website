@@ -117,6 +117,14 @@
             xhr.addEventListener('readystatechange', () => {
                 // Check if we have received partial data (readyState 3) or completed (readyState 4)
                 if (xhr.readyState >= 3) {
+                    // Add HTTP error handling
+                    if (xhr.status >= 400) {
+                        error = `Server error (${xhr.status}): ${xhr.statusText}`;
+                        isProcessing = false;
+                        currentPhase = null;
+                        return;
+                    }
+
                     // Get only the new data
                     const newData = xhr.responseText.slice(buffer.length);
                     buffer = xhr.responseText;
@@ -136,6 +144,12 @@
                                     currentPhase = 'analyzing';
                                     analysisProgress = data.progress || 0;
                                     statusMessage = data.message;
+                                    // Add handling for error status
+                                    if (data.status === 'error') {
+                                        error = data.message;
+                                        isProcessing = false;
+                                        currentPhase = null;
+                                    }
                                     break;
                                 case 'finding':
                                     if (!processedFindingIds.has(data.id)) {
@@ -157,6 +171,13 @@
                         }
                     }
                 }
+            });
+
+            // Add error event handler
+            xhr.addEventListener('error', () => {
+                error = 'Network error occurred. Please try again.';
+                isProcessing = false;
+                currentPhase = null;
             });
 
             xhr.open('POST', '/analyze');
@@ -296,7 +317,7 @@
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
-    <div class="insight-card p-6 w-[300px] h-fit transition-all duration-300 ease-in-out" 
+    <div class="insight-card p-6 mt-16 w-[300px] h-fit transition-all duration-300 ease-in-out" 
          style="position: sticky; top: 2rem; {isAnyCardExpanded ? 'sm:transform: translateX(-120%);' : ''}"
     >
         <div class="flex flex-col gap-6">
@@ -370,7 +391,7 @@
             </div>
 
             {#if isProcessing}
-                <div class="text-xs space-y-1.5 mt-2">
+                <div class="text-xs space-y-1.5">
                     <div class="flex justify-between items-center">
                         <span class="text-aeon-biolum truncate pr-2">{statusMessage}</span>
                         {#if currentPhase === 'preprocessing'}

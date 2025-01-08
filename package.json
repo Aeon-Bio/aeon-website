@@ -43,7 +43,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"google-auth-library": "^9.15.0",
 		"lucide-svelte": "^0.469.0",
 		"papaparse": "^5.4.1"
 	}

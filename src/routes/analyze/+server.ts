@@ -1,19 +1,86 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ANALYSIS_SERVER_URL } from '$env/static/private';
-import { GoogleAuth } from 'google-auth-library';
 import { GOOGLE_SERVICE_KEY } from '$env/static/private';
 
-async function getAuthToken() {
-    const auth = new GoogleAuth({
-        credentials: JSON.parse(
-            Buffer.from(GOOGLE_SERVICE_KEY, 'base64').toString()
-        ),
-        scopes: ['https://www.googleapis.com/auth/cloud-platform']
+// Simple JWT generation function that works in Cloudflare Workers
+async function generateJWT(serviceAccountKey: string): Promise<string> {
+    const key = JSON.parse(atob(serviceAccountKey));
+    
+    const header = {
+        alg: 'RS256',
+        typ: 'JWT',
+        kid: key.private_key_id
+    };
+
+    const now = Math.floor(Date.now() / 1000);
+    const payload = {
+        iss: key.client_email,
+        sub: key.client_email,
+        aud: ANALYSIS_SERVER_URL,
+        iat: now,
+        exp: now + 3600,
+        scope: 'https://www.googleapis.com/auth/cloud-platform'
+    };
+
+    const encoder = new TextEncoder();
+    const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '');
+    const payloadB64 = btoa(JSON.stringify(payload)).replace(/=/g, '');
+    const signatureInput = encoder.encode(`${headerB64}.${payloadB64}`);
+
+    // Convert PEM key to format suitable for WebCrypto
+    const privateKey = key.private_key
+        .replace('-----BEGIN PRIVATE KEY-----\n', '')
+        .replace('\n-----END PRIVATE KEY-----', '')
+        .replace(/\n/g, '');
+
+    const binaryKey = Uint8Array.from(atob(privateKey), c => c.charCodeAt(0));
+    const cryptoKey = await crypto.subtle.importKey(
+        'pkcs8',
+        binaryKey,
+        {
+            name: 'RSASSA-PKCS1-v1_5',
+            hash: 'SHA-256'
+        },
+        false,
+        ['sign']
+    );
+
+    const signature = await crypto.subtle.sign(
+        'RSASSA-PKCS1-v1_5',
+        cryptoKey,
+        signatureInput
+    );
+
+    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+
+    return `${headerB64}.${payloadB64}.${signatureB64}`;
+}
+
+async function getAccessToken(): Promise<string> {
+    const jwt = await generateJWT(GOOGLE_SERVICE_KEY);
+    
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            assertion: jwt
+        })
     });
-    const client = await auth.getClient();
-    const token = await client.getAccessToken();
-    return token.token;
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to get access token: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
 }
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -28,7 +95,8 @@ export const POST: RequestHandler = async ({ request }) => {
             return json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Send directly to Azure function
+        const accessToken = await getAccessToken();
+
         const uploadResponse = await fetch(
             `${ANALYSIS_SERVER_URL}/methylation-analysis?` + 
             new URLSearchParams({
@@ -41,9 +109,8 @@ export const POST: RequestHandler = async ({ request }) => {
                 headers: {
                     'Content-Type': 'text/csv',
                     'x-request-id': requestId,
-                    'Authorization': `Bearer ${await getAuthToken()}`
-                },
-                signal: AbortSignal.timeout(1800000)
+                    'Authorization': `Bearer ${accessToken}`
+                }
             }
         );
 
