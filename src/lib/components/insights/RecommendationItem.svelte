@@ -113,7 +113,7 @@
                         <div class="grid gap-2">
                             {#each recommendation.monitoringMetrics as metric}
                                 <div class="bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
-                                    <div class="flex items-center gap-3 p-4 pb-2">
+                                    <div class="flex items-center gap-3 px-4 py-1">
                                         <div class="p-1.5 bg-aeon-surface-1 rounded-md">
                                             <Target class="h-4 w-4 text-aeon-primary" />
                                         </div>
@@ -135,7 +135,7 @@
                         <div class="space-y-2">
                             {#each recommendation.supportingEvidence as evidence}
                                 <div class="bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
-                                    <div class="flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-3">
                                         <div class="p-1.5 bg-aeon-surface-1 rounded-md flex-shrink-0">
                                             <FileText class="h-4 w-4 text-aeon-primary" />
                                         </div>
@@ -150,7 +150,7 @@
 
             <!-- Important Considerations -->
             {#if recommendation.contraindications?.length}
-                <div class="space-y-3">
+                <div class="pl-2 space-y-3">
                     <div class="bg-aeon-surface-1 p-4 rounded-lg border-l-4 border-yellow-500">
                         <div class="flex items-center gap-3 mb-3">
                             <div class="p-1.5 rounded-md">

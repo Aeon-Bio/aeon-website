@@ -27,10 +27,16 @@
                 </span>
                 <span class="px-2 py-1 rounded-full text-xs {
                     finding.pattern.direction === 'hypo' 
-                        ? 'bg-aeon-surface-2 text-aeon-primary' 
-                        : 'bg-aeon-interactive text-aeon-biolum'
+                        ? 'bg-aeon-surface-2 text-aeon-primary'
+                        : finding.pattern.direction === 'hyper'
+                            ? 'bg-aeon-interactive text-aeon-biolum'
+                            : 'bg-aeon-surface-2 text-aeon-text'
                 }">
-                    {finding.pattern.direction === 'hypo' ? 'Increased' : 'Decreased'} Activity
+                    {finding.pattern.direction === 'hypo' 
+                        ? 'Increased' 
+                        : finding.pattern.direction === 'hyper'
+                            ? 'Decreased'
+                            : 'Mixed'} Activity
                 </span>
             </div>
             <h3 class="font-medium text-lg text-white">

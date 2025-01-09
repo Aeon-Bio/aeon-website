@@ -2,9 +2,11 @@
     import { FileText, Network, Dna, ChevronRight, ExternalLink } from 'lucide-svelte';
     import type { Finding } from '$lib/types/insights';
     import RegionSelector from '../RegionSelector.svelte';
+    import StudySelector from '../StudySelector.svelte';
     
     export let finding: Finding;
     let selectedRegionIndex = 0;
+    let selectedStudyIndex = 0;
 
     // Helper to get all unique study IDs across all regions
     $: studyIds = [...new Set(
@@ -39,29 +41,37 @@
     {/if}
 
     <!-- Study Context -->
-    {#if finding.provenance.studyContext?.primaryStudyId}
+    {#if finding.provenance.studyContext?.studyMetrics?.length}
         <div class="bg-aeon-surface-1 p-4 rounded-lg">
             <h4 class="font-medium text-white flex items-center gap-2 mb-4">
                 <FileText class="h-4 w-4 text-aeon-primary" />
                 Research Context
             </h4>
+
+            {#if finding.provenance.studyContext.studyMetrics.length > 1}
+                <StudySelector 
+                    studies={finding.provenance.studyContext.studyMetrics}
+                    bind:selectedIndex={selectedStudyIndex}
+                />
+            {/if}
+
             <div class="space-y-4">
                 <!-- Study Population -->
-                {#if finding.provenance.studyContext.studyMetrics[0]?.populationContext}
+                {#if finding.provenance.studyContext.studyMetrics[selectedStudyIndex]?.populationContext}
                     <div>
                         <div class="text-sm text-gray-400 mb-2">Study Population</div>
                         <p class="text-aeon-biolum">
-                            {finding.provenance.studyContext.studyMetrics[0].populationContext}
+                            {finding.provenance.studyContext.studyMetrics[selectedStudyIndex].populationContext}
                         </p>
                     </div>
                 {/if}
 
                 <!-- Study Groups -->
-                {#if finding.provenance.studyContext.studyMetrics[0]?.studyPopulationSummary?.length}
+                {#if finding.provenance.studyContext.studyMetrics[selectedStudyIndex]?.studyPopulationSummary?.length}
                     <div>
                         <div class="text-sm text-gray-400 mb-2">Study Groups</div>
                         <div class="grid gap-3">
-                            {#each finding.provenance.studyContext.studyMetrics[0].studyPopulationSummary as group}
+                            {#each finding.provenance.studyContext.studyMetrics[selectedStudyIndex].studyPopulationSummary as group}
                                 <div class="bg-aeon-surface-0 p-3 rounded-lg">
                                     <div class="flex justify-between items-start">
                                         <span class="text-sm text-white font-medium">{group.groupName}</span>
