@@ -9,6 +9,7 @@
     let jsonFile: File | null = null;
     let findings: any[] = mockFindings;
     let isProcessing = false;
+    let isComplete = false;
     let isDragging = { csv: false, json: false };
     let sampleId: string | null = null;
     let error: string | null = null;
@@ -33,6 +34,7 @@
 
     async function processCSV(newFile: File) {
         processedFindingIds.clear();
+        isComplete = false;
         csvFile = newFile;
         if (!csvConfig.cpgColumn || !csvConfig.sampleColumn) {
             error = 'Please specify both CpG probe ID and sample columns';
@@ -144,11 +146,17 @@
                                     currentPhase = 'analyzing';
                                     analysisProgress = data.progress || 0;
                                     statusMessage = data.message;
-                                    // Add handling for error status
+                                    // Handle different status types
                                     if (data.status === 'error') {
                                         error = data.message;
                                         isProcessing = false;
                                         currentPhase = null;
+                                    } else if (data.status === 'complete') {
+                                        // Reset processing state for next file
+                                        isProcessing = false;
+                                        isComplete = true;
+                                        currentPhase = null;
+                                        statusMessage = 'Analysis complete!';
                                     }
                                     break;
                                 case 'finding':
@@ -160,7 +168,10 @@
                                     }
                                     break;
                                 case 'error':
-                                    throw new Error(data.error);
+                                    error = data.message;
+                                    isProcessing = false;
+                                    currentPhase = null;
+                                    break;
                             }
                         } catch (err) {
                             if (err instanceof Error && 
@@ -390,7 +401,7 @@
                 {/if}
             </div>
 
-            {#if isProcessing}
+            {#if isProcessing || isComplete}
                 <div class="text-xs space-y-1.5">
                     <div class="flex justify-between items-center">
                         <span class="text-aeon-biolum truncate pr-2">{statusMessage}</span>
