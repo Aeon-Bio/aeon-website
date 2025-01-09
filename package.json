@@ -43,6 +43,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"jose": "^5.9.6",
 		"lucide-svelte": "^0.469.0",
 		"papaparse": "^5.4.1"
 	}
