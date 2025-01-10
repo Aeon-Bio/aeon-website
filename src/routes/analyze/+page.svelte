@@ -21,13 +21,23 @@
     let currentPhase: 'preprocessing' | 'uploading' | 'analyzing' | null = null;
     let processedCount = 0;
     let totalExpectedFindings = 0;
+    let requestId: string | null = null;
     
     // Add column configuration
     let csvConfig = {
         cpgColumn: '',
         sampleColumn: '',
+        selected_llm: '',
         file: null as File | null
     };
+
+    // Add LLM options
+    const llmOptions = [
+        'claude-3-5-sonnet-latest',
+        'gemini-exp-1206',
+        'gemini-2.0-flash-exp',
+        'gemini-1.5-pro'
+    ];
 
     // Add a Set to track processed finding IDs
     let processedFindingIds = new Set<string>();
@@ -80,23 +90,57 @@
 
     // Extract the actual processing logic to a separate function
     async function startProcessing() {
-        if (!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.file) {
-            error = 'Please specify both CpG probe ID and sample columns';
+        if (!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.file || !csvConfig.selected_llm) {
+            error = 'Please specify both columns and select an LLM';
             return;
         }
 
+        // If already processing, cancel the current analysis
+        if (isProcessing && requestId) {
+            try {
+                const response = await fetch(`/analyze?requestId=${requestId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to cancel analysis');
+                }
+
+                // Reset all processing states
+                isProcessing = false;
+                isComplete = false;
+                currentPhase = null;
+                statusMessage = null;
+                uploadProgress = 0;
+                analysisProgress = 0;
+                processedCount = 0;
+                totalExpectedFindings = 0;
+                findings = [];
+                processedFindingIds.clear();
+                error = null;
+                requestId = null;
+                return;
+            } catch (err) {
+                console.error('Failed to cancel analysis:', err);
+                error = 'Failed to cancel analysis';
+                return;
+            }
+        }
+
+        // Generate new requestId for new analysis
+        requestId = crypto.randomUUID();
         isProcessing = true;
         findings = [];
         error = null;
         currentPhase = 'preprocessing';
         statusMessage = 'Preprocessing file...';
-        const requestId = crypto.randomUUID();
         
         try {
             const formData = new FormData();
             formData.append('requestId', requestId);
             formData.append('cpgColumn', csvConfig.cpgColumn);
             formData.append('sampleColumn', csvConfig.sampleColumn);
+            formData.append('selected_llm', csvConfig.selected_llm);
 
             let filteredData = [];
             
@@ -418,7 +462,7 @@
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
-    <div class="insight-card p-6 mt-16 w-[300px] h-fit transition-all duration-300 ease-in-out" 
+    <div class="insight-card p-6 mt-8 w-[300px] h-fit transition-all duration-300 ease-in-out" 
          style="position: sticky; top: 2rem; {isAnyCardExpanded ? 'sm:transform: translateX(-120%);' : ''}"
     >
         <div class="flex flex-col gap-6">
@@ -426,8 +470,8 @@
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-md font-medium text-white mb-4">Option 1: Analyze New Data</h3>
 
-                <!-- Column Configuration - Only show if file is selected -->
-                {#if csvFile && showColumnConfig}
+                <!-- Column Configuration - Show if file is selected (removed showColumnConfig check) -->
+                {#if csvFile}
                     <div class="mb-4 space-y-3" transition:slide>
                         <div class="relative">
                             <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
@@ -441,10 +485,12 @@
                                     placeholder="Select or type column name"
                                     class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
                                     list="cpgColumns"
+                                    autocomplete="off"
+                                    on:focus={() => csvConfig.cpgColumn = ''}
                                 />
                                 <datalist id="cpgColumns">
                                     {#each availableColumns as column}
-                                        <option value={column} />
+                                        <option value={column}>{column}</option>
                                     {/each}
                                 </datalist>
                             </div>
@@ -461,25 +507,46 @@
                                     placeholder="Select or type column name"
                                     class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
                                     list="sampleColumns"
+                                    autocomplete="off"
+                                    on:focus={() => csvConfig.sampleColumn = ''}
                                 />
                                 <datalist id="sampleColumns">
                                     {#each availableColumns as column}
-                                        <option value={column} />
+                                        <option value={column}>{column}</option>
+                                    {/each}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="text-sm text-gray-400 block mb-1" for="llmSelect">
+                                Language Model
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text"
+                                    id="llmSelect"
+                                    bind:value={csvConfig.selected_llm}
+                                    placeholder="Select LLM"
+                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                    list="llmOptions"
+                                    autocomplete="off"
+                                />
+                                <datalist id="llmOptions">
+                                    {#each llmOptions as llm}
+                                        <option value={llm}>{llm}</option>
                                     {/each}
                                 </datalist>
                             </div>
                         </div>
                         
-                        <!-- Only show analyze button if we're not processing and not complete -->
-                        {#if !isProcessing && !isComplete}
-                            <button
-                                on:click={() => startProcessing()}
-                                class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn}
-                            >
-                                Analyze Data
-                            </button>
-                        {/if}
+                        <!-- Show analyze button always when columns are selected -->
+                        <button
+                            on:click={() => startProcessing()}
+                            class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.selected_llm}
+                        >
+                            {isProcessing ? 'Cancel Analysis' : 'Analyze Data'}
+                        </button>
                     </div>
                 {/if}
 
