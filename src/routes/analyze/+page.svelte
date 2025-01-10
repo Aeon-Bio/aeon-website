@@ -4,6 +4,8 @@
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
 	import Papa from 'papaparse';
+    import { slide } from 'svelte/transition';
+    import { cubicOut } from 'svelte/easing';
     
     let csvFile: File | null = null;
     let jsonFile: File | null = null;
@@ -23,7 +25,8 @@
     // Add column configuration
     let csvConfig = {
         cpgColumn: '',
-        sampleColumn: ''
+        sampleColumn: '',
+        file: null as File | null
     };
 
     // Add a Set to track processed finding IDs
@@ -32,11 +35,52 @@
     // Add a store to track if any card is expanded
     let isAnyCardExpanded = false;
 
-    async function processCSV(newFile: File) {
-        processedFindingIds.clear();
-        isComplete = false;
+    // Add new state variables
+    let availableColumns: string[] = [];
+    let showColumnConfig = false;
+
+    async function processCSV(newFile: File, autoProcess = false) {
         csvFile = newFile;
-        if (!csvConfig.cpgColumn || !csvConfig.sampleColumn) {
+        csvConfig.file = newFile;
+        isProcessing = false;
+        error = null;
+        
+        // Reset and analyze headers first
+        availableColumns = [];
+        showColumnConfig = true;
+        
+        await new Promise((resolve) => {
+            Papa.parse(newFile, {
+                preview: 1, // Only parse first row for headers
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    availableColumns = Object.keys(results.data[0] || {});
+                    
+                    // Auto-detect columns if possible
+                    if (autoProcess) {
+                        const cpgGuesses = availableColumns.filter(col => 
+                            /cpg|probe|cg\d+/i.test(col));
+                        const sampleGuesses = availableColumns.filter(col => 
+                            /sample|gsm|patient|subject/i.test(col));
+                        
+                        if (cpgGuesses.length > 0) csvConfig.cpgColumn = cpgGuesses[0];
+                        if (sampleGuesses.length > 0) csvConfig.sampleColumn = sampleGuesses[0];
+                    }
+                    resolve(null);
+                }
+            });
+        });
+
+        // If both columns are selected and autoProcess is true, continue processing
+        if (autoProcess && csvConfig.cpgColumn && csvConfig.sampleColumn) {
+            await startProcessing();
+        }
+    }
+
+    // Extract the actual processing logic to a separate function
+    async function startProcessing() {
+        if (!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.file) {
             error = 'Please specify both CpG probe ID and sample columns';
             return;
         }
@@ -57,7 +101,7 @@
             let filteredData = [];
             
             await new Promise((resolve, reject) => {
-                Papa.parse(newFile, {
+                Papa.parse(csvConfig.file!, {
                     header: true,
                     skipEmptyLines: true,
                     comments: '#',
@@ -81,8 +125,8 @@
                         reject(error);
                     },
                     progress: function(results) {
-                        if (results.meta.cursor && newFile.size) {
-                            uploadProgress = results.meta.cursor / newFile.size;
+                        if (results.meta.cursor && csvConfig.file!.size) {
+                            uploadProgress = results.meta.cursor / csvConfig.file!.size;
                             statusMessage = `Preprocessing file... ${Math.round(uploadProgress * 100)}%`;
                         }
                     }
@@ -163,7 +207,7 @@
                                     if (!processedFindingIds.has(data.id)) {
                                         console.log(`updated! ${data.id}`);
                                         processedFindingIds.add(data.id);
-                                        findings = [...findings, data.data];
+                                        findings = insertSorted(data.data, findings);
                                         processedCount = findings.length;
                                     }
                                     break;
@@ -325,6 +369,52 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+
+    function getAverageMatchStrength(finding: any): number {
+        const regions = finding.provenance?.associated_regions || [];
+        if (regions.length === 0) return 0;
+        
+        return regions.reduce((sum: number, region: any) => 
+            sum + (region.matchStrength || 0), 0) / regions.length;
+    }
+
+    function insertSorted(newFinding: any, currentFindings: any[]): any[] {
+        const newStrength = getAverageMatchStrength(newFinding);
+        
+        // Find insertion index
+        const insertIndex = currentFindings.findIndex(finding => 
+            getAverageMatchStrength(finding) < newStrength
+        );
+        
+        // If no lower strength found, append to end
+        if (insertIndex === -1) {
+            return [...currentFindings, newFinding];
+        }
+        
+        // Insert at proper position
+        return [
+            ...currentFindings.slice(0, insertIndex),
+            newFinding,
+            ...currentFindings.slice(insertIndex)
+        ];
+    }
+
+    function slideAndFade(node: Element, {
+        delay = 0,
+        duration = 300
+    }) {
+        return {
+            delay,
+            duration,
+            css: (t: number) => {
+                const eased = cubicOut(t);
+                return `
+                    opacity: ${eased};
+                    transform: translateY(${(1 - eased) * 20}px);
+                `;
+            }
+        };
+    }
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
@@ -336,33 +426,62 @@
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-md font-medium text-white mb-4">Option 1: Analyze New Data</h3>
 
-                <!-- Column Configuration -->
-                <div class="mb-4 space-y-3">
-                    <div>
-                        <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
-                            CpG Probe ID Column
-                        </label>
-                        <input 
-                            type="text"
-                            id="cpgColumn"
-                            bind:value={csvConfig.cpgColumn}
-                            placeholder="e.g., CpG_ID"
-                            class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
-                        />
+                <!-- Column Configuration - Only show if file is selected -->
+                {#if csvFile && showColumnConfig}
+                    <div class="mb-4 space-y-3" transition:slide>
+                        <div class="relative">
+                            <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
+                                CpG Probe ID Column
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text"
+                                    id="cpgColumn"
+                                    bind:value={csvConfig.cpgColumn}
+                                    placeholder="Select or type column name"
+                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                    list="cpgColumns"
+                                />
+                                <datalist id="cpgColumns">
+                                    {#each availableColumns as column}
+                                        <option value={column} />
+                                    {/each}
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="text-sm text-gray-400 block mb-1" for="sampleColumn">
+                                Sample Column
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text"
+                                    id="sampleColumn"
+                                    bind:value={csvConfig.sampleColumn}
+                                    placeholder="Select or type column name"
+                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                    list="sampleColumns"
+                                />
+                                <datalist id="sampleColumns">
+                                    {#each availableColumns as column}
+                                        <option value={column} />
+                                    {/each}
+                                </datalist>
+                            </div>
+                        </div>
+                        
+                        <!-- Only show analyze button if we're not processing and not complete -->
+                        {#if !isProcessing && !isComplete}
+                            <button
+                                on:click={() => startProcessing()}
+                                class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn}
+                            >
+                                Analyze Data
+                            </button>
+                        {/if}
                     </div>
-                    <div>
-                        <label class="text-sm text-gray-400 block mb-1" for="sampleColumn">
-                            Sample Column
-                        </label>
-                        <input 
-                            type="text"
-                            id="sampleColumn"
-                            bind:value={csvConfig.sampleColumn}
-                            placeholder="e.g., Sample_ID"
-                            class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
-                        />
-                    </div>
-                </div>
+                {/if}
 
                 <!-- CSV Upload Zone -->
                 <label 
@@ -389,16 +508,6 @@
                         </span>
                     </div>
                 </label>
-
-                {#if csvFile && !isProcessing}
-                    <button
-                        on:click={() => processCSV(csvFile!)}
-                        class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn}
-                    >
-                        Upload and Analyze
-                    </button>
-                {/if}
             </div>
 
             {#if isProcessing || isComplete}
@@ -502,8 +611,10 @@
                 </div>
             </div>
             <div class="findings-list">
-                {#each findings as finding, index (index)}
-                    <div class="finding-item" transition:fade={{duration: 300}}>
+                {#each findings as finding, index (finding.provenance?.associated_regions?.[0]?.matched_gene || index)}
+                    <div class="finding-item" 
+                         transition:slideAndFade={{duration: 300}}
+                    >
                         <InsightCard 
                             {finding} 
                             on:expand={() => isAnyCardExpanded = true}
