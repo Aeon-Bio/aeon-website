@@ -558,14 +558,14 @@
 
                 <!-- JSON Upload Zone -->
                 <label 
-                    class="file-drop-zone flex flex-col items-center gap-3 px-6 py-8 rounded-lg border-2 border-dashed transition-all duration-200 {isDragging.json ? 'border-aeon-primary bg-aeon-primary/10' : 'border-gray-700 bg-aeon-surface-1'} {!isDragging.json ? 'hover:border-aeon-primary hover:transform hover:translate-y-[-1px] hover:shadow-lg' : ''} cursor-pointer"
+                    class="file-drop-zone flex flex-col items-center gap-2 px-4 py-6 rounded-lg border-2 border-dashed transition-all duration-200 {isDragging.json ? 'border-aeon-primary bg-aeon-primary/10' : 'border-gray-700 bg-aeon-surface-1'} {!isDragging.json ? 'hover:border-aeon-primary hover:transform hover:translate-y-[-1px] hover:shadow-lg' : ''} cursor-pointer"
                     on:click|preventDefault={() => handleClick('json')}
                     on:dragenter={(e) => handleDragEnter(e, 'json')}
                     on:dragleave={(e) => handleDragLeave(e, 'json')}
                     on:dragover={handleDragOver}
                     on:drop={(e) => handleDrop(e, 'json')}
                 >
-                    <FileJson class="h-8 w-8 text-aeon-primary" />
+                    <FileJson class="h-6 w-6 text-aeon-primary" />
                     <input 
                         type="file" 
                         accept=".json"
@@ -573,10 +573,10 @@
                         on:change={(e) => handleFileSelect(e, 'json')}
                     />
                     <div class="text-center">
-                        <span class="text-sm text-aeon-biolum block">
+                        <span class="text-sm text-aeon-biolum block truncate max-w-[200px]">
                             {jsonFile ? jsonFile.name : 'Drop JSON file here'}
                         </span>
-                        <span class="text-xs text-gray-400 mt-1 block">
+                        <span class="text-xs text-gray-400 mt-0.5 block">
                             or click to browse
                         </span>
                     </div>
@@ -732,7 +732,8 @@
         50% { transform: translateY(-4px); }
     }
 
-    .file-drop-zone:not(.border-aeon-primary):hover :global(.lucide-file-text) {
+    .file-drop-zone:not(.border-aeon-primary):hover :global(.lucide-file-text),
+    .file-drop-zone:not(.border-aeon-primary):hover :global(.lucide-file-json) {
         animation: bounce 1s ease infinite;
     }
 
