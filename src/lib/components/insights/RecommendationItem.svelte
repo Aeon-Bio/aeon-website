@@ -2,7 +2,7 @@
     import type { Recommendation } from '$lib/types/insights';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
-    import { Target, Info, ChevronRight, AlertTriangle, FileText } from 'lucide-svelte';
+    import { Target, Info, ChevronsRight, AlertTriangle, FileText } from 'lucide-svelte';
     
     export let recommendation: Recommendation;
     export let abbreviated = false;
@@ -96,7 +96,7 @@
                     <div class="grid gap-2">
                         {#each recommendation.specificActions as action}
                             <div class="flex items-start gap-3 bg-aeon-surface-1/50 rounded-lg hover:bg-aeon-surface-1 transition-colors">
-                                <ChevronRight class="h-4 w-4 mt-0.5 text-aeon-primary flex-shrink-0" />
+                                <ChevronsRight class="h-4 w-4 mt-0.5 text-aeon-primary flex-shrink-0" />
                                 <span class="text-sm text-aeon-biolum">{action}</span>
                             </div>
                         {/each}
@@ -161,7 +161,7 @@
                         <div class="space-y-2 ml-10">
                             {#each recommendation.contraindications as contraindication}
                                 <div class="flex items-start gap-2">
-                                    <ChevronRight class="h-4 w-4 mt-1 text-yellow-500 flex-shrink-0" />
+                                    <ChevronsRight class="h-4 w-4 mt-1 text-yellow-500 flex-shrink-0" />
                                     <span class="text-sm text-aeon-biolum">{contraindication}</span>
                                 </div>
                             {/each}

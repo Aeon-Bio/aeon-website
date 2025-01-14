@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Network, Dna, ChevronDown, ChevronRight, GitBranch } from 'lucide-svelte';
+    import { Network, Dna, ArrowDownToDot, ChevronsRight, GitBranch } from 'lucide-svelte';
     import type { Finding } from '../types';
     
     export let finding: Finding;
@@ -19,7 +19,7 @@
                 <div class="space-y-2">
                     {#each finding.knowledgeContext.establishedFunctions as func}
                         <div class="flex items-start gap-2">
-                            <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                            <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                             <span class="text-sm text-aeon-biolum">{func}</span>
                         </div>
                     {/each}
@@ -32,7 +32,7 @@
                 <div class="space-y-2">
                     {#each finding.knowledgeContext.commonCellularRoles as role}
                         <div class="flex items-start gap-2">
-                            <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                            <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                             <span class="text-sm text-aeon-biolum">{role}</span>
                         </div>
                     {/each}
@@ -77,7 +77,7 @@
                         <div class="space-y-2">
                             {#each finding.knowledgeContext.regulatoryNetwork.upstream as factor}
                                 <div class="flex items-start gap-2">
-                                    <ChevronDown class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                                    <ArrowDownToDot class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                                     <span class="text-sm text-aeon-biolum">{factor}</span>
                                 </div>
                             {/each}
@@ -92,7 +92,7 @@
                         <div class="space-y-2">
                             {#each finding.knowledgeContext.regulatoryNetwork.downstream as effect}
                                 <div class="flex items-start gap-2">
-                                    <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                                    <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                                     <span class="text-sm text-aeon-biolum">{effect}</span>
                                 </div>
                             {/each}
@@ -113,7 +113,7 @@
             <div class="space-y-2">
                 {#each finding.knowledgeContext.conservedPathways as pathway}
                     <div class="flex items-start gap-2">
-                        <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                        <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                         <span class="text-sm text-aeon-biolum">{pathway}</span>
                     </div>
                 {/each}

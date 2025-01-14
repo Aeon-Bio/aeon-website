@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { FileText, Network, Dna, ChevronRight, ExternalLink } from 'lucide-svelte';
+    import { FileText, Network, Dna, ChevronRight, ChevronsRight, ExternalLink, BookOpenText } from 'lucide-svelte';
     import type { Finding } from '$lib/types/insights';
     import RegionSelector from '../RegionSelector.svelte';
     import StudySelector from '../StudySelector.svelte';
@@ -44,7 +44,7 @@
     {#if finding.provenance.studyContext?.studyMetrics?.length}
         <div class="bg-aeon-surface-1 p-4 rounded-lg">
             <h4 class="font-medium text-white flex items-center gap-2 mb-4">
-                <FileText class="h-4 w-4 text-aeon-primary" />
+                <BookOpenText class="h-4 w-4 text-aeon-primary" />
                 Research Context
             </h4>
 
@@ -104,7 +104,7 @@
                 <div class="space-y-2">
                     {#each finding.evidence.mechanisticInsights as insight}
                         <div class="flex items-start gap-2">
-                            <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                            <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                             <span class="text-sm text-aeon-biolum">{insight}</span>
                         </div>
                     {/each}
@@ -118,7 +118,7 @@
                     <div class="space-y-2">
                         {#each finding.evidence.functionalImpact as impact}
                             <div class="flex items-start gap-2">
-                                <ChevronRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
+                                <ChevronsRight class="h-4 w-4 mt-1 text-aeon-primary flex-shrink-0" />
                                 <span class="text-sm text-aeon-biolum">{impact}</span>
                             </div>
                         {/each}

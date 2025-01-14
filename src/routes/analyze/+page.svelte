@@ -22,6 +22,8 @@
     let processedCount = 0;
     let totalExpectedFindings = 0;
     let requestId: string | null = null;
+    let currentController: AbortController | null = null;
+    let delimiter: string = 'auto';
     
     // Add column configuration
     let csvConfig = {
@@ -53,9 +55,8 @@
         csvFile = newFile;
         csvConfig.file = newFile;
         isProcessing = false;
-        error = null;
         
-        // Reset and analyze headers first
+        // Reset columns first
         availableColumns = [];
         showColumnConfig = true;
         
@@ -64,7 +65,30 @@
                 preview: 1, // Only parse first row for headers
                 header: true,
                 skipEmptyLines: true,
+                delimiter: delimiter === 'auto' ? undefined : delimiter,
                 complete: function(results) {
+                    console.log(results);
+                    // Check for parsing errors
+                    if (results.errors.length > 0) {
+                        const errorMessages = results.errors.map(err => err.message).join('; ');
+                        error = `File parsing error: ${errorMessages}`;
+                        csvFile = null;
+                        csvConfig.file = null;
+                        resolve(null);
+                        return;
+                    }
+
+                    // Check if we have any data
+                    if (!results.data || results.data.length === 0) {
+                        error = 'No data found in file. Please check the file format.';
+                        csvFile = null;
+                        csvConfig.file = null;
+                        resolve(null);
+                        return;
+                    }
+
+                    // Only clear error if we successfully parsed the file
+                    error = null;
                     availableColumns = Object.keys(results.data[0] || {});
                     
                     // Auto-detect columns if possible
@@ -82,8 +106,8 @@
             });
         });
 
-        // If both columns are selected and autoProcess is true, continue processing
-        if (autoProcess && csvConfig.cpgColumn && csvConfig.sampleColumn) {
+        // Only continue if there are no errors
+        if (!error && autoProcess && csvConfig.cpgColumn && csvConfig.sampleColumn) {
             await startProcessing();
         }
     }
@@ -96,45 +120,33 @@
         }
 
         // If already processing, cancel the current analysis
-        if (isProcessing && requestId) {
-            try {
-                const response = await fetch(`/analyze?requestId=${requestId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to cancel analysis');
-                }
-
-                // Reset all processing states
-                isProcessing = false;
-                isComplete = false;
-                currentPhase = null;
-                statusMessage = null;
-                uploadProgress = 0;
-                analysisProgress = 0;
-                processedCount = 0;
-                totalExpectedFindings = 0;
-                findings = [];
-                processedFindingIds.clear();
-                error = null;
-                requestId = null;
-                return;
-            } catch (err) {
-                console.error('Failed to cancel analysis:', err);
-                error = 'Failed to cancel analysis';
-                return;
-            }
+        if (isProcessing) {
+            currentController?.abort();
+            // Reset states
+            isProcessing = false;
+            isComplete = false;
+            currentPhase = null;
+            statusMessage = null;
+            uploadProgress = 0;
+            analysisProgress = 0;
+            processedCount = 0;
+            totalExpectedFindings = 0;
+            findings = [];
+            processedFindingIds.clear();
+            error = null;
+            requestId = null;
+            return;
         }
 
-        // Generate new requestId for new analysis
+        // Generate new requestId and AbortController for new analysis
         requestId = crypto.randomUUID();
+        currentController = new AbortController();
         isProcessing = true;
         findings = [];
         error = null;
         currentPhase = 'preprocessing';
         statusMessage = 'Preprocessing file...';
-        
+
         try {
             const formData = new FormData();
             formData.append('requestId', requestId);
@@ -289,9 +301,14 @@
             });
 
         } catch (err) {
-            console.error('Processing error:', err);
-            error = err instanceof Error ? err.message : 'Server error; try again';
+            if (err instanceof Error && err.name === 'AbortError') {
+                console.log('Analysis cancelled');
+            } else {
+                console.error('Processing error:', err);
+                error = err instanceof Error ? err.message : 'Server error; try again';
+            }
         } finally {
+            currentController = null;
             isProcessing = false;
             currentPhase = null;
         }
@@ -469,6 +486,26 @@
             <!-- Option 1: CSV Upload -->
             <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-md font-medium text-white mb-4">Option 1: Analyze New Data</h3>
+
+                <!-- Delimiter selection - only show when no file is loaded -->
+                {#if !csvFile}
+                    <div class="mb-4">
+                        <label class="text-sm text-gray-400 block mb-1" for="delimiter">
+                            CSV Delimiter
+                        </label>
+                        <select
+                            id="delimiter"
+                            bind:value={delimiter}
+                            class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                        >
+                            <option value="auto">Auto-detect</option>
+                            <option value=",">Comma (,)</option>
+                            <option value=";">Semicolon (;)</option>
+                            <option value="\t">Tab</option>
+                            <option value="|">Pipe (|)</option>
+                        </select>
+                    </div>
+                {/if}
 
                 <!-- Column Configuration - Show if file is selected (removed showColumnConfig check) -->
                 {#if csvFile}
