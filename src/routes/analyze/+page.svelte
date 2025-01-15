@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import { FileText, FileJson, Download } from 'lucide-svelte';
+    import { FileText, FileJson, Download, Info, CheckCircle2, BarChart } from 'lucide-svelte';
     import InsightCard from '$lib/components/insights/InsightCard.svelte';
     import { mockFindings } from './mockFindings';
 	import Papa from 'papaparse';
@@ -35,10 +35,11 @@
 
     // Add LLM options
     const llmOptions = [
-        'claude-3-5-sonnet-latest',
-        'gemini-exp-1206',
         'gemini-2.0-flash-exp',
-        'gemini-1.5-pro'
+        'gemini-exp-1206',
+        'gemini-1.5-pro',
+        'claude-3-5-sonnet-latest',
+
     ];
 
     // Add a Set to track processed finding IDs
@@ -50,6 +51,12 @@
     // Add new state variables
     let availableColumns: string[] = [];
     let showColumnConfig = false;
+
+    // Tooltip content
+    let delimiterTooltip = "Choose the delimiter for your CSV/TSV file. 'Auto-detect' attempts to identify it automatically.";
+    let cpgColumnTooltip = "Select the column containing CpG Probe IDs to reference beta values.";
+    let sampleColumnTooltip = "Select the column containing a target Sample ID";
+    let llmTooltip = "Choose a Language Model (LLM) for data analysis. Different models offer varying levels of detail and insights.";
 
     async function processCSV(newFile: File, autoProcess = false) {
         csvFile = newFile;
@@ -234,6 +241,7 @@
                     // Process any complete SSE messages
                     const lines = newData.split('\n\n');
                     for (const line of lines) {
+                        console.log(line);
                         if (!line.trim() || !line.startsWith('data: ')) continue;
                         
                         try {
@@ -484,14 +492,41 @@
     >
         <div class="flex flex-col gap-6">
             <!-- Option 1: CSV Upload -->
-            <div class="p-4 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
-                <h3 class="text-md font-medium text-white mb-4">Option 1: Analyze New Data</h3>
+            <div class="p-6 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
+                <h3 class="text-sm text-white mb-3">Option 1: Analyze New Data</h3>
+                
+                {#if !isProcessing && !isComplete}
+                <div class="mb-1">
+                    <p class="text-blue-400 text-sm">
+                        <a href="https://www.ncbi.nlm.nih.gov/gds/?term=methylation+profiling+homo+sapiens+peripheral+mononuclear+blood" target="_blank" rel="noopener noreferrer">Find methylation data<br>(normalized beta values, Illumina)</a>
+                    </p>
+                </div>
 
-                <!-- Delimiter selection - only show when no file is loaded -->
+                <div class="mb-1">
+                    <h4 class="text-sm font-medium text-white">File requirements</h4>
+                    <ul class="list-disc text-sm list-inside text-gray-300">
+                        <li>Headers in first line</li>
+                        <li>No spaces in headers</li>
+                        <li>Standard delimiters</li>
+                    </ul>
+                </div>
+                {/if}
+                
+                <div>
+                    <p class="text-gray-300 mb-2 text-sm">
+                        <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147740" target="_blank" rel="noopener noreferrer" class="text-blue-400">Population reference</a>
+                    </p>
+                </div>
+                
+
+                <!-- Delimiter Selection with Tooltip -->
                 {#if !csvFile}
-                    <div class="mb-4">
+                    <div class="my-4">
                         <label class="text-sm text-gray-400 block mb-1" for="delimiter">
                             CSV Delimiter
+                            <span class="tooltip" title={delimiterTooltip}>
+                                <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                            </span>
                         </label>
                         <select
                             id="delimiter"
@@ -507,19 +542,22 @@
                     </div>
                 {/if}
 
-                <!-- Column Configuration - Show if file is selected (removed showColumnConfig check) -->
+                <!-- Column Configuration with Tooltips -->
                 {#if csvFile}
                     <div class="mb-4 space-y-3" transition:slide>
                         <div class="relative">
                             <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
                                 CpG Probe ID Column
+                                <span class="tooltip" title={cpgColumnTooltip}>
+                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                </span>
                             </label>
                             <div class="relative">
                                 <input 
                                     type="text"
                                     id="cpgColumn"
                                     bind:value={csvConfig.cpgColumn}
-                                    placeholder="Select or type column name"
+                                    placeholder="Select or type header"
                                     class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
                                     list="cpgColumns"
                                     autocomplete="off"
@@ -535,13 +573,16 @@
                         <div class="relative">
                             <label class="text-sm text-gray-400 block mb-1" for="sampleColumn">
                                 Sample Column
+                                <span class="tooltip" title={sampleColumnTooltip}>
+                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                </span>
                             </label>
                             <div class="relative">
                                 <input 
                                     type="text"
                                     id="sampleColumn"
                                     bind:value={csvConfig.sampleColumn}
-                                    placeholder="Select or type column name"
+                                    placeholder="Select or type header"
                                     class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
                                     list="sampleColumns"
                                     autocomplete="off"
@@ -557,6 +598,9 @@
                         <div class="relative">
                             <label class="text-sm text-gray-400 block mb-1" for="llmSelect">
                                 Language Model
+                                <span class="tooltip" title={llmTooltip}>
+                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                </span>
                             </label>
                             <div class="relative">
                                 <input 
@@ -576,7 +620,7 @@
                             </div>
                         </div>
                         
-                        <!-- Show analyze button always when columns are selected -->
+                        <!-- Analyze Button -->
                         <button
                             on:click={() => startProcessing()}
                             class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -753,7 +797,6 @@
         border-radius: 0.75rem;
         background: rgba(17, 24, 39, 0.95);
         backdrop-filter: blur(20px);
-        overflow: hidden;
         box-shadow: 
             0 4px 6px -1px rgba(0, 0, 0, 0.2),
             0 2px 4px -2px rgba(0, 0, 0, 0.1),
@@ -889,5 +932,62 @@
 
     .download-btn:active {
         transform: translateY(0);
+    }
+
+    /* Tooltip Styles */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .tooltip::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(17, 24, 39, 0.9);
+        color: #fff;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        z-index: 20;
+        min-width: 200px;
+
+    }
+
+    .tooltip:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-0.5rem);
+    }
+
+    /* Optional: Arrow for Tooltip */
+    .tooltip::before {
+        content: '';
+        position: absolute;
+        bottom: 115%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(17, 24, 39, 0.9) transparent transparent transparent;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .tooltip:hover::before {
+        opacity: 1;
+    }
+
+    .steps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 </style> 
