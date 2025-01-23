@@ -1,22 +1,23 @@
 export type Tab = 'overview' | 'recommendations' | 'science' | 'evidence';
 
-export type PopulationDistribution = {
-    q5: number;
-    q25: number;
-    q75: number;
-    q95: number;
-    mean: number;
-    median: number;
-    std: number;
-    mad: number;
+export type PopulationModes = {
+    center: number;
+    spread: number;
+    density: number;
 };
 
-export type MethylationMetrics = {
+export type PersonalMethylationMetrics = {
+    name: string;
     value: number;
+    methylation_state: 'hypo' | 'hyper';
+    confidence: number;
+    distribution_type: 'unimodal' | 'multimodal';
+    deviations: {
+        mode_deviation: number;
+        weighted_deviation: number;
+        median_deviation: number;
+    };
     percentile: number;
-    delta_from_mean: number;
-    z_score: number;
-    population_distribution: PopulationDistribution;
 };
 
 export type ModifyingFactor = {
@@ -59,7 +60,6 @@ export type StudyMetric = {
 };
 
 export type StudyContext = {
-    primaryStudyId: string;
     studyMetrics: StudyMetric[];
 };
 
@@ -126,7 +126,5 @@ export type Finding = {
     knowledgeContext: KnowledgeContext;
     provenance: Provenance;
     recommendations: Recommendation[];
-    evidence: Evidence;
-};
-
+    evidence: Evidence;};
 // Add other type definitions as needed 

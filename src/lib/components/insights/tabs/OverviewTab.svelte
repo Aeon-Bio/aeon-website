@@ -9,6 +9,18 @@
   export let finding: Finding;
   let selectedRegionIndex = 0;
   
+  $: uniqueRegions = (() => {
+    const seen = new Set();
+    return finding.provenance.associated_regions.filter(region => {
+      const key = region.matched_probe ? `${region.matched_gene}-${region.matched_probe}` : region.matched_gene;
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  })();
+  
   // Dispatch event for tab changes
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher<{ tabChange: string }>();
@@ -53,15 +65,16 @@
   <!-- Technical Details Grid -->
   <div class="grid gap-6 grid-cols-1 md:grid-cols-2">
     <div class="bg-aeon-surface-1 rounded-lg">
-      {#if finding.provenance.associated_regions.length > 1}
+      {#if uniqueRegions.length > 1}
       <RegionSelector 
-        regions={finding.provenance.associated_regions}
+        regions={uniqueRegions}
         bind:selectedIndex={selectedRegionIndex}
         />
       {/if}
       <MethylationStatus 
-        metrics={finding.provenance.associated_regions[selectedRegionIndex].methylationMetrics}
-        direction={finding.provenance.associated_regions[selectedRegionIndex].direction}
+        metrics={uniqueRegions[selectedRegionIndex].personal_metrics}
+        modes={uniqueRegions[selectedRegionIndex].modes}
+        direction={uniqueRegions[selectedRegionIndex].direction}
       />
     </div>
 

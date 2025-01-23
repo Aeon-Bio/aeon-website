@@ -1,16 +1,11 @@
 <script lang="ts">
     import { BarChart, Info } from 'lucide-svelte';
-    import type { MethylationMetrics } from '../../../types/insights';
+    import type { PersonalMethylationMetrics, PopulationModes } from '../../../types/insights';
     import { fade } from 'svelte/transition';
     
-    export let metrics: MethylationMetrics;
+    export let metrics: PersonalMethylationMetrics;
+    export let modes: PopulationModes[];
     export let direction: 'hyper' | 'hypo';
-
-    // Only show key distribution markers
-    $: distributionMarkers = [
-        { pos: metrics.population_distribution.q25, label: '25th' },
-        { pos: metrics.population_distribution.q75, label: '75th' }
-    ];
 
     // Helper function for ordinal suffixes
     function getOrdinalSuffix(n: number): string {
@@ -30,58 +25,59 @@
     }
 
     // Format percentile nicely
-    $: formattedPercentile = metrics.percentile === 100 
+    $: formattedPercentile = metrics.percentile === 100
         ? '100th'
-        : metrics.percentile < 0.01 
+        : metrics.percentile < 0.01
             ? '< 0.01th'
-            : `${metrics.percentile.toFixed(1)}${getOrdinalSuffix(metrics.percentile)}`;
+            : metrics.percentile < 0.1
+                ? `< ${metrics.percentile.toFixed(1)}<span class="text-xs align-top">st</span>`
+                : metrics.percentile > 99.9
+                    ? `> ${metrics.percentile.toFixed(1)}<span class="text-xs align-top">th</span>`
+                    : (() => {
+                        const displayedValue = metrics.percentile.toFixed(1);
+                        const lastDigit = parseInt(displayedValue.slice(-1));
+                        return `${displayedValue}<span class="text-xs align-top">${getOrdinalSuffix(lastDigit)}</span>`;
+                    })();
 
-    let gaussianGradient: string;
-    let iqrBackground: string;
+    let combinedGradient: string;
 
-    // Calculate gradients
+    // Gaussian-like function for combined gradient
+    function gaussian(x: number, center: number, spread: number): number {
+        const exponent = -Math.pow(x - center, 2) / (2 * Math.pow(spread, 2));
+        return Math.exp(exponent);
+    }
+
+    // Calculate combined gradient
     $: {
-        const { median, mad, q25, q75 } = metrics.population_distribution;
-        
-        // Gaussian gradient centered on median
-        const positions = [
-            { pos: Math.max(0, median - 2 * mad), opacity: 0.02 },
-            { pos: Math.max(0, median - mad), opacity: 0.1 },
-            { pos: median, opacity: 0.2 },
-            { pos: Math.min(1, median + mad), opacity: 0.1 },
-            { pos: Math.min(1, median + 2 * mad), opacity: 0.02 }
-        ];
+        const steps = 100; // Number of steps for the gradient
+        const gradientStops = [];
+        const opacityScale = 2; // Scale factor for the opacity
 
-        gaussianGradient = `
-            linear-gradient(to right,
-                rgba(76,201,240,0) 0%,
-                ${positions.map(p => 
-                    `rgba(76,201,240,${p.opacity}) ${p.pos * 100}%`
-                ).join(',')},
-                rgba(76,201,240,0) 100%
-            )
-        `;
+        for (let i = 0; i <= steps; i++) {
+            const position = i / steps;
+            let opacity = 0;
 
-        // IQR background
-        iqrBackground = `
-            linear-gradient(to right,
-                rgba(76,201,240,0) 0%,
-                rgba(76,201,240,0) ${q25 * 100}%,
-                rgba(76,201,240,0.1) ${q25 * 100}%,
-                rgba(76,201,240,0.1) ${q75 * 100}%,
-                rgba(76,201,240,0) ${q75 * 100}%,
-                rgba(76,201,240,0) 100%
-            )
-        `;
+            if (modes) {
+                modes.forEach(mode => {
+                    const gaussianValue = gaussian(position, mode.center, mode.spread);
+                    opacity += (gaussianValue * mode.density / 100);
+                });
+            }
+
+            // Scale and add base opacity
+            opacity = Math.min(1, opacity * opacityScale);
+
+            gradientStops.push(`rgba(156, 163, 175,${opacity}) ${position * 100}%`);
+        }
+
+        combinedGradient = `linear-gradient(to right, ${gradientStops.join(',')})`;
     }
 
     // Calculate label positions with collision avoidance
     $: labelPositions = (() => {
         const minSpacing = 0.1; // Minimum 10% spacing between labels
         const labels = [
-            { pos: metrics.population_distribution.q25, text: '25th', priority: 1 },
-            { pos: metrics.population_distribution.median, text: 'Median', priority: 2 },
-            { pos: metrics.population_distribution.q75, text: '75th', priority: 1 }
+            ...(modes?.map((mode, i) => ({ pos: mode.center, text: `Peak ${i+1}`, priority: 2, index: i })) || [])
         ].sort((a, b) => a.pos - b.pos);
 
         // If labels are too close, hide lower priority ones
@@ -98,7 +94,10 @@
             }
         }
 
-        return labels.filter(label => !label.hidden);
+        return labels.filter(label => !label.hidden).map(label => ({
+            ...label,
+            yOffset: label.index % 2 === 0 ? 20 : 15 // Stagger labels vertically
+        }));
     })();
 
     let showStatsInfo = false;
@@ -114,9 +113,6 @@
             showStatsInfo = false;
         }, 100);
     }
-
-    // Add minimum MAD threshold to prevent division by zero issues
-    const MIN_MAD = 0.001; // 0.1%
 </script>
 
 <div class="bg-aeon-surface-1 rounded-lg">
@@ -141,22 +137,23 @@
                     on:mouseenter={handleTooltipEnter}
                     on:mouseleave={handleTooltipLeave}
                 >
+                    <p class="text-sm text-gray-400 mb-2">This chart shows how your methylation level compares to the population distribution.</p>
                     <ul class="space-y-2">
                         <li class="grid grid-cols-[auto_1fr] gap-2">
                             <strong>Your Level:</strong>
-                            <span>How often this DNA site is methylated in your cells</span>
+                            <span>Percentage of your cells where methylation is seen.</span>
                         </li>
                         <li class="grid grid-cols-[auto_1fr] gap-2">
                             <strong>Population:</strong>
-                            <span>The most common methylation pattern seen at this site</span>
+                             <span>Closest percentage peak seen in the population.</span>
                         </li>
                         <li class="grid grid-cols-[auto_1fr] gap-2">
-                            <strong>MAD Score:</strong>
-                            <span>A robust measure of how unusual your methylation level is</span>
+                            <strong>Deviation:</strong>
+                            <span>Standard deviation from the closest peak.</span>
                         </li>
                         <li class="grid grid-cols-[auto_1fr] gap-2">
                             <strong>Percentile:</strong>
-                            <span>How your methylation compares to others in the population</span>
+                            <span>Your rank within the population.</span>
                         </li>
                     </ul>
                 </div>
@@ -167,50 +164,31 @@
         <!-- Visualization -->
         <div class="relative">
             <!-- Labels -->
-            {#each labelPositions as label}
-                <div 
-                    class="absolute text-gray-400 text-sm whitespace-nowrap transition-all"
-                    style:left={`${label.pos * 100}%`}
-                    style:transform="translateX(-50%)"
-                    style:bottom="-20px"
-                >
-                    {label.text}
-                </div>
-            {/each}
+            <div 
+                class="absolute text-[#4CC9F0] text-sm whitespace-nowrap transition-all"
+                style:left={`${metrics.value * 100}%`}
+                style:transform="translateX(-50%)"
+                style:bottom="-20px"
+            >
+                You
+            </div>
 
             <!-- Bar -->
             <div class="relative h-24 w-full rounded-lg overflow-hidden border border-gray-700">
-                <!-- IQR Background -->
+                <!-- Combined Background -->
                 <div 
                     class="absolute inset-0"
-                    style:background={iqrBackground}
+                    style:background={combinedGradient}
                 />
                 
-                <!-- Gaussian Background -->
-                <div 
-                    class="absolute inset-0"
-                    style:background={gaussianGradient}
-                />
-
-                <!-- Quartile Lines -->
-                {#each distributionMarkers as marker}
-                    <div
+                {#each modes as mode}
+                    <div 
                         class="absolute top-0 h-full"
-                        style:left={`${marker.pos * 100}%`}
+                        style:left={`${mode.center * 100}%`}
                     >
-                        <div class="absolute h-full w-px bg-gray-600/50" />
+                        <div class="absolute h-full w-[1px] bg-gray-400/50" />
                     </div>
                 {/each}
-
-                <!-- Mean Line -->
-                <div 
-                    class="absolute top-0 h-full"
-                    style:left={`${metrics.population_distribution.median * 100}%`}
-                >
-                    <div class="absolute h-full w-0.5 bg-gradient-to-b from-gray-600 to-gray-500">
-                        <div class="absolute inset-0 w-0.5 bg-gray-500/50 blur-[1px]" />
-                    </div>
-                </div>
 
                 <!-- Your Value Marker -->
                 <div 
@@ -243,37 +221,35 @@
                 <div class="text-gray-500 text-sm mb-1">Population</div>
                 <div class="flex items-baseline gap-2">
                     <span class="text-white text-2xl font-medium">
-                        {(metrics.population_distribution.median * 100).toFixed(1)}%
-                    </span>
-                    <span class="text-gray-400">
-                        ± {(metrics.population_distribution.mad * 100).toFixed(1)}%
+                        {#if modes && modes.length > 0}
+                            {(() => {
+                                const sortedModes = [...modes].sort((a, b) => a.center - b.center);
+                                const relevantMode = metrics.methylation_state === 'hypo' ? sortedModes[0] : sortedModes[sortedModes.length - 1];
+                                return (relevantMode.center * 100).toFixed(1);
+                            })()}%
+                        {/if}
                     </span>
                 </div>
             </div>
             <div>
-                <div class="text-gray-500 text-sm mb-1">Median Absolute Deviation</div>
-                <div class="text-white text-2xl font-medium flex items-baseline gap-2">
-                    <span>
-                        {metrics.population_distribution.mad < MIN_MAD 
-                            ? '—' 
-                            : Math.abs(metrics.z_score).toFixed(1)}
-                    </span>
-                    {#if metrics.population_distribution.mad >= MIN_MAD}
-                        <span class="text-gray-400 text-base">
-                            {direction === 'hyper' ? 'higher' : 'lower'}
-                        </span>
+                <div class="text-gray-500 text-sm mb-1">Deviation</div>
+                <div class="text-white text-2xl font-medium">
+                    {#if metrics.deviations.mode_deviation === 0}
+                        No Deviation
+                    {:else}
+                        {Math.abs(metrics.deviations.mode_deviation).toFixed(1)}x
+                        {metrics.deviations.mode_deviation > 0 ? 'higher' : 'lower'}
                     {/if}
                 </div>
                 <div class="text-gray-400 text-sm">
-                    1 MAD = {metrics.population_distribution.mad < MIN_MAD 
-                        ? '< 0.1' 
-                        : (metrics.population_distribution.mad * 100).toFixed(1)}%
+                    from typical
                 </div>
+                
             </div>
             <div>
                 <div class="text-gray-500 text-sm mb-1">Percentile</div>
                 <div class="text-white text-2xl font-medium">
-                    {formattedPercentile}
+                    {@html formattedPercentile}
                 </div>
             </div>
         </div>
@@ -319,5 +295,9 @@
 
     .stats-tooltip strong {
         color: white;
+    }
+
+    .text-xs.align-top {
+        line-height: 1.2rem;
     }
 </style> 

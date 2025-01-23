@@ -58,6 +58,10 @@
     let sampleColumnTooltip = "Select the column containing a target Sample ID";
     let llmTooltip = "Choose a Language Model (LLM) for data analysis. Different models offer varying levels of detail and insights.";
 
+    // Add new state for message buffering
+    let messageBuffer = '';
+    let isCollectingFinding = false;
+
     async function processCSV(newFile: File, autoProcess = false) {
         csvFile = newFile;
         csvConfig.file = newFile;
@@ -224,7 +228,6 @@
             // Handle the streaming response
             let buffer = '';
             xhr.addEventListener('readystatechange', () => {
-                // Check if we have received partial data (readyState 3) or completed (readyState 4)
                 if (xhr.readyState >= 3) {
                     // Add HTTP error handling
                     if (xhr.status >= 400) {
@@ -238,54 +241,43 @@
                     const newData = xhr.responseText.slice(buffer.length);
                     buffer = xhr.responseText;
                     
-                    // Process any complete SSE messages
-                    const lines = newData.split('\n\n');
+                    // Split into individual messages
+                    const lines = newData.split('\n');
+                    
                     for (const line of lines) {
-                        console.log(line);
-                        if (!line.trim() || !line.startsWith('data: ')) continue;
-                        
-                        try {
-                            const data = JSON.parse(line.slice(6));
-                            console.log(data);
-                            
-                            // Handle different message types
-                            switch (data.type) {
-                                case 'progress':
-                                    currentPhase = 'analyzing';
-                                    analysisProgress = data.progress || 0;
-                                    statusMessage = data.message;
-                                    // Handle different status types
-                                    if (data.status === 'error') {
-                                        error = data.message;
-                                        isProcessing = false;
-                                        currentPhase = null;
-                                    } else if (data.status === 'complete') {
-                                        // Reset processing state for next file
-                                        isProcessing = false;
-                                        isComplete = true;
-                                        currentPhase = null;
-                                        statusMessage = 'Analysis complete!';
-                                    }
-                                    break;
-                                case 'finding':
-                                    if (!processedFindingIds.has(data.id)) {
-                                        console.log(`updated! ${data.id}`);
-                                        processedFindingIds.add(data.id);
-                                        findings = insertSorted(data.data, findings);
-                                        processedCount = findings.length;
-                                    }
-                                    break;
-                                case 'error':
-                                    error = data.message;
-                                    isProcessing = false;
-                                    currentPhase = null;
-                                    break;
+                        if (!line.trim()) continue;
+
+                        if (line.startsWith('data: {')) {
+                            // New complete message
+                            if (messageBuffer) {
+                                // Process any existing buffered message first
+                                try {
+                                    const data = JSON.parse(messageBuffer);
+                                    handleSSEMessage(data);
+                                } catch (err) {
+                                    console.warn('Failed to parse buffered message:', err);
+                                }
                             }
-                        } catch (err) {
-                            if (err instanceof Error && 
-                                !err.message.includes('JSON') && 
-                                !err.message.includes('parse')) {
-                                error = err.message;
+                            messageBuffer = line.slice(6); // Remove 'data: ' prefix
+                            isCollectingFinding = true;
+                        } else if (line.startsWith('data: ') && isCollectingFinding) {
+                            // Continuation of current message
+                            messageBuffer += line.slice(6);
+                        } else if (isCollectingFinding && line.trim()) {
+                            // Part of multi-line message
+                            messageBuffer += line;
+                        }
+
+                        // Try to parse the complete message
+                        if (messageBuffer) {
+                            try {
+                                const data = JSON.parse(messageBuffer);
+                                handleSSEMessage(data);
+                                messageBuffer = '';
+                                isCollectingFinding = false;
+                            } catch (err) {
+                                // If we can't parse, it might be incomplete - continue buffering
+                                continue;
                             }
                         }
                     }
@@ -301,6 +293,16 @@
 
             xhr.open('POST', '/analyze');
             xhr.send(formData);
+            
+            // Associate the AbortController's signal with the request
+            xhr.addEventListener('abort', () => {
+                console.log('Request aborted by client');
+                isProcessing = false;
+            });
+            
+            currentController?.signal.addEventListener('abort', () => {
+                xhr.abort();
+            });
 
             await new Promise((resolve, reject) => {
                 xhr.addEventListener('load', () => resolve(null));
@@ -317,7 +319,6 @@
             }
         } finally {
             currentController = null;
-            isProcessing = false;
             currentPhase = null;
         }
     }
@@ -484,6 +485,45 @@
             }
         };
     }
+
+    // Add new function to handle SSE messages
+    function handleSSEMessage(data: any) {
+        console.log('Handling message:', data);
+        
+        // Handle different message types
+        switch (data.type) {
+            case 'progress':
+                currentPhase = 'analyzing';
+                analysisProgress = data.progress || 0;
+                statusMessage = data.message;
+                // Handle different status types
+                if (data.status === 'error') {
+                    error = data.message;
+                    isProcessing = false;
+                    currentPhase = null;
+                } else if (data.status === 'complete') {
+                    // Reset processing state for next file
+                    isProcessing = false;
+                    isComplete = true;
+                    currentPhase = null;
+                    statusMessage = 'Analysis complete!';
+                }
+                break;
+            case 'finding':
+                if (!processedFindingIds.has(data.id)) {
+                    console.log(`updated! ${data.id}`);
+                    processedFindingIds.add(data.id);
+                    findings = insertSorted(data.data, findings);
+                    processedCount = findings.length;
+                }
+                break;
+            case 'error':
+                error = data.message;
+                isProcessing = false;
+                currentPhase = null;
+                break;
+        }
+    }
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
@@ -497,18 +537,18 @@
                 
                 {#if !isProcessing && !isComplete}
                 <div class="mb-1">
-                    <p class="text-blue-400 text-sm">
-                        <a href="https://www.ncbi.nlm.nih.gov/gds/?term=methylation+profiling+homo+sapiens+peripheral+mononuclear+blood" target="_blank" rel="noopener noreferrer">Find methylation data<br>(normalized beta values, Illumina)</a>
-                    </p>
-                </div>
-
-                <div class="mb-1">
                     <h4 class="text-sm font-medium text-white">File requirements</h4>
                     <ul class="list-disc text-sm list-inside text-gray-300">
                         <li>Headers in first line</li>
                         <li>No spaces in headers</li>
                         <li>Standard delimiters</li>
                     </ul>
+                </div>
+                
+                <div class="mb-1">
+                    <p class="text-blue-400 text-sm">
+                        <a href="https://www.ncbi.nlm.nih.gov/gds/?term=methylation+profiling+homo+sapiens+peripheral+mononuclear+blood" target="_blank" rel="noopener noreferrer">Find methylation data<br>(normalized beta values, Illumina)</a>
+                    </p>
                 </div>
                 {/if}
                 
@@ -525,7 +565,7 @@
                         <label class="text-sm text-gray-400 block mb-1" for="delimiter">
                             CSV Delimiter
                             <span class="tooltip" title={delimiterTooltip}>
-                                <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                <Info class="h-4 w-4 text-gray-400 inline-block ml-1 mb-1" />
                             </span>
                         </label>
                         <select
