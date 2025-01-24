@@ -35,11 +35,11 @@
 
     // Add LLM options
     const llmOptions = [
+        'gemini-2.0-flash-thinking-exp-01-21',
         'gemini-2.0-flash-exp',
         'gemini-exp-1206',
         'gemini-1.5-pro',
         'claude-3-5-sonnet-latest',
-
     ];
 
     // Add a Set to track processed finding IDs
@@ -153,6 +153,7 @@
         requestId = crypto.randomUUID();
         currentController = new AbortController();
         isProcessing = true;
+        // Reset findings array here as well
         findings = [];
         error = null;
         currentPhase = 'preprocessing';
@@ -292,6 +293,8 @@
             });
 
             xhr.open('POST', '/analyze');
+            // Clear processedFindingIds here, before sending the request
+            processedFindingIds.clear();
             xhr.send(formData);
             
             // Associate the AbortController's signal with the request
@@ -449,6 +452,7 @@
     }
 
     function insertSorted(newFinding: any, currentFindings: any[]): any[] {
+        console.log('insertSorted called with:', newFinding, currentFindings); // Debugging log
         const newStrength = getAverageMatchStrength(newFinding);
         
         // Find insertion index
@@ -501,6 +505,8 @@
                     error = data.message;
                     isProcessing = false;
                     currentPhase = null;
+                    // Clear processed IDs on error
+                    processedFindingIds.clear();
                 } else if (data.status === 'complete') {
                     // Reset processing state for next file
                     isProcessing = false;
@@ -510,32 +516,45 @@
                 }
                 break;
             case 'finding':
+                console.log(`Received finding with id: ${data.id}`); // Debugging log
                 if (!processedFindingIds.has(data.id)) {
                     console.log(`updated! ${data.id}`);
                     processedFindingIds.add(data.id);
-                    findings = insertSorted(data.data, findings);
+                    // Ensure findings are updated correctly
+                    console.log('Before insertSorted:', [...findings]); // Debugging log
+                    findings = insertSorted(data.data, [...findings]);
+                    console.log('After insertSorted:', [...findings]); // Debugging log
                     processedCount = findings.length;
+                    console.log(`processedCount: ${processedCount}`); // Debugging log
                 }
                 break;
             case 'error':
                 error = data.message;
                 isProcessing = false;
                 currentPhase = null;
+                // Clear processed IDs on error
+                processedFindingIds.clear();
                 break;
         }
     }
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
-    <div class="insight-card p-6 mt-8 w-[300px] h-fit transition-all duration-300 ease-in-out" 
+    <div class="insight-card p-3 mt-8 w-[300px] h-fit transition-all duration-300 ease-in-out" 
          style="position: sticky; top: 2rem; {isAnyCardExpanded ? 'sm:transform: translateX(-120%);' : ''}"
     >
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-3">
             <!-- Option 1: CSV Upload -->
             <div class="p-6 rounded-lg border border-gray-700 bg-aeon-surface-1/50">
                 <h3 class="text-sm text-white mb-3">Option 1: Analyze New Data</h3>
                 
                 {#if !isProcessing && !isComplete}
+                <div class="mb-1">
+                    <p class="text-blue-400 text-sm">
+                        <a href="https://www.ncbi.nlm.nih.gov/gds/?term=(%22methylation%22%5BMeSH+Terms%5D+OR+methylation%5BAll+Fields%5D)+AND+profiling%5BAll+Fields%5D+AND+(%22humans%22%5BMeSH+Terms%5D+OR+%22Homo+sapiens%22%5BOrganism%5D+OR+homo+sapiens%5BAll+Fields%5D)+AND+peripheral%5BAll+Fields%5D+AND+mononuclear%5BAll+Fields%5D+AND+(%22blood%22%5BSubheading%5D+OR+%22blood%22%5BMeSH+Terms%5D+OR+blood%5BAll+Fields%5D)" target="_blank" rel="noopener noreferrer">Find methylation data matrix<br>(normalized beta values, Illumina)</a>
+                    </p>
+                </div>
+
                 <div class="mb-1">
                     <h4 class="text-sm font-medium text-white">File requirements</h4>
                     <ul class="list-disc text-sm list-inside text-gray-300">
@@ -544,17 +563,11 @@
                         <li>Standard delimiters</li>
                     </ul>
                 </div>
-                
-                <div class="mb-1">
-                    <p class="text-blue-400 text-sm">
-                        <a href="https://www.ncbi.nlm.nih.gov/gds/?term=methylation+profiling+homo+sapiens+peripheral+mononuclear+blood" target="_blank" rel="noopener noreferrer">Find methylation data<br>(normalized beta values, Illumina)</a>
-                    </p>
-                </div>
                 {/if}
                 
                 <div>
                     <p class="text-gray-300 mb-2 text-sm">
-                        <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147740" target="_blank" rel="noopener noreferrer" class="text-blue-400">Population reference</a>
+                        <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE147740" target="_blank" rel="noopener noreferrer" class="text-blue-400">About population reference</a>
                     </p>
                 </div>
                 
@@ -563,7 +576,7 @@
                 {#if !csvFile}
                     <div class="my-4">
                         <label class="text-sm text-gray-400 block mb-1" for="delimiter">
-                            CSV Delimiter
+                            File Delimiter
                             <span class="tooltip" title={delimiterTooltip}>
                                 <Info class="h-4 w-4 text-gray-400 inline-block ml-1 mb-1" />
                             </span>
@@ -651,6 +664,7 @@
                                     class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
                                     list="llmOptions"
                                     autocomplete="off"
+                                    on:focus={() => csvConfig.selected_llm = ''}
                                 />
                                 <datalist id="llmOptions">
                                     {#each llmOptions as llm}

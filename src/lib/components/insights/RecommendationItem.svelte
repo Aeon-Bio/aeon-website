@@ -159,7 +159,7 @@
                             <h5 class="font-medium text-white">Important Considerations</h5>
                         </div>
                         <div class="space-y-2 ml-10">
-                            {#each recommendation.contraindications as contraindication}
+                            {#each Array.isArray(recommendation.contraindications) ? recommendation.contraindications : [recommendation.contraindications] as contraindication}
                                 <div class="flex items-start gap-2">
                                     <ChevronsRight class="h-4 w-4 mt-1 text-yellow-500 flex-shrink-0" />
                                     <span class="text-sm text-aeon-biolum">{contraindication}</span>
