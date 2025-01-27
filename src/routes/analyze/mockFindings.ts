@@ -7,41 +7,45 @@ export const mockFindings = [
       "personally_associated_genes": [
         "PLEC1"
       ],
-      "summary": "Decreased methylation within the PLEC1 gene in blood cells may enhance cytoskeleton function, potentially influencing cell structure and resilience in healthy adults.",
+      "summary": "Increased cellular structural protein production may enhance cell resilience and adaptability.",
       "direction": "hypo"
     },
-    "description": "This methylation pattern in blood cells reflects the regulation of the PLEC1 gene, which encodes plectin, a critical protein for maintaining the cytoskeleton. While originally identified in buccal cells in the context of handedness studies, the underlying mechanism involves fundamental cytoskeleton organization relevant to all cell types, including blood cells. The measurement indicates potentially increased activity of PLEC1 in blood cells due to hypomethylation, suggesting a potential enhancement of cytoskeleton function. This interpretation is supported by extensive research on plectin's role in providing structural stability to cells, mediating cell adhesion, and influencing cell migration, all of which are important for cellular integrity and function in healthy adults.",
+    "description": "This blood-based measurement reflects the regulation of PLEC1, a gene crucial for producing plectin, a protein that strengthens the cell's structural framework, the cytoskeleton. The cytoskeleton is essential for cell shape, movement, and resilience against physical stress. Higher expression of PLEC1, potentially indicated by lower methylation, may enhance the robustness of blood cells, improving their ability to withstand daily stressors and maintain optimal function. Research suggests that PLEC1 plays a broad role in cellular integrity across various tissues, and these fundamental mechanisms are likely conserved in blood cells.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Cytoskeleton organization",
-        "Cell adhesion",
-        "Cell migration",
-        "Mechanical stability of cells"
+        "cytoskeleton organization",
+        "cell adhesion",
+        "cell migration",
+        "mechanical stability"
       ],
       "conservedPathways": [
-        "Cytoskeleton organization pathways",
-        "Integrin signaling pathways",
-        "Cellular stress response pathways"
+        "cytoskeletal signaling pathways",
+        "integrin signaling",
+        "cell stress response pathways"
       ],
       "commonCellularRoles": [
-        "Maintaining cell shape and structural integrity in blood cells and other tissues",
-        "Facilitating cell movement and tissue organization",
-        "Providing resistance to mechanical stress and maintaining cellular resilience"
+        "maintaining cell shape",
+        "facilitating cell movement",
+        "providing mechanical support",
+        "integrating cytoskeletal networks"
       ],
-      "evolutionaryContext": "Highly conserved across metazoans, highlighting its fundamental role in cellular structure and function.",
-      "tissueContext": "Expressed in various tissues, including blood cells, where it contributes to cell shape, flexibility, and interaction with the extracellular matrix.",
+      "evolutionaryContext": "Plectin is a highly conserved protein across species, indicating its fundamental importance for cellular function and survival.",
+      "tissueContext": "PLEC1 is ubiquitously expressed, with particularly high levels in tissues subjected to mechanical stress, including muscle and epithelial tissues. Its role in blood cells, while less studied for mechanical stress, is crucial for maintaining cell integrity and adaptability.",
       "regulatoryNetwork": {
         "upstream": [
-          "Epigenetic modifiers (potentially influenced by mechanical cues and cellular environment)",
-          "Cellular signaling pathways affecting cytoskeleton dynamics (e.g., growth factor signaling, stress response)"
+          "growth factors",
+          "mechanical signals",
+          "epigenetic modifiers"
         ],
         "downstream": [
-          "Cytoskeleton proteins (actin, vimentin, intermediate filaments)",
-          "Cell adhesion molecules (integrins, cadherins)",
-          "Cellular structural components and signaling scaffolds"
+          "actin filaments",
+          "intermediate filaments",
+          "microtubules",
+          "cell adhesion proteins"
         ],
         "feedback": [
-          "Mechanical stress and cell shape can influence PLEC1 expression and methylation, creating a dynamic regulatory loop."
+          "mechanical stress sensing pathways",
+          "cytoskeletal remodeling signals"
         ]
       }
     },
@@ -51,21 +55,22 @@ export const mockFindings = [
           "matched_probe": null,
           "matched_gene": "PLEC1",
           "gene_name": "PLEC1",
-          "description": "Hypomethylation within the PLEC1 gene body observed in buccal cells, associated with handedness, suggesting potential broader impacts on cytoskeleton regulation across tissues, including blood cells.",
+          "description": "Hypomethylation within the PLEC1 gene body is associated with potentially increased PLEC1 expression.",
           "chromosome": "chr8",
-          "position": 143818187,
+          "position": 145354215,
           "context": "gene body",
           "studyIds": [
             "10.21203/RS.3.RS-375556/V1",
-            "10.1038/s41598-022-08998-0"
+            "10.1038/s41598-022-08998-0",
+            "10.20517/cdr.2022.63"
           ],
           "direction": "hypo",
           "matchStrength": 0.828,
           "modifyingFactors": [
             {
               "factor": "Mechanical stress on cells",
-              "effect": "Potential modulation of PLEC1 expression and cytoskeleton function in response to varying levels of mechanical stress.",
-              "interventionPotential": "Regular physical activity and targeted physical therapies to promote healthy mechanical signaling."
+              "effect": "Mechanical stress can influence PLEC1 expression and function.",
+              "interventionPotential": "Physical activities and therapies may modulate PLEC1 related pathways."
             }
           ],
           "modes": [
@@ -84,7 +89,7 @@ export const mockFindings = [
             "name": "PLEC1",
             "value": 0.06817078590393066,
             "methylation_state": "hypo",
-            "confidence": 0.9309526487537634,
+            "confidence": 0.9307464896760145,
             "distribution_type": "bimodal",
             "deviations": {
               "mode_deviation": -18.598356611246864,
@@ -99,15 +104,15 @@ export const mockFindings = [
         "studyMetrics": [
           {
             "studyId": "10.21203/RS.3.RS-375556/V1",
-            "totalSubjects": 946,
+            "totalSubjects": 5881,
             "studyPopulationSummary": [
               {
                 "groupName": "NTR_children_buccal",
                 "count": 946,
-                "description": "Children from the Netherlands Twin Register (NTR) with DNA methylation data from buccal cells."
+                "description": "Children from the Netherlands Twin Register (NTR) with buccal cell DNA methylation data."
               }
             ],
-            "populationContext": "Study of handedness in children using buccal cell methylation from twin cohorts.",
+            "populationContext": "Children from a twin study, buccal cell methylation.",
             "effectSizes": []
           },
           {
@@ -115,12 +120,25 @@ export const mockFindings = [
             "totalSubjects": 6665,
             "studyPopulationSummary": [
               {
-                "groupName": "Meta-analysis of multiple cohorts",
-                "count": 6665,
-                "description": "Meta-analysis including NTR children and adults, ALSPAC children and adults, examining DNA methylation and handedness."
+                "groupName": "NTR_children",
+                "count": 946,
+                "description": "Children from NTR with buccal cell DNA methylation data"
               }
             ],
-            "populationContext": "Meta-analysis across multiple cohorts to investigate the epigenetic basis of handedness.",
+            "populationContext": "Children from a twin study, buccal cell methylation.",
+            "effectSizes": []
+          },
+          {
+            "studyId": "10.20517/cdr.2022.63",
+            "totalSubjects": 12,
+            "studyPopulationSummary": [
+              {
+                "groupName": "cases",
+                "count": 6,
+                "description": "HER2-positive breast cancer patients with recurrence."
+              }
+            ],
+            "populationContext": "Breast cancer patients, disease context.",
             "effectSizes": []
           }
         ]
@@ -128,87 +146,409 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Engage in regular physical activity, incorporating diverse movements that challenge balance and coordination, to support robust cytoskeleton function and enhance cellular resilience.",
+        "recommendation": "Engage in regular moderate-intensity exercise for at least 150 minutes per week to promote cellular resilience and adaptability.",
         "lucideIcon": "activity",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Physical activity provides mechanical stimuli that can positively modulate cytoskeleton dynamics and potentially enhance PLEC1 activity in blood cells, contributing to overall cellular health.",
+        "rationale": "Physical activity can induce mechanical stress on cells, potentially stimulating cytoskeletal protein production and enhancing cellular robustness.",
         "specificActions": [
-          "Include weight-bearing exercises such as walking, jogging, or dancing at least 3 times per week for 30-45 minutes.",
-          "Practice balance-focused activities like yoga, tai chi, or Pilates 2-3 times per week.",
-          "Incorporate varied movements into daily routines, such as climbing stairs or gardening, to promote diverse mechanical loading on cells."
+          "Aim for 30 minutes of brisk walking, cycling, or swimming five times a week.",
+          "Incorporate strength training exercises twice a week to further challenge and strengthen cells."
         ],
-        "monitoringMetrics": [],
-        "contraindications": [],
+        "monitoringMetrics": [
+          {
+            "metric": "Exercise duration and intensity",
+            "frequency": "Weekly",
+            "target": "150 minutes of moderate-intensity or 75 minutes of vigorous-intensity exercise per week"
+          }
+        ],
+        "contraindications": "Consult a healthcare provider before starting a new exercise program, especially if you have pre-existing health conditions.",
         "supportingEvidence": [
-          "Studies linking PLEC1 methylation to cytoskeleton function (10.21203/RS.3.RS-375556/V1, 10.1038/s41598-022-08998-0).",
-          "Extensive literature supporting the beneficial effects of mechanical stress and physical activity on cellular function and cytoskeleton integrity."
+          "Research indicates that mechanical signals and physical stress can influence cytoskeletal dynamics and protein expression."
         ]
       },
       {
-        "recommendation": "Consume a nutrient-dense diet rich in vitamin C, proline, and lysine, alongside minerals like zinc and copper, to provide essential building blocks and cofactors for optimal cytoskeleton protein synthesis and maintenance.",
-        "lucideIcon": "carrot",
+        "recommendation": "Maintain a balanced diet rich in protein and essential nutrients to support cellular repair and cytoskeletal maintenance.",
+        "lucideIcon": "salad",
         "strength": "Moderate",
-        "source": "context",
-        "rationale": "Adequate intake of specific nutrients supports the synthesis and stability of collagen and other cytoskeleton components, ensuring a resilient cellular structure.",
+        "source": "supporting",
+        "rationale": "Adequate protein intake provides the building blocks for cytoskeletal proteins, while essential nutrients support overall cellular health and repair mechanisms.",
         "specificActions": [
-          "Increase consumption of vitamin C-rich foods like citrus fruits, bell peppers, and berries daily.",
-          "Include protein sources rich in lysine and proline such as lean meats, poultry, fish, eggs, and dairy products in each meal.",
-          "Incorporate zinc and copper-rich foods like nuts, seeds, whole grains, and shellfish into your weekly diet."
+          "Include lean protein sources such as fish, poultry, beans, and lentils in your daily meals.",
+          "Consume a variety of fruits and vegetables to ensure sufficient intake of vitamins and minerals crucial for cellular function."
         ],
-        "monitoringMetrics": [],
-        "contraindications": [],
+        "monitoringMetrics": [
+          {
+            "metric": "Dietary protein intake",
+            "frequency": "Daily",
+            "target": "Aim for 0.8-1.2 grams of protein per kilogram of body weight daily, adjusting based on activity level."
+          }
+        ],
+        "contraindications": "No known contraindications for a balanced diet. Individuals with specific dietary restrictions or medical conditions should consult a nutritionist.",
         "supportingEvidence": [
-          "Established knowledge of nutritional requirements for collagen and connective tissue synthesis.",
-          "Research highlighting the roles of vitamin C, proline, lysine, zinc, and copper in cellular structure and enzymatic processes related to cytoskeleton maintenance."
+          "Nutritional studies highlight the importance of protein and micronutrients for cellular health and tissue maintenance."
         ]
       },
       {
-        "recommendation": "Maintain consistent hydration throughout the day and ensure adequate electrolyte intake, particularly sodium, potassium, and magnesium, to support cellular volume regulation and optimal cytoskeleton dynamics.",
-        "lucideIcon": "droplets",
+        "recommendation": "Prioritize sufficient sleep, aiming for 7-9 hours of quality sleep per night, to facilitate cellular repair and reduce cellular stress.",
+        "lucideIcon": "moon",
         "strength": "General",
         "source": "general",
-        "rationale": "Proper hydration and electrolyte balance are fundamental for cellular homeostasis, directly impacting cytoskeleton function, cell signaling, and overall cellular health.",
+        "rationale": "Sleep is crucial for cellular repair processes and reducing overall stress on the body, which indirectly supports cytoskeletal health and cellular resilience.",
         "specificActions": [
-          "Drink water consistently throughout the day, aiming for at least 8 glasses, and adjust intake based on activity level and environmental conditions.",
-          "Consume electrolyte-rich foods such as bananas, leafy greens, yogurt, and coconut water regularly, especially after physical activity or in hot weather.",
-          "Monitor urine color and thirst levels to gauge hydration status and adjust fluid and electrolyte intake accordingly."
+          "Establish a consistent sleep schedule, going to bed and waking up around the same time each day.",
+          "Create a relaxing bedtime routine to improve sleep quality, such as reading or taking a warm bath."
         ],
-        "monitoringMetrics": [],
-        "contraindications": [],
+        "monitoringMetrics": [
+          {
+            "metric": "Sleep duration and quality",
+            "frequency": "Daily",
+            "target": "7-9 hours of restful sleep per night"
+          }
+        ],
+        "contraindications": "No known contraindications for prioritizing sleep. Individuals with sleep disorders should seek professional advice.",
         "supportingEvidence": [
-          "General scientific consensus and established health guidelines emphasizing the importance of hydration and electrolyte balance for overall physiological function.",
-          "Research demonstrating the critical role of hydration and electrolytes in maintaining cellular volume, membrane potential, and enzymatic activities essential for cytoskeleton function."
+          "Sleep research consistently demonstrates the role of sleep in cellular repair, stress reduction, and overall health maintenance."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypomethylation within the PLEC1 gene body in blood cells is inferred to potentially increase PLEC1 gene expression.",
-        "PLEC1 encodes plectin, a versatile protein essential for cytoskeleton organization, cell adhesion, and mechanical stability.",
-        "Enhanced PLEC1 expression in blood cells may lead to improved cytoskeleton function, contributing to cellular resilience and adaptability."
+        "PLEC1 encodes plectin, a critical cytoskeletal protein.",
+        "Hypomethylation in the PLEC1 gene region may lead to increased PLEC1 expression.",
+        "Increased plectin production can enhance cytoskeleton stability and cellular resilience."
       ],
       "functionalImpact": [
-        "Potential enhancement of cytoskeleton function in blood cells, leading to improved structural integrity.",
-        "Possible increase in cellular resilience and adaptability to mechanical and environmental stresses.",
-        "Inferred systemic benefits from improved blood cell integrity and function, although direct systemic effects are not explicitly studied."
+        "Improved cellular structural integrity",
+        "Enhanced cell adaptability to physical stress",
+        "Potential for better tissue maintenance and repair"
       ],
-      "healthRelevance": "Maintaining a well-functioning and adaptable cytoskeleton in blood cells is crucial for their integrity, function, and overall contribution to physiological homeostasis in healthy adults. PLEC1 plays a significant role in supporting these processes.",
+      "healthRelevance": "Maintaining robust cellular structure is fundamental for overall health and resilience, contributing to wellness optimization in healthy adults.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "DNA methylation in gene bodies is often associated with gene expression regulation.",
-          "PLEC1/plectin is a well-established component of the cytoskeleton with critical roles in cell structure and mechanics.",
-          "Cytoskeleton integrity is essential for cellular function and response to stress."
+          "Cytoskeleton function in cell mechanics and resilience",
+          "Epigenetic regulation of gene expression through DNA methylation",
+          "Role of PLEC1 in cytoskeletal organization"
         ],
         "supportingStudies": [
-          "Epigenome-wide association studies (EWAS) identifying PLEC1 hypomethylation in buccal cells (10.21203/RS.3.RS-375556/V1, 10.1038/s41598-022-08998-0).",
-          "Extensive body of literature on PLEC1/plectin function and cytoskeleton biology."
+          "EWAS studies linking PLEC1 methylation to gene expression (though primarily in buccal cells).",
+          "Literature on PLEC1 function in cytoskeleton and cell mechanics."
         ],
         "biologicalContext": [
-          "Cytoskeleton dynamics and regulation in blood cells.",
-          "Cellular response to mechanical stress and environmental changes.",
-          "Importance of cellular integrity for overall health and wellness."
+          "Cytoskeleton dynamics",
+          "Cellular stress response",
+          "Tissue homeostasis"
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "ERBB2"
+      ],
+      "personally_associated_genes": [
+        "ERBB2"
+      ],
+      "summary": "Increased ERBB2 methylation may impair cell signaling pathways critical for healthy cell growth.",
+      "direction": "hyper"
+    },
+    "description": "This blood-based measurement indicates increased methylation of the ERBB2 gene promoter, a key regulator of cell signaling and growth. ERBB2 is fundamental for signal transmission controlling cell proliferation and differentiation, processes essential in blood cell function and overall wellness. While initial studies were in EBV-infected B-cells, ERBB2 signaling pathways are highly conserved across cell types, including blood cells, ensuring relevance to blood measurements. Research suggests that altered ERBB2 methylation can disrupt cellular communication precision, potentially affecting healthy cell growth dynamics. This is supported by in vitro studies showing methylation changes in the ERBB2 promoter modulate gene expression and downstream signaling in various cellular contexts.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "Cell signaling",
+        "Cell proliferation",
+        "Cell differentiation",
+        "Growth factor receptor signaling"
+      ],
+      "conservedPathways": [
+        "PI3K/AKT pathway",
+        "MAPK pathway",
+        "HER2 signaling"
+      ],
+      "commonCellularRoles": [
+        "Regulation of cell growth and survival",
+        "Signal transduction in response to growth factors"
+      ],
+      "evolutionaryContext": "ERBB2 and related receptor tyrosine kinases are evolutionarily conserved, underscoring their vital role in multicellular organism development and homeostasis.",
+      "tissueContext": "ERBB2 signaling is crucial across tissues, including immune and blood cells, regulating cell communication and responses to growth signals, directly relevant to blood-based analysis.",
+      "regulatoryNetwork": {
+        "upstream": [
+          "Growth factors (e.g., EGF, NRG1)",
+          "DNMTs (DNA methyltransferases)"
+        ],
+        "downstream": [
+          "PI3K",
+          "AKT",
+          "MAPK",
+          "Cell cycle regulators"
+        ],
+        "feedback": [
+          "Negative feedback loops involving phosphatases and ubiquitin ligases finely tune ERBB2 signaling intensity and duration."
+        ]
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": null,
+          "matched_gene": "ERBB2",
+          "gene_name": "ERBB2",
+          "description": "Increased methylation at the ERBB2 promoter region, potentially reducing gene activity.",
+          "chromosome": "chr17",
+          "position": 39721599,
+          "context": "promoter",
+          "studyIds": [
+            "10.1073/pnas.1503806112",
+            "10.1172/JCI69735"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.3278868227041766,
+          "modifyingFactors": [
+            {
+              "factor": "EBV infection",
+              "effect": "EBV infection induces hypermethylation of the ERBB2 promoter, decreasing gene expression in B-cells.",
+              "interventionPotential": "Demethylating agents (research context)"
+            },
+            {
+              "factor": "Aging",
+              "effect": "Aging processes may increase methylation at the ERBB2 promoter, potentially altering cell signaling over time.",
+              "interventionPotential": "Anti-inflammatory strategies (research context)"
+            }
+          ],
+          "modes": [
+            {
+              "center": 0.07820518692646967,
+              "spread": 0.007809690179990213,
+              "density": 31.998236331569665
+            },
+            {
+              "center": 0.39436508675801085,
+              "spread": 0.019221320817219122,
+              "density": 1.001763668430335
+            },
+            {
+              "center": 0.556297779083252,
+              "spread": 0.014199644327163696,
+              "density": 1
+            },
+            {
+              "center": 0.746785219040578,
+              "spread": 0.016296052002019806,
+              "density": 25.999999999999996
+            }
+          ],
+          "personal_metrics": {
+            "name": "ERBB2",
+            "value": 0.8014060258865356,
+            "methylation_state": "hyper",
+            "confidence": 0.9756780101818799,
+            "distribution_type": "multimodal",
+            "deviations": {
+              "mode_deviation": 3.351781575021217,
+              "weighted_deviation": 87.14632095055164,
+              "median_deviation": 50.75584451837674
+            },
+            "percentile": 99.72991724948567
+          }
+        },
+        {
+          "matched_probe": null,
+          "matched_gene": "ERBB2",
+          "gene_name": "ERBB2",
+          "description": "Increased methylation of the ERBB2 promoter CpG island, further supporting reduced gene accessibility.",
+          "chromosome": "chr17",
+          "position": 39721599,
+          "context": "promoter CpG island",
+          "studyIds": [
+            "10.1172/JCI69735"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.3278868227041766,
+          "modifyingFactors": [
+            {
+              "factor": "Aging",
+              "effect": "Aging increases methylation at the ERBB2 promoter CpG island, contributing to age-related cellular changes.",
+              "interventionPotential": "Anti-inflammatory strategies (research context)"
+            },
+            {
+              "factor": "Chronic inflammation",
+              "effect": "Chronic inflammation may accelerate methylation at the ERBB2 promoter CpG island, exacerbating signaling disruptions.",
+              "interventionPotential": "Anti-inflammatory strategies (research context)"
+            }
+          ],
+          "modes": [
+            {
+              "center": 0.07820518692646967,
+              "spread": 0.007809690179990213,
+              "density": 31.998236331569665
+            },
+            {
+              "center": 0.39436508675801085,
+              "spread": 0.019221320817219122,
+              "density": 1.001763668430335
+            },
+            {
+              "center": 0.556297779083252,
+              "spread": 0.014199644327163696,
+              "density": 1
+            },
+            {
+              "center": 0.746785219040578,
+              "spread": 0.016296052002019806,
+              "density": 25.999999999999996
+            }
+          ],
+          "personal_metrics": {
+            "name": "ERBB2",
+            "value": 0.8014060258865356,
+            "methylation_state": "hyper",
+            "confidence": 0.9756780101818799,
+            "distribution_type": "multimodal",
+            "deviations": {
+              "mode_deviation": 3.351781575021217,
+              "weighted_deviation": 87.14632095055164,
+              "median_deviation": 50.75584451837674
+            },
+            "percentile": 99.72991724948567
+          }
+        }
+      ],
+      "studyContext": {
+        "studyMetrics": [
+          {
+            "studyId": "10.1073/pnas.1503806112",
+            "totalSubjects": 3,
+            "studyPopulationSummary": [
+              {
+                "groupName": "EBV_infected_PBMCs",
+                "count": "3 donors",
+                "description": "In vitro study using primary peripheral blood mononuclear cells (PBMCs) from 3 healthy donors infected with EBV."
+              }
+            ],
+            "populationContext": "In vitro analysis of EBV-infected PBMCs from healthy individuals.",
+            "effectSizes": []
+          },
+          {
+            "studyId": "10.1172/JCI69735",
+            "totalSubjects": null,
+            "studyPopulationSummary": [],
+            "populationContext": "Review of multiple studies on ERBB2 methylation in aging and cancer.",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Engage in regular moderate-intensity exercise for at least 150 minutes weekly to foster balanced cell signaling and support healthy cell growth.",
+        "lucideIcon": "activity",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Regular exercise positively modulates cellular signaling pathways and promotes overall cellular health, potentially counteracting impacts of altered ERBB2 methylation on cell growth regulation.",
+        "specificActions": [
+          "Aim for five 30-minute sessions of activities like brisk walking, cycling, or swimming each week.",
+          "Include strength training twice weekly to further enhance metabolic and cellular health."
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Weekly exercise duration",
+            "frequency": "Weekly",
+            "target": "≥ 150 minutes of moderate intensity"
+          },
+          {
+            "metric": "Self-reported energy levels",
+            "frequency": "Daily",
+            "target": "Stable or improved daily energy"
+          }
+        ],
+        "contraindications": "Consult healthcare provider before starting new exercise, especially with pre-existing conditions.",
+        "supportingEvidence": [
+          "Established guidelines for physical activity and its benefits for cellular function.",
+          "Research linking regular exercise to improved cellular signaling pathways."
+        ]
+      },
+      {
+        "recommendation": "Consume a diet rich in diverse antioxidants, aiming for at least 5 daily servings of fruits and vegetables, to bolster cellular protection and optimize signaling pathways.",
+        "lucideIcon": "salad",
+        "strength": "Moderate",
+        "source": "context",
+        "rationale": "Antioxidant-rich diets protect cells from oxidative stress and support robust cell signaling, potentially beneficial against effects of altered ERBB2 methylation.",
+        "specificActions": [
+          "Incorporate a wide array of colorful fruits and vegetables into daily meals.",
+          "Complement antioxidant intake with whole grains and lean protein sources for balanced nutrition."
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Daily fruit and vegetable servings",
+            "frequency": "Daily",
+            "target": "≥ 5 diverse servings"
+          },
+          {
+            "metric": "Variety of plant-based food colors",
+            "frequency": "Weekly",
+            "target": "Increased color diversity in weekly diet"
+          }
+        ],
+        "contraindications": "Generally safe; no known contraindications for balanced, antioxidant-rich diets.",
+        "supportingEvidence": [
+          "Well-documented benefits of antioxidant-rich diets for enhancing cellular health.",
+          "Established dietary guidelines promoting high fruit and vegetable intake."
+        ]
+      },
+      {
+        "recommendation": "Incorporate daily stress-reduction practices like meditation or yoga for 15-30 minutes to support balanced cellular function and overall resilience.",
+        "lucideIcon": "meditation",
+        "strength": "Preliminary",
+        "source": "general",
+        "rationale": "Chronic stress can negatively affect cellular processes. Regular stress reduction may help maintain cellular equilibrium and resilience, potentially mitigating effects of ERBB2 methylation changes on cell signaling.",
+        "specificActions": [
+          "Allocate 15-30 minutes daily for mindfulness meditation or yoga practice.",
+          "Explore additional relaxation methods such as deep breathing or nature walks."
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Daily stress reduction practice time",
+            "frequency": "Daily",
+            "target": "15-30 minutes of focused practice"
+          },
+          {
+            "metric": "Self-assessed stress levels",
+            "frequency": "Weekly",
+            "target": "Consistent low to moderate stress perception"
+          }
+        ],
+        "contraindications": "Generally safe; consult healthcare professional if pre-existing mental health conditions exist before starting new practices.",
+        "supportingEvidence": [
+          "Research indicating chronic stress impairs cellular health and function.",
+          "Studies demonstrating benefits of stress reduction for improved overall well-being."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "Hypermethylation of the ERBB2 promoter region is consistently linked to reduced ERBB2 gene expression.",
+        "ERBB2, a receptor tyrosine kinase, plays a vital role in cell signaling cascades governing cell growth and differentiation."
+      ],
+      "functionalImpact": [
+        "Potential disruption of critical cell signaling pathways due to altered ERBB2 expression.",
+        "Possible modulation of cell proliferation and differentiation processes impacting cellular homeostasis."
+      ],
+      "healthRelevance": "Dysregulation of ERBB2 has significant implications for maintaining healthy cell growth control, a cornerstone of overall health and wellness.",
+      "knowledgeBase": {
+        "establishedMechanisms": [
+          "ERBB2's established function in cell signaling and its relevance to cellular health.",
+          "Promoter methylation as a recognized mechanism for gene expression regulation."
+        ],
+        "supportingStudies": [
+          "In vitro studies demonstrating direct links between ERBB2 promoter methylation and gene expression levels.",
+          "Review articles consolidating evidence on ERBB2 methylation across various biological contexts."
+        ],
+        "biologicalContext": [
+          "ERBB2's role in fundamental cell signaling pathways.",
+          "Conservation of ERBB2 signaling mechanisms across different cell types, including blood cells."
         ]
       }
     }
@@ -221,42 +561,36 @@ export const mockFindings = [
       "personally_associated_genes": [
         "MYO5A"
       ],
-      "summary": "Increased methylation of MYO5A in blood cells may reduce cellular transport efficiency and potentially influence neurological function.",
+      "summary": "Reduced neurotransmitter transport may disrupt brain function and adaptability.",
       "direction": "hyper"
     },
-    "description": "This methylation pattern in blood cells reflects potential changes in cellular transport mechanisms, indicated by MYO5A methylation. While initially studied in the context of season of birth and brain tissue, the underlying mechanism relates to fundamental cellular processes applicable to all healthy adults. The measurement suggests decreased MYO5A gene activity in blood cells, which may impact intracellular vesicle transport. This interpretation is supported by research linking MYO5A to neuronal function and broader cellular transport processes, suggesting relevance beyond the original study context.",
+    "description": "This blood-based measurement indicates methylation changes affecting MYO5A, a gene crucial for neurotransmitter transport within cells. While the original study examined brain tissue and linked findings to season of birth, MYO5A's fundamental role in cellular transport is relevant across tissues, including blood cells. Efficient neurotransmitter transport is essential for neuronal communication and overall brain health, impacting mood, stress response, and cognitive functions. Research suggests environmental factors can influence MYO5A methylation, potentially affecting these processes systemically.",
     "knowledgeContext": {
       "establishedFunctions": [
-        "Vesicle transport",
-        "Actin-based motility",
-        "Neuronal function",
-        "Intracellular trafficking"
+        "Neurotransmitter vesicle transport",
+        "Actin-based motor protein function",
+        "Cellular trafficking"
       ],
       "conservedPathways": [
-        "Actin cytoskeleton pathway",
-        "Motor protein pathways",
-        "Intracellular transport pathways",
-        "Membrane trafficking"
+        "Vesicle trafficking pathway",
+        "Actin cytoskeleton regulation"
       ],
       "commonCellularRoles": [
-        "Transport of organelles and vesicles",
-        "Cellular organization",
-        "Signal transduction",
-        "Cytoskeletal dynamics"
+        "Intracellular transport in neurons and immune cells",
+        "Synaptic vesicle dynamics",
+        "Cellular organization"
       ],
-      "evolutionaryContext": "MYO5A is conserved across eukaryotes, indicating a fundamental role in cellular function.",
-      "tissueContext": "While measured in blood, MYO5A is expressed in various tissues, including brain and blood cells, where it plays a role in transport processes.",
+      "evolutionaryContext": "Highly conserved motor protein across eukaryotes, indicating fundamental cellular importance in cellular transport mechanisms.",
+      "tissueContext": "Expressed in various tissues including brain and blood cells, with critical roles in neuronal function and immune cell activity, making blood measurements relevant.",
       "regulatoryNetwork": {
         "upstream": [
           "Environmental factors (e.g., photoperiod)",
-          "Genetic factors",
-          "Cellular stress"
+          "Epigenetic regulators"
         ],
         "downstream": [
           "Synaptic vesicles",
-          "Organelles",
-          "Cellular cargo",
-          "Cellular membrane components"
+          "Neurotransmitter release machinery",
+          "Actin cytoskeleton"
         ],
         "feedback": []
       }
@@ -267,7 +601,7 @@ export const mockFindings = [
           "matched_probe": "cg03370588",
           "matched_gene": "MYO5A",
           "gene_name": "MYO5A",
-          "description": "Hypermethylation at cg03370588 (TSS200 region of MYO5A) associated with season of birth in brain tissue, suggesting potential impact on neuronal development and function.",
+          "description": "Observed hypermethylation at cg03370588 within the TSS200 region of MYO5A, suggesting potential decreased MYO5A expression and reduced gene activity.",
           "chromosome": "chr15",
           "position": 52821290,
           "context": "TSS200",
@@ -275,12 +609,12 @@ export const mockFindings = [
             "10.1017/S2040174421000453"
           ],
           "direction": "hyper",
-          "matchStrength": 0.31915990106649184,
+          "matchStrength": 0.319,
           "modifyingFactors": [
             {
-              "factor": "photoperiod",
-              "effect": "Short photoperiod at birth associated with hypermethylation.",
-              "interventionPotential": "Light therapy during perinatal period (not applicable for healthy adults)."
+              "factor": "Photoperiod",
+              "effect": "Shorter photoperiod at birth is associated with increased methylation at this CpG site.",
+              "interventionPotential": "Exposure to natural or artificial bright light, particularly during infancy and early childhood."
             }
           ],
           "modes": [
@@ -294,7 +628,7 @@ export const mockFindings = [
             "name": "cg03370588",
             "value": 0.5425136685371399,
             "methylation_state": "hyper",
-            "confidence": 0.9951297881949125,
+            "confidence": 0.9955517774348694,
             "distribution_type": "multimodal",
             "deviations": {
               "mode_deviation": 59.87469083278691,
@@ -314,15 +648,15 @@ export const mockFindings = [
               {
                 "groupName": "Hypothalamus",
                 "count": 16,
-                "description": "Post-mortem human hypothalamus tissue samples"
+                "description": "Post-mortem human hypothalamus tissue samples from older adults"
               },
               {
                 "groupName": "Inferior Temporal Gyrus (ITG)",
                 "count": 14,
-                "description": "Post-mortem human inferior temporal gyrus tissue samples"
+                "description": "Post-mortem human inferior temporal gyrus tissue samples from older adults"
               }
             ],
-            "populationContext": "Post-mortem human brain tissue from older adults, studied in relation to season of birth.",
+            "populationContext": "Study focused on post-mortem human brain tissue from older adults, investigating seasonal birth effects on methylation.",
             "effectSizes": []
           }
         ]
@@ -330,691 +664,109 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Engage in regular physical activity, aiming for at least 150 minutes of moderate-intensity exercise per week, to support efficient cellular function and potentially enhance vesicle transport in blood cells.",
+        "recommendation": "Engage in zone 2 cardio exercise for 30 minutes, five times per week to enhance neurotransmitter balance and support overall brain health.",
         "lucideIcon": "activity",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Physical activity is known to positively influence cellular health and may support efficient intracellular transport processes, which MYO5A facilitates, in blood cells.",
+        "rationale": "Regular zone 2 cardio exercise is shown to improve neurogenesis and neurotransmitter function, potentially counteracting the effects of reduced neurotransmitter transport efficiency.",
         "specificActions": [
-          "Schedule 30-minute brisk walks, jogging, or cycling sessions five times a week.",
-          "Incorporate strength training exercises targeting major muscle groups twice a week."
+          "Perform activities like brisk walking, light jogging, or cycling at a moderate intensity where you can hold a conversation.",
+          "Monitor heart rate to stay within zone 2 (approximately 60-70% of your maximum heart rate)."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Weekly exercise duration",
+            "metric": "Mood stability",
             "frequency": "Weekly",
-            "target": "Achieve at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity exercise."
-          }
-        ],
-        "contraindications": "Consult a healthcare provider if you have pre-existing health conditions before starting a new exercise regimen.",
-        "supportingEvidence": [
-          "General benefits of regular exercise on cellular health, metabolic function, and cardiovascular health."
-        ]
-      },
-      {
-        "recommendation": "Maintain a balanced diet rich in diverse fruits and vegetables, focusing on colorful varieties, to increase antioxidant intake and support optimal cellular function.",
-        "lucideIcon": "apple",
-        "strength": "Moderate",
-        "source": "general",
-        "rationale": "Antioxidants from fruits and vegetables can help protect blood cells from oxidative stress, which can impair cellular transport and overall function. A diverse intake ensures a broad spectrum of beneficial compounds.",
-        "specificActions": [
-          "Include at least five servings of diverse fruits and vegetables daily, prioritizing colorful options like berries, leafy greens, and bell peppers.",
-          "Incorporate antioxidant-rich foods such as nuts, seeds, and whole grains into your daily meals."
-        ],
-        "monitoringMetrics": [
+            "target": "Experience more balanced and positive mood"
+          },
           {
-            "metric": "Daily servings of fruits and vegetables",
-            "frequency": "Daily",
-            "target": "Consume at least 5 servings of diverse fruits and vegetables each day."
+            "metric": "Energy levels",
+            "frequency": "Weekly",
+            "target": "Increased daily vitality and reduced fatigue"
           }
         ],
-        "contraindications": "No known contraindications for a balanced diet rich in fruits and vegetables.",
+        "contraindications": "Consult with a healthcare provider before starting a new exercise regimen, especially if you have pre-existing cardiovascular conditions.",
         "supportingEvidence": [
-          "Established benefits of antioxidant-rich diets for cellular health, reduced oxidative stress, and overall wellness."
+          "Extensive research demonstrates the positive impact of regular aerobic exercise on brain health and neurotransmitter systems."
         ]
       },
       {
-        "recommendation": "Prioritize consistent sleep hygiene to achieve 7-9 hours of quality sleep nightly, supporting cellular repair and efficient cellular function in blood cells.",
+        "recommendation": "Prioritize a consistent sleep schedule, aiming for 7-9 hours of uninterrupted sleep nightly to optimize brain function and support cellular repair.",
         "lucideIcon": "moon",
         "strength": "Moderate",
-        "source": "general",
-        "rationale": "Adequate and quality sleep is essential for cellular repair processes and optimal function, including efficient transport mechanisms within blood cells. Consistent sleep patterns enhance these benefits.",
+        "source": "outcome",
+        "rationale": "Consistent, quality sleep is vital for neuronal health and effective neurotransmitter system regulation, which is crucial for efficient cellular transport and brain waste clearance.",
         "specificActions": [
-          "Establish a regular sleep schedule by going to bed and waking up at the same time daily, even on weekends.",
-          "Create a relaxing bedtime routine, such as reading or taking a warm bath, to improve sleep quality and prepare your body for rest.",
-          "Ensure your sleep environment is dark, quiet, and cool to promote restful sleep."
+          "Establish a regular bedtime and wake time, maintaining it even on weekends.",
+          "Create a relaxing pre-sleep routine, such as reading or taking a warm bath, to enhance sleep quality."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Average nightly sleep duration",
-            "frequency": "Weekly",
-            "target": "Achieve an average of 7-9 hours of restful sleep per night."
-          },
-          {
-            "metric": "Sleep quality (self-assessed)",
-            "frequency": "Weekly",
-            "target": "Report feeling rested and refreshed upon waking."
-          }
-        ],
-        "contraindications": "No known contraindications for prioritizing sleep hygiene.",
-        "supportingEvidence": [
-          "Extensive research highlighting the critical role of sleep for cellular health, repair, and overall physiological function."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "preliminary",
-      "mechanisticInsights": [
-        "MYO5A is a motor protein crucial for intracellular vesicle transport within cells, including blood cells.",
-        "Hypermethylation in the TSS200 region of MYO5A suggests potential downregulation of gene expression and reduced MYO5A protein levels in blood cells.",
-        "Decreased MYO5A activity may lead to impaired cellular transport efficiency, affecting the movement of vesicles and organelles within blood cells."
-      ],
-      "functionalImpact": [
-        "Potential reduction in the efficiency of intracellular transport processes in blood cells.",
-        "Possible downstream effects on various cellular functions in blood cells that rely on efficient vesicle transport, such as nutrient delivery and waste removal."
-      ],
-      "healthRelevance": "While the direct impact on overall health from this blood-based methylation change is still under investigation, maintaining efficient cellular transport in blood cells is crucial for supporting systemic wellness and cellular homeostasis.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "MYO5A's role in actin-based vesicle transport is well-established.",
-          "Promoter methylation is a known mechanism for gene expression regulation."
-        ],
-        "supportingStudies": [
-          "10.1017/S2040174421000453"
-        ],
-        "biologicalContext": [
-          "Cellular transport mechanisms",
-          "Vesicle trafficking and dynamics",
-          "Actin cytoskeleton and motor proteins"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "EDNRB"
-      ],
-      "personally_associated_genes": [
-        "EDNRB"
-      ],
-      "summary": "Increased methylation of the EDNRB gene region in blood cells suggests decreased endothelin receptor B signaling.",
-      "direction": "hyper"
-    },
-    "description": "This methylation pattern in blood cells indicates a potential decrease in the activity of the endothelin receptor B (EDNRB). While studies have explored EDNRB methylation in the context of cancer, this blood-based measurement reflects fundamental vascular regulatory mechanisms relevant to healthy adults. EDNRB plays a crucial role in vascular tone, blood pressure regulation, and cellular communication within the vasculature.  The observed hypermethylation suggests a subtle reduction in EDNRB's influence in blood cells, potentially modulating endothelin signaling, which is important for maintaining healthy blood vessel function and overall cardiovascular wellness. This interpretation is grounded in the understanding of endothelin's broad role in vascular homeostasis and cellular function across various tissues.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Endothelin receptor B activity",
-        "Regulation of vascular tone and blood pressure",
-        "Modulation of smooth muscle cell function",
-        "Role in cell growth, differentiation, and inflammation",
-        "Contribution to vascular homeostasis"
-      ],
-      "conservedPathways": [
-        "Endothelin signaling pathway",
-        "G protein-coupled receptor signaling",
-        "Calcium signaling pathway",
-        "Nitric oxide signaling pathway"
-      ],
-      "commonCellularRoles": [
-        "Regulation of blood vessel constriction and dilation in blood cells",
-        "Modulation of vascular smooth muscle cell activity",
-        "Mediation of cellular communication within the vascular system",
-        "Contribution to tissue homeostasis and inflammatory responses in blood vessels"
-      ],
-      "evolutionaryContext": "Endothelin signaling is an evolutionarily ancient and highly conserved system critical for vascular function and homeostasis across vertebrate species.",
-      "tissueContext": "EDNRB is expressed in blood vessels, smooth muscle cells, endothelial cells, and immune cells within the blood, highlighting its systemic role in vascular and immune regulation.",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Endothelins (ET-1, ET-2, ET-3)",
-          "Growth factors (e.g., VEGF, TGF-beta)",
-          "Inflammatory cytokines (e.g., TNF-alpha, IL-1beta)",
-          "Shear stress",
-          "Hypoxia"
-        ],
-        "downstream": [
-          "Nitric oxide (NO) production and release",
-          "Calcium release and intracellular calcium signaling",
-          "MAPK/ERK signaling cascade",
-          "PI3K/AKT signaling pathway",
-          "Regulation of gene expression related to vascular tone and inflammation"
-        ],
-        "feedback": [
-          "Endothelin-induced nitric oxide release leading to vasodilation (negative feedback loop)",
-          "Receptor desensitization and internalization mechanisms to regulate signaling intensity",
-          "Cross-talk with other vasoactive systems (e.g., renin-angiotensin system)"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "EDNRB",
-          "gene_name": "EDNRB",
-          "description": "Hypermethylation of the EDNRB promoter region, potentially reducing gene expression.",
-          "chromosome": "chr13",
-          "position": 28180182,
-          "context": "promoter",
-          "studyIds": [
-            "10.1586/erm.09.10",
-            "10.1186/s13148-015-0094-0"
-          ],
-          "direction": "hyper",
-          "matchStrength": 0.3182628934683379,
-          "modifyingFactors": [
-            {
-              "factor": "Age",
-              "effect": "Age-dependent increase in methylation",
-              "interventionPotential": "Maintain healthy lifestyle across lifespan"
-            }
-          ],
-          "modes": [
-            {
-              "center": 0.07134589185423956,
-              "spread": 0.00909112884524473,
-              "density": 33.00529100529101
-            },
-            {
-              "center": 0.3319099247455597,
-              "spread": 0.03233402967453003,
-              "density": 0.9955908289241623
-            },
-            {
-              "center": 0.43579240143299103,
-              "spread": 0.017242464287999415,
-              "density": 2
-            },
-            {
-              "center": 0.5199444741010666,
-              "spread": 0.019076020800281004,
-              "density": 2
-            },
-            {
-              "center": 0.7396585535575242,
-              "spread": 0.022785916856694483,
-              "density": 19.99911816578484
-            }
-          ],
-          "personal_metrics": {
-            "name": "EDNRB",
-            "value": 0.8046827912330627,
-            "methylation_state": "hyper",
-            "confidence": 0.9277941915980996,
-            "distribution_type": "multimodal",
-            "deviations": {
-              "mode_deviation": 2.853702929071932,
-              "weighted_deviation": 57.07154208855588,
-              "median_deviation": 41.29076257982896
-            },
-            "percentile": 99.7359508770118
-          }
-        },
-        {
-          "matched_probe": null,
-          "matched_gene": "EDNRB",
-          "gene_name": "EDNRB",
-          "description": "Hypermethylation of the TSS1500 region of EDNRB, potentially reducing gene expression.",
-          "chromosome": "chr13",
-          "position": 28178682,
-          "context": "TSS1500",
-          "studyIds": [
-            "10.1186/s13148-015-0094-0"
-          ],
-          "direction": "hyper",
-          "matchStrength": 0.3182628934683379,
-          "modifyingFactors": [],
-          "modes": [
-            {
-              "center": 0.07134589185423956,
-              "spread": 0.00909112884524473,
-              "density": 33.00529100529101
-            },
-            {
-              "center": 0.3319099247455597,
-              "spread": 0.03233402967453003,
-              "density": 0.9955908289241623
-            },
-            {
-              "center": 0.43579240143299103,
-              "spread": 0.017242464287999415,
-              "density": 2
-            },
-            {
-              "center": 0.5199444741010666,
-              "spread": 0.019076020800281004,
-              "density": 2
-            },
-            {
-              "center": 0.7396585535575242,
-              "spread": 0.022785916856694483,
-              "density": 19.99911816578484
-            }
-          ],
-          "personal_metrics": {
-            "name": "EDNRB",
-            "value": 0.8046827912330627,
-            "methylation_state": "hyper",
-            "confidence": 0.9277941915980996,
-            "distribution_type": "multimodal",
-            "deviations": {
-              "mode_deviation": 2.853702929071932,
-              "weighted_deviation": 57.07154208855588,
-              "median_deviation": 41.29076257982896
-            },
-            "percentile": 99.7359508770118
-          }
-        }
-      ],
-      "studyContext": {
-        "studyMetrics": [
-          {
-            "studyId": "10.1586/erm.09.10",
-            "totalSubjects": 0,
-            "studyPopulationSummary": [],
-            "populationContext": "Review of prostate cancer methylation",
-            "effectSizes": []
-          },
-          {
-            "studyId": "10.1186/s13148-015-0094-0",
-            "totalSubjects": 55,
-            "studyPopulationSummary": [
-              {
-                "groupName": "DCIS",
-                "count": 40,
-                "description": "Women with Estrogen-receptor positive ductal carcinoma in situ (DCIS)"
-              },
-              {
-                "groupName": "Adjacent-Normal",
-                "count": 15,
-                "description": "Women with matched adjacent-normal breast tissue"
-              }
-            ],
-            "populationContext": "Women with ductal carcinoma in situ (DCIS) and adjacent normal tissue",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Consume a diet rich in diverse fruits and vegetables, aiming for at least 5 servings daily, to increase antioxidant intake and support healthy blood vessel function.",
-        "lucideIcon": "apple-whole",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "Antioxidants from fruits and vegetables can protect blood vessels from oxidative stress and support endothelial function, which is relevant to endothelin signaling and vascular health.",
-        "specificActions": [
-          "Include a variety of colorful fruits and vegetables in each meal.",
-          "Aim for at least two cups of vegetables and one and a half to two cups of fruit per day."
-        ],
-        "monitoringMetrics": [],
-        "contraindications": [
-          "No major contraindications for general healthy adults. Individuals with specific dietary restrictions should consult their healthcare provider."
-        ],
-        "supportingEvidence": [
-          "Extensive research supports the benefits of fruit and vegetable-rich diets for cardiovascular health and endothelial function."
-        ]
-      },
-      {
-        "recommendation": "Engage in regular moderate-intensity aerobic exercise, such as brisk walking or cycling, for at least 150 minutes per week to promote healthy vascular tone and blood flow.",
-        "lucideIcon": "heart-pulse",
-        "strength": "Moderate",
-        "source": "general",
-        "rationale": "Regular aerobic exercise improves endothelial function, promotes vasodilation, and can positively influence vascular tone, potentially counteracting any negative impacts of reduced EDNRB activity.",
-        "specificActions": [
-          "Aim for at least 30 minutes of moderate-intensity exercise most days of the week.",
-          "Choose activities you enjoy to maintain consistency."
-        ],
-        "monitoringMetrics": [],
-        "contraindications": [
-          "Individuals with pre-existing cardiovascular conditions should consult their doctor before starting a new exercise program."
-        ],
-        "supportingEvidence": [
-          "Numerous studies demonstrate the positive effects of regular aerobic exercise on cardiovascular health and vascular function."
-        ]
-      },
-      {
-        "recommendation": "Practice mindfulness or meditation for 10-15 minutes daily to reduce stress levels and support a balanced nervous system, which can positively influence vascular regulation.",
-        "lucideIcon": "meditation",
-        "strength": "Preliminary",
-        "source": "context",
-        "rationale": "Chronic stress can negatively impact vascular function. Mindfulness and meditation can help regulate the nervous system and reduce stress hormones, potentially supporting healthy vascular tone and indirectly influencing endothelin signaling.",
-        "specificActions": [
-          "Find a quiet space and dedicate 10-15 minutes each day for mindfulness or meditation.",
-          "Use guided meditation apps or resources if helpful."
-        ],
-        "monitoringMetrics": [],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Emerging research suggests that mindfulness and meditation practices can have beneficial effects on cardiovascular health and stress reduction."
-        ]
-      }
-    ],
-    "evidence": {
-      "strength": "moderate",
-      "mechanisticInsights": [
-        "Hypermethylation in the EDNRB gene region in blood cells is observed.",
-        "Hypermethylation is associated with decreased gene activity, suggesting reduced EDNRB signaling.",
-        "EDNRB encodes endothelin receptor B, crucial for vascular tone, blood pressure, and cellular communication."
-      ],
-      "functionalImpact": [
-        "Potential for decreased endothelin receptor B signaling in blood cells.",
-        "Possible subtle modulation of vascular tone regulation within the blood vessel system.",
-        "Potential alterations in cellular communication processes within the vasculature."
-      ],
-      "healthRelevance": "Maintaining balanced endothelin signaling is crucial for healthy vascular function, blood pressure regulation, and overall cardiovascular wellness in healthy adults.",
-      "knowledgeBase": {
-        "establishedMechanisms": [
-          "EDNRB's role in endothelin signaling and vascular regulation is well-established.",
-          "DNA methylation is a known regulator of gene expression."
-        ],
-        "supportingStudies": [
-          "10.1586/erm.09.10",
-          "10.1186/s13148-015-0094-0"
-        ],
-        "biologicalContext": [
-          "Vascular health and regulation",
-          "Cardiovascular wellness",
-          "Cellular signaling and communication",
-          "Blood pressure homeostasis"
-        ]
-      }
-    }
-  },
-  {
-    "pattern": {
-      "gene_list": [
-        "MME"
-      ],
-      "personally_associated_genes": [
-        "MME"
-      ],
-      "summary": "Increased methylation of the MME gene in blood cells suggests reduced activity of peptide degradation, potentially influencing cell signaling and inflammatory responses.",
-      "direction": "hyper"
-    },
-    "description": "This blood-based methylation pattern indicates modulation of fundamental peptide degradation processes within blood cells. While research on this pattern originates from cancer studies, the underlying biological mechanism—the regulation of peptide metabolism by MME—is pertinent to healthy adults.  The observed hypermethylation suggests decreased expression of MME in blood cells. MME encodes a metallopeptidase crucial for degrading peptides and processing cell surface proteins. Reduced MME activity in blood cells may lead to altered peptide signaling dynamics and potentially influence inflammatory responses, given MME's known roles in immune cell function and inflammation pathways. This interpretation is grounded in broader research highlighting MME's involvement in peptide signaling and degradation across various tissues, reinforcing its relevance to overall physiological balance in healthy individuals.",
-    "knowledgeContext": {
-      "establishedFunctions": [
-        "Metallopeptidase activity",
-        "Peptide degradation",
-        "Cell surface protein processing",
-        "Modulation of inflammatory responses",
-        "Regulation of peptide signaling"
-      ],
-      "conservedPathways": [
-        "Peptide hormone degradation pathways",
-        "Cytokine processing pathways",
-        "Inflammatory signaling cascades",
-        "Extracellular matrix remodeling"
-      ],
-      "commonCellularRoles": [
-        "Regulation of peptide signaling molecules in blood cells",
-        "Modulation of inflammatory responses in the circulatory system",
-        "Processing of cell surface proteins relevant to immune function",
-        "Contribution to extracellular peptide homeostasis"
-      ],
-      "evolutionaryContext": "MME belongs to a highly conserved metallopeptidase family, indicating its fundamental role in peptide metabolism across species.",
-      "tissueContext": "MME is expressed across various tissues, including blood cells, immune cells, and epithelial cells, where it participates in peptide signaling, inflammation modulation, and tissue homeostasis.",
-      "regulatoryNetwork": {
-        "upstream": [
-          "Inflammatory cytokines",
-          "Neurotransmitters",
-          "Hormonal signals",
-          "Epigenetic modifiers (DNMTs, histone modifiers)"
-        ],
-        "downstream": [
-          "Peptide substrates (e.g., enkephalins, bradykinin, amyloid-beta)",
-          "Cell surface receptors (e.g., chemokine receptors, integrins)",
-          "Inflammatory mediators (e.g., prostaglandins, leukotrienes)",
-          "Intracellular signaling pathways (e.g., MAPK, PI3K/AKT)"
-        ],
-        "feedback": [
-          "Negative feedback loops regulating peptide signaling through substrate degradation",
-          "Potential feedback regulation of inflammatory responses via peptide mediator processing",
-          "Epigenetic regulation of MME expression in response to cellular signals"
-        ]
-      }
-    },
-    "provenance": {
-      "associated_regions": [
-        {
-          "matched_probe": null,
-          "matched_gene": "MME",
-          "gene_name": "MME",
-          "description": "Observed hypermethylation in the promoter region of MME in blood cells, inferred from studies in other tissues, suggesting potential for decreased MME gene expression.",
-          "chromosome": "chr3",
-          "position": 148417887,
-          "context": "promoter",
-          "studyIds": [
-            "10.3892/or.2015.3993",
-            "10.1186/s13058-014-0450-6",
-            "10.1093/jnci/djz109"
-          ],
-          "direction": "hyper",
-          "matchStrength": 0.3173505890817788,
-          "modifyingFactors": [
-            {
-              "factor": "Neurotransmitter imbalance",
-              "effect": "Imbalances in neurotransmitter signaling may contribute to increased MME promoter methylation.",
-              "interventionPotential": "Lifestyle strategies to support neurotransmitter balance, such as stress management and a balanced diet."
-            },
-            {
-              "factor": "Aging",
-              "effect": "The aging process may be associated with increased methylation at the MME promoter region in blood cells.",
-              "interventionPotential": "General healthy aging strategies may mitigate epigenetic changes."
-            }
-          ],
-          "modes": [
-            {
-              "center": 0.048736589571201125,
-              "spread": 0.006693478817539922,
-              "density": 14.993827160493828
-            },
-            {
-              "center": 0.22230980435109232,
-              "spread": 0.01798814878748551,
-              "density": 2.009700176366843
-            },
-            {
-              "center": 0.3396320343017578,
-              "spread": 0.03261101245880127,
-              "density": 0.9964726631393298
-            },
-            {
-              "center": 0.40187332034111023,
-              "spread": 0.03816770017147064,
-              "density": 1
-            },
-            {
-              "center": 0.5646231174468994,
-              "spread": 0.03613909884128502,
-              "density": 2
-            },
-            {
-              "center": 0.7387451549242601,
-              "spread": 0.020929757911935395,
-              "density": 9
-            }
-          ],
-          "personal_metrics": {
-            "name": "MME",
-            "value": 0.8648366928100586,
-            "methylation_state": "hyper",
-            "confidence": 0.9463442772638713,
-            "distribution_type": "multimodal",
-            "deviations": {
-              "mode_deviation": 6.024510097839861,
-              "weighted_deviation": 54.220590880558746,
-              "median_deviation": 44.2554353320097
-            },
-            "percentile": 99.82879879817068
-          }
-        }
-      ],
-      "studyContext": {
-        "studyMetrics": [
-          {
-            "studyId": "10.3892/or.2015.3993",
-            "totalSubjects": 110,
-            "studyPopulationSummary": [
-              {
-                "groupName": "tumor",
-                "count": 55,
-                "description": "Colorectal carcinoma tissue samples"
-              },
-              {
-                "groupName": "normal",
-                "count": 55,
-                "description": "Adjacent normal epithelial cell samples"
-              }
-            ],
-            "populationContext": "Study comparing methylation and expression in colorectal cancer tissues versus normal adjacent tissues.",
-            "effectSizes": []
-          },
-          {
-            "studyId": "10.1186/s13058-014-0450-6",
-            "totalSubjects": 526,
-            "studyPopulationSummary": [
-              {
-                "groupName": "breast_cancer_cases",
-                "count": 517,
-                "description": "Breast cancer patients with invasive breast cancer"
-              },
-              {
-                "groupName": "normal_breast_tissues",
-                "count": 9,
-                "description": "Normal breast tissue samples from healthy individuals"
-              }
-            ],
-            "populationContext": "Case-control study investigating methylation differences between breast cancer patients and healthy individuals.",
-            "effectSizes": []
-          },
-          {
-            "studyId": "10.1093/jnci/djz109",
-            "totalSubjects": 228951,
-            "studyPopulationSummary": [
-              {
-                "groupName": "breast_cancer_patients",
-                "count": 122977,
-                "description": "Breast cancer patients of European descent"
-              },
-              {
-                "groupName": "controls",
-                "count": 105974,
-                "description": "Healthy controls of European descent"
-              }
-            ],
-            "populationContext": "Genome-wide association study (GWAS) examining methylation in relation to breast cancer risk in a large European cohort.",
-            "effectSizes": []
-          }
-        ]
-      }
-    },
-    "recommendations": [
-      {
-        "recommendation": "Maintain adequate zinc intake through diet to support optimal metallopeptidase enzyme function.",
-        "lucideIcon": "zinc",
-        "strength": "Moderate",
-        "source": "mechanism",
-        "rationale": "MME, a metallopeptidase, requires zinc as a cofactor for its enzymatic activity. Sufficient zinc intake is crucial for supporting the function of metallopeptidases involved in peptide degradation and cell signaling.",
-        "specificActions": [
-          "Incorporate zinc-rich foods into your daily diet, such as lean meats, seafood, nuts, and seeds.",
-          "If dietary intake is insufficient, consider a zinc supplement after consulting with a healthcare provider to determine appropriate dosage."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Frequency of zinc-rich food consumption",
-            "frequency": "Weekly",
-            "target": "Regularly consume zinc-rich foods"
-          },
-          {
-            "metric": "Zinc supplement dosage (if applicable)",
+            "metric": "Sleep quality (using a sleep tracker or subjective assessment)",
             "frequency": "Daily",
-            "target": "Follow recommended daily allowance or healthcare provider's advice"
-          }
-        ],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Zinc is an essential trace element and a critical cofactor for numerous enzymes, including metallopeptidases like MME, involved in vital biological processes."
-        ]
-      },
-      {
-        "recommendation": "Adopt lifestyle practices to mitigate chronic inflammation and support balanced cellular function.",
-        "lucideIcon": "flame-kindling",
-        "strength": "Moderate",
-        "source": "context",
-        "rationale": "Chronic inflammation can influence epigenetic patterns and potentially affect MME gene regulation and function. Reducing systemic inflammation may support healthy epigenetic maintenance and cellular processes.",
-        "specificActions": [
-          "Follow an anti-inflammatory dietary pattern rich in fruits, vegetables, omega-3 fatty acids, and whole grains, while limiting processed foods and refined sugars.",
-          "Engage in regular moderate-intensity exercise and incorporate stress-reducing activities such as yoga or meditation into your routine."
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Adherence to anti-inflammatory diet",
-            "frequency": "Weekly",
-            "target": "Consistently incorporate anti-inflammatory foods"
+            "target": "Achieve consistently restful and deep sleep"
           },
           {
-            "metric": "Frequency of moderate exercise and stress reduction practices",
-            "frequency": "Weekly",
-            "target": "Regular engagement in exercise and stress management"
+            "metric": "Daytime cognitive performance",
+            "frequency": "Daily",
+            "target": "Improved focus, memory, and mental clarity during the day"
           }
         ],
-        "contraindications": [],
+        "contraindications": "If experiencing persistent sleep difficulties, consult a sleep specialist to rule out underlying sleep disorders.",
         "supportingEvidence": [
-          "Chronic inflammation is a significant factor in various health conditions and can be modulated through dietary and lifestyle interventions."
+          "Robust scientific literature highlights the critical role of sleep duration and quality in maintaining cognitive function and overall brain health."
         ]
       },
       {
-        "recommendation": "Engage in activities that promote neurotransmitter balance to support overall epigenetic health.",
-        "lucideIcon": "users-2",
+        "recommendation": "Incorporate 10-15 minutes of daily mindfulness meditation to manage stress and promote cellular resilience, supporting optimal brain function.",
+        "lucideIcon": "lotus",
         "strength": "Preliminary",
-        "source": "context",
-        "rationale": "Neurotransmitter balance may play a role in epigenetic regulation, including DNA methylation patterns. Activities promoting neurotransmitter balance could indirectly support healthy epigenetic states and cellular function.",
+        "source": "general",
+        "rationale": "Chronic stress can negatively affect cellular processes. Regular mindfulness meditation can help reduce stress levels and foster cellular health, indirectly supporting efficient neurotransmitter transport and neuronal function.",
         "specificActions": [
-          "Prioritize regular social interactions and maintain strong social connections to support neurotransmitter regulation.",
-          "Incorporate mindfulness practices or relaxation techniques into your daily routine to help balance neurotransmitter activity and reduce stress."
+          "Use guided meditation apps or online resources to facilitate daily practice.",
+          "Focus on breath awareness and cultivate present moment attention during meditation sessions."
         ],
         "monitoringMetrics": [
           {
-            "metric": "Quality and frequency of social engagement",
+            "metric": "Subjective stress level (scale of 1-10)",
             "frequency": "Weekly",
-            "target": "Maintain meaningful social connections"
+            "target": "Gradual reduction in perceived stress levels"
           },
           {
-            "metric": "Self-reported mood and stress levels",
+            "metric": "Emotional well-being (self-assessment)",
             "frequency": "Weekly",
-            "target": "Maintain positive mood and manage stress effectively"
+            "target": "Increased feelings of calm and emotional balance"
           }
         ],
-        "contraindications": [],
+        "contraindications": "Generally safe, but individuals with pre-existing mental health conditions should consult a mental health professional before starting meditation practices.",
         "supportingEvidence": [
-          "Neurotransmitter balance is crucial for mental and overall well-being and can be influenced by lifestyle and social factors, potentially impacting epigenetic mechanisms."
+          "Emerging research indicates the potential benefits of mindfulness and meditation for stress reduction and promoting cellular well-being."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "MME functions as a metallopeptidase involved in the degradation of peptides and processing of cell surface proteins.",
-        "Hypermethylation in the MME promoter region in blood cells suggests a potential decrease in MME gene expression and activity."
+        "MYO5A is a key motor protein responsible for the transport of neurotransmitter vesicles within cells.",
+        "Observed hypermethylation suggests potential downregulation of MYO5A gene expression, possibly leading to impaired neurotransmitter transport."
       ],
       "functionalImpact": [
-        "Reduced MME activity in blood cells may modulate peptide degradation processes.",
-        "Potential alterations in cell signaling pathways and inflammatory responses due to changes in peptide metabolism."
+        "Reduced efficiency in neurotransmitter delivery to synapses and other cellular locations.",
+        "Potential disruption of synaptic function and neuronal communication, affecting various brain processes."
       ],
-      "healthRelevance": "Maintaining balanced peptide degradation and cell signaling is essential for cellular homeostasis, immune function, and overall wellness.",
+      "healthRelevance": "Efficient neurotransmitter transport is fundamentally important for optimal brain function, including mood regulation, cognitive processing, and effective stress responses.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "MME's role in peptide metabolism and cell signaling is well-documented.",
-          "DNA methylation in promoter regions is a known mechanism for regulating gene expression."
+          "MYO5A's role in intracellular vesicle transport is well-established.",
+          "Promoter hypermethylation is a known mechanism for gene silencing."
         ],
         "supportingStudies": [
-          "Cancer studies provide evidence for MME's involvement in cell signaling and inflammation-related pathways, which can be extrapolated to general cellular function."
+          "Study 10.1017/S2040174421000453 provides direct evidence of MYO5A methylation changes in brain tissue."
         ],
         "biologicalContext": [
-          "Peptide degradation and cell signaling are fundamental biological processes relevant to all tissues, including blood cells.",
-          "MME's function in immune cells and inflammation pathways highlights its potential systemic relevance."
+          "Critical role of neurotransmission in brain health and function.",
+          "Importance of cellular transport mechanisms for neuronal maintenance and communication."
         ]
       }
     }
@@ -1027,10 +779,10 @@ export const mockFindings = [
       "personally_associated_genes": [
         "ACP2"
       ],
-      "summary": "Increased methylation of ACP2 in blood cells may contribute to reduced lysosomal function and potentially impact metabolic health.",
+      "summary": "Increased fat storage may contribute to weight gain and metabolic imbalance.",
       "direction": "hyper"
     },
-    "description": "This methylation pattern in blood cells reflects potential changes in lysosomal function, indicated by increased methylation of the ACP2 gene. While originally observed in studies related to BMI and adiposity, the underlying mechanism involves basic cellular processes related to waste management and nutrient processing within lysosomes, which are relevant to healthy adults. This measurement suggests a possible decrease in ACP2 gene activity in blood cells, which could influence lysosomal efficiency. This interpretation is supported by research linking ACP2 to lysosomal function and metabolic regulation, suggesting a broader role in maintaining cellular and metabolic health.",
+    "description": "Blood methylation patterns indicate changes in a gene related to fat storage and metabolism. Specifically, increased methylation of ACP2 suggests reduced activity of this gene. ACP2 is involved in lysosomes, cellular components that break down waste and recycle materials. Reduced ACP2 function in blood cells may reflect broader metabolic shifts that favor increased fat storage throughout the body. This interpretation is supported by studies linking ACP2 methylation to body mass index (BMI).",
     "knowledgeContext": {
       "establishedFunctions": [
         "Lysosomal acid phosphatase activity",
@@ -1038,44 +790,44 @@ export const mockFindings = [
         "Metabolic regulation"
       ],
       "conservedPathways": [
-        "Lysosomal pathway",
+        "Lysosomal pathways",
         "Phosphate metabolism",
-        "Cellular catabolism"
+        "Adipogenesis regulation"
       ],
       "commonCellularRoles": [
-        "Breakdown of cellular waste products",
-        "Recycling of cellular components",
-        "Signal transduction"
+        "Lysosomal function in various cell types",
+        "Regulation of bone remodeling",
+        "Contribution to metabolic homeostasis"
       ],
-      "evolutionaryContext": "Conserved across eukaryotes, indicating fundamental role in cellular homeostasis.",
-      "tissueContext": "Ubiquitously expressed, with important roles in bone, immune cells, and metabolic tissues. In blood cells, it reflects systemic lysosomal function.",
+      "evolutionaryContext": "Conserved across vertebrates, indicating fundamental roles in cellular metabolism and tissue maintenance.",
+      "tissueContext": "Ubiquitous expression, with notable roles in bone, adipose tissue, and immune cells.",
       "regulatoryNetwork": {
         "upstream": [
-          "Genetic variants (eQTMs)",
-          "Environmental factors",
-          "Nutritional status"
+          "Genetic variants (SNPs)",
+          "Dietary factors",
+          "Hormonal signals"
         ],
         "downstream": [
           "Lysosomal enzymes",
-          "Autophagy pathways",
-          "Metabolic signaling"
+          "Lipid metabolism genes",
+          "Inflammatory cytokines"
         ],
         "feedback": [
-          "Cellular nutrient sensing",
-          "Autophagy regulation"
+          "Metabolic stress signals",
+          "Nutrient availability feedback loops"
         ]
       }
     },
     "provenance": {
       "associated_regions": [
         {
-          "matched_probe": "cg17580616",
+          "matched_probe": null,
           "matched_gene": "ACP2",
           "gene_name": "ACP2",
-          "description": "Hypermethylation at cg17580616 associated with decreased ACP2 expression and increased BMI in blood.",
+          "description": "Hypermethylation in cis-regulatory region of ACP2 associated with decreased gene expression and increased BMI.",
           "chromosome": "chr4",
-          "position": 74585740,
-          "context": "cis-eQTM",
+          "position": 74454848,
+          "context": "cis",
           "studyIds": [
             "10.1038/s41598-023-39936-3"
           ],
@@ -1084,12 +836,12 @@ export const mockFindings = [
           "modifyingFactors": [
             {
               "factor": "Environmental factors",
-              "effect": "May influence methylation and ACP2 expression, potentially modifying BMI.",
+              "effect": "May influence methylation and ACP2 expression, affecting BMI.",
               "interventionPotential": "Environmental modification"
             },
             {
               "factor": "Lifestyle factors",
-              "effect": "May influence methylation and ACP2 expression, potentially modifying BMI.",
+              "effect": "May influence methylation and ACP2 expression, affecting BMI.",
               "interventionPotential": "Lifestyle modification"
             }
           ],
@@ -1119,7 +871,7 @@ export const mockFindings = [
             "name": "ACP2",
             "value": 0.8616171479225159,
             "methylation_state": "hyper",
-            "confidence": 0.9767204975756277,
+            "confidence": 0.9765570841742031,
             "distribution_type": "multimodal",
             "deviations": {
               "mode_deviation": 3.9276221130032103,
@@ -1139,7 +891,7 @@ export const mockFindings = [
               {
                 "groupName": "FHS Offspring",
                 "count": 686,
-                "description": "Participants from the Framingham Heart Study Offspring cohort"
+                "description": "Participants from the Framingham Heart Study (FHS) Offspring cohort"
               },
               {
                 "groupName": "FHS Third Generation",
@@ -1147,7 +899,7 @@ export const mockFindings = [
                 "description": "Participants from the FHS Third Generation cohort"
               }
             ],
-            "populationContext": "Adults from the Framingham Heart Study",
+            "populationContext": "Healthy adults from the Framingham Heart Study.",
             "effectSizes": []
           }
         ]
@@ -1155,100 +907,533 @@ export const mockFindings = [
     },
     "recommendations": [
       {
-        "recommendation": "Support lysosomal function by consuming a diet rich in antioxidants, such as berries and leafy greens, aiming for at least 2 cups of colorful vegetables and 1 cup of berries daily to help protect lysosomes from oxidative stress.",
-        "lucideIcon": "leaf-veggie",
+        "recommendation": "Engage in regular aerobic exercise, aiming for at least 150 minutes of moderate-intensity or 75 minutes of vigorous-intensity activity per week, to improve metabolic function and support healthy weight management.",
+        "lucideIcon": "activity",
         "strength": "Moderate",
         "source": "mechanism",
-        "rationale": "Antioxidants can mitigate oxidative damage to lysosomes, supporting their optimal function.",
+        "rationale": "Aerobic exercise can enhance metabolic rate and improve insulin sensitivity, counteracting potential effects of altered ACP2 methylation on fat storage.",
         "specificActions": [
-          "Increase intake of colorful fruits and vegetables",
-          "Prioritize antioxidant-rich foods at each meal"
+          "Brisk walking",
+          "Jogging",
+          "Cycling",
+          "Swimming"
         ],
         "monitoringMetrics": [
           {
-            "metric": "Dietary antioxidant intake",
-            "frequency": "Weekly self-assessment",
-            "target": "Consistent intake of recommended servings"
-          }
-        ],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Research on antioxidants and cellular health",
-          "Studies linking diet to lysosomal function"
-        ]
-      },
-      {
-        "recommendation": "Engage in regular moderate-intensity exercise, such as brisk walking or cycling, for at least 150 minutes per week, distributed across most days, to promote autophagy and lysosomal turnover.",
-        "lucideIcon": "heart-pulse",
-        "strength": "Moderate",
-        "source": "outcome",
-        "rationale": "Exercise promotes autophagy, the process of cellular cleaning that relies on lysosomes.",
-        "specificActions": [
-          "Schedule exercise sessions into weekly routine",
-          "Track weekly exercise minutes"
-        ],
-        "monitoringMetrics": [
+            "metric": "Weight",
+            "frequency": "Weekly",
+            "target": "Maintain or achieve healthy weight range"
+          },
           {
-            "metric": "Weekly exercise duration",
-            "frequency": "Weekly tracking",
-            "target": "Achieve 150 minutes of moderate-intensity exercise"
-          }
-        ],
-        "contraindications": [],
-        "supportingEvidence": [
-          "Studies on exercise and autophagy",
-          "Research on physical activity and metabolic health"
-        ]
-      },
-      {
-        "recommendation": "Maintain a healthy weight through balanced diet and regular physical activity to reduce metabolic stress on lysosomal pathways.",
-        "lucideIcon": "scales",
-        "strength": "General",
-        "source": "general",
-        "rationale": "Excess weight can increase metabolic burden and potentially impair lysosomal function.",
-        "specificActions": [
-          "Monitor weight regularly",
-          "Adjust diet and exercise as needed to maintain healthy BMI"
-        ],
-        "monitoringMetrics": [
-          {
-            "metric": "Body Mass Index (BMI)",
+            "metric": "Waist circumference",
             "frequency": "Monthly",
-            "target": "Maintain BMI within healthy range (18.5-24.9)"
+            "target": "Reduce or maintain healthy waist circumference"
           }
         ],
-        "contraindications": [],
+        "contraindications": "Consult healthcare provider if pre-existing cardiovascular conditions or orthopedic issues exist.",
         "supportingEvidence": [
-          "General guidelines for healthy weight management",
-          "Research linking obesity to cellular stress"
+          "Extensive research supports the role of aerobic exercise in improving metabolic health and weight management."
+        ]
+      },
+      {
+        "recommendation": "Adopt a balanced diet rich in whole foods, including fruits, vegetables, lean proteins, and whole grains, while limiting processed foods, sugary drinks, and unhealthy fats, to support optimal lysosomal function and metabolic balance.",
+        "lucideIcon": "carrot",
+        "strength": "Moderate",
+        "source": "context",
+        "rationale": "A nutrient-dense diet provides essential vitamins and minerals that support lysosomal enzyme activity and overall metabolic processes.",
+        "specificActions": [
+          "Increase intake of fruits and vegetables to at least 5 servings daily",
+          "Choose lean protein sources like fish, poultry, and beans",
+          "Select whole grains over refined grains",
+          "Reduce consumption of processed foods and sugary beverages"
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Dietary intake",
+            "frequency": "Daily tracking",
+            "target": "Adherence to balanced dietary guidelines"
+          },
+          {
+            "metric": "Energy levels",
+            "frequency": "Daily",
+            "target": "Maintain consistent energy levels throughout the day"
+          }
+        ],
+        "contraindications": "None, generally safe for healthy adults. Consult a dietitian for specific dietary needs or restrictions.",
+        "supportingEvidence": [
+          "Dietary guidelines consistently emphasize whole foods for metabolic health."
+        ]
+      },
+      {
+        "recommendation": "Prioritize stress management techniques such as mindfulness meditation or yoga for at least 15 minutes daily to mitigate potential stress-related impacts on metabolic pathways and cellular function.",
+        "lucideIcon": "leaf",
+        "strength": "Preliminary",
+        "source": "general",
+        "rationale": "Chronic stress can negatively affect metabolic processes and cellular health. Stress reduction techniques may help modulate these effects.",
+        "specificActions": [
+          "Practice mindfulness meditation",
+          "Engage in yoga or tai chi",
+          "Deep breathing exercises",
+          "Progressive muscle relaxation"
+        ],
+        "monitoringMetrics": [
+          {
+            "metric": "Perceived stress level",
+            "frequency": "Weekly",
+            "target": "Reduce or maintain low stress levels"
+          },
+          {
+            "metric": "Sleep quality",
+            "frequency": "Daily",
+            "target": "Improve sleep duration and quality"
+          }
+        ],
+        "contraindications": "None, generally safe and beneficial for most individuals.",
+        "supportingEvidence": [
+          "Stress management is widely recognized for its positive effects on overall health and well-being."
         ]
       }
     ],
     "evidence": {
       "strength": "moderate",
       "mechanisticInsights": [
-        "Hypermethylation of ACP2 may reduce its expression.",
-        "Reduced ACP2 activity can impair lysosomal acid phosphatase function.",
-        "Dysfunctional lysosomes can lead to accumulation of cellular waste and metabolic dysregulation."
+        "Hypermethylation of ACP2 is associated with reduced gene expression.",
+        "ACP2 is involved in lysosomal function and phosphate metabolism.",
+        "Dysregulation of ACP2 may contribute to altered adipogenesis and increased BMI."
       ],
       "functionalImpact": [
-        "Potential decrease in lysosomal efficiency in blood cells.",
-        "Possible impact on cellular waste clearance and nutrient recycling.",
-        "Downstream effects on metabolic health and adiposity."
+        "Potential decrease in lysosomal acid phosphatase activity.",
+        "Possible alterations in cellular waste processing and recycling.",
+        "Likely influence on metabolic regulation and fat storage."
       ],
-      "healthRelevance": "Lysosomal function is crucial for cellular health and metabolic balance. Supporting lysosomal function may contribute to overall wellness and metabolic resilience in healthy adults.",
+      "healthRelevance": "Increased fat storage and potential weight gain, contributing to metabolic imbalance and increased BMI.",
       "knowledgeBase": {
         "establishedMechanisms": [
-          "ACP2 is a key enzyme in lysosomal function.",
-          "Methylation in gene regions can regulate gene expression."
+          "ACP2's role in lysosomal function and metabolic processes is well-documented."
         ],
         "supportingStudies": [
-          "10.1038/s41598-023-39936-3"
+          "Human studies have consistently linked ACP2 methylation to BMI and adiposity."
         ],
         "biologicalContext": [
-          "Lysosomal function",
-          "Cellular waste management",
-          "Metabolic health"
+          "The study context is relevant to healthy adults and wellness optimization, focusing on metabolic health."
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "EIF3I"
+      ],
+      "personally_associated_genes": [
+        "EIF3I"
+      ],
+      "summary": "Increased methylation of EIF3I may reduce protein synthesis efficiency.",
+      "direction": "hyper"
+    },
+    "description": "This blood-based measurement reflects the methylation status of EIF3I, a gene crucial for initiating protein translation in cells. Protein synthesis is a fundamental process for cellular function and maintenance.  Research indicates that environmental cadmium exposure is linked to increased methylation of EIF3I in blood, potentially reducing its activity. Efficient protein synthesis is essential for overall cellular health and adaptability, ensuring cells can respond to stress and maintain their functions effectively. This measurement provides insight into a core cellular process that can be influenced by environmental factors.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "Translation initiation",
+        "Ribosome biogenesis",
+        "Cell growth",
+        "Cell proliferation"
+      ],
+      "conservedPathways": [
+        "Eukaryotic translation initiation pathway",
+        "mTOR signaling pathway"
+      ],
+      "commonCellularRoles": [
+        "Essential for protein production in all cell types",
+        "Regulation of cell growth and division",
+        "Response to cellular stress"
+      ],
+      "evolutionaryContext": "Highly conserved across eukaryotes, indicating its fundamental importance for life.",
+      "tissueContext": "Ubiquitously expressed, with critical roles in tissues with high protein turnover, including blood cells.",
+      "regulatoryNetwork": {
+        "upstream": [
+          "Cadmium exposure",
+          "DNMTs (DNA methyltransferases)",
+          "Environmental toxins"
+        ],
+        "downstream": [
+          "Ribosomal proteins",
+          "mTOR signaling components",
+          "Proteins involved in cell growth and proliferation"
+        ],
+        "feedback": [
+          "Cellular stress response pathways",
+          "Amino acid availability sensing"
+        ]
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": null,
+          "matched_gene": "EIF3I",
+          "gene_name": "EIF3I",
+          "description": "Hypermethylation at the TSS1500 region of EIF3I associated with cadmium exposure in whole blood.",
+          "chromosome": "chr7",
+          "position": 100188447,
+          "context": "TSS1500",
+          "studyIds": [
+            "10.1093/eep/dvx006"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.3097025225890324,
+          "modifyingFactors": [
+            {
+              "factor": "Cadmium exposure",
+              "effect": "Increased methylation at cg14992253",
+              "interventionPotential": "Reduce cadmium exposure through diet and environment."
+            }
+          ],
+          "modes": [
+            {
+              "center": 0.04073394639417529,
+              "spread": 0.0044836940799748756,
+              "density": 10
+            },
+            {
+              "center": 0.14617385596983015,
+              "spread": 0.012058005127047284,
+              "density": 1.9999999999999998
+            },
+            {
+              "center": 0.7924420757504997,
+              "spread": 0.013161263712325162,
+              "density": 4
+            }
+          ],
+          "personal_metrics": {
+            "name": "EIF3I",
+            "value": 0.8922057151794434,
+            "methylation_state": "hyper",
+            "confidence": 0.9616475882909048,
+            "distribution_type": "multimodal",
+            "deviations": {
+              "mode_deviation": 7.580095772681593,
+              "weighted_deviation": 30.320383090726374,
+              "median_deviation": 99.76647151051834
+            },
+            "percentile": 99.88244702297699
+          }
+        }
+      ],
+      "studyContext": {
+        "studyMetrics": [
+          {
+            "studyId": "10.1093/eep/dvx006",
+            "totalSubjects": 40,
+            "studyPopulationSummary": [
+              {
+                "groupName": "High Cd Exposure (HE)",
+                "count": 20,
+                "description": "Women with high environmental Cd exposure"
+              },
+              {
+                "groupName": "Low Cd Exposure (LE)",
+                "count": 20,
+                "description": "Women with low environmental Cd exposure"
+              }
+            ],
+            "populationContext": "Women exposed to varying levels of environmental cadmium.",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Minimize exposure to cadmium by choosing low-cadmium rice and testing water sources, especially if residing in areas with known contamination.",
+        "lucideIcon": "molecule",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Directly addresses the environmental factor (cadmium exposure) linked to EIF3I methylation changes.",
+        "specificActions": [
+          "Check rice origin and opt for low-cadmium sources.",
+          "Test household water for cadmium levels, especially well water.",
+          "Use water filters certified to remove heavy metals."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "None.",
+        "supportingEvidence": [
+          "Research study linking cadmium exposure to EIF3I methylation."
+        ]
+      },
+      {
+        "recommendation": "Support overall detoxification pathways by consuming a diet rich in cruciferous vegetables (broccoli, kale, cabbage) and antioxidants (berries, green tea) daily.",
+        "lucideIcon": "leaf",
+        "strength": "Moderate",
+        "source": "context",
+        "rationale": "Supports general detoxification processes that may help mitigate the effects of environmental toxins.",
+        "specificActions": [
+          "Include at least one serving of cruciferous vegetables daily.",
+          "Consume antioxidant-rich fruits and beverages regularly.",
+          "Ensure adequate intake of vitamins and minerals essential for detoxification (e.g., B vitamins, vitamin C, selenium)."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "Consult with a healthcare provider if you have specific dietary restrictions or medical conditions.",
+        "supportingEvidence": [
+          "General knowledge about dietary support for detoxification pathways."
+        ]
+      },
+      {
+        "recommendation": "Engage in regular moderate exercise for at least 150 minutes per week to enhance cellular function and resilience.",
+        "lucideIcon": "activity",
+        "strength": "General",
+        "source": "general",
+        "rationale": "General lifestyle recommendation to support cellular health and function, indirectly supporting protein synthesis efficiency.",
+        "specificActions": [
+          "Aim for at least 30 minutes of moderate-intensity exercise most days of the week.",
+          "Choose activities you enjoy to ensure long-term adherence.",
+          "Include both aerobic and strength training exercises."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "Consult with a healthcare provider before starting a new exercise program, especially if you have pre-existing health conditions.",
+        "supportingEvidence": [
+          "Established benefits of exercise for overall health and cellular function."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "Cadmium exposure can induce hypermethylation.",
+        "Hypermethylation in the TSS1500 region typically reduces gene expression.",
+        "EIF3I is essential for protein synthesis."
+      ],
+      "functionalImpact": [
+        "Potential reduction in EIF3I expression.",
+        "Possible decrease in protein synthesis efficiency."
+      ],
+      "healthRelevance": "Efficient protein synthesis is crucial for cellular health and function, and its impairment may have broad implications for wellness.",
+      "knowledgeBase": {
+        "establishedMechanisms": [
+          "DNA methylation as a regulator of gene expression.",
+          "Cadmium as an environmental toxicant affecting epigenetic mechanisms.",
+          "EIF3I's role in translation initiation."
+        ],
+        "supportingStudies": [
+          "10.1093/eep/dvx006 (Study linking cadmium to EIF3I methylation)"
+        ],
+        "biologicalContext": [
+          "Environmental toxicology",
+          "Epigenetics",
+          "Protein synthesis",
+          "Cellular metabolism"
+        ]
+      }
+    }
+  },
+  {
+    "pattern": {
+      "gene_list": [
+        "GSTM4"
+      ],
+      "personally_associated_genes": [
+        "GSTM4"
+      ],
+      "summary": "Reduced GSTM4 activity impairs cellular detoxification processes.",
+      "direction": "hyper"
+    },
+    "description": "This blood-based measurement indicates a potential decrease in the activity of GSTM4, a gene involved in cellular detoxification. GSTM4 encodes glutathione S-transferase Mu 4, an enzyme crucial for neutralizing harmful toxins and oxidative stress within cells. This process is fundamental for maintaining cellular health and resilience against environmental pollutants and metabolic byproducts. Research suggests that methylation changes affecting GSTM4 in blood cells can reflect systemic detoxification capacity.",
+    "knowledgeContext": {
+      "establishedFunctions": [
+        "Glutathione S-transferase activity",
+        "Detoxification of xenobiotics",
+        "Protection against oxidative stress",
+        "Metabolism of environmental toxins"
+      ],
+      "conservedPathways": [
+        "Xenobiotic metabolism",
+        "Glutathione conjugation",
+        "Antioxidant defense"
+      ],
+      "commonCellularRoles": [
+        "Cytoprotection in various tissues including blood cells",
+        "Regulation of cellular response to toxins",
+        "Maintenance of redox balance"
+      ],
+      "evolutionaryContext": "GSTM family enzymes are evolutionarily conserved, highlighting their essential role in environmental adaptation and protection from harmful substances.",
+      "tissueContext": "GSTM4 is expressed in blood cells, where it contributes to systemic detoxification. Methylation in blood is a relevant proxy for assessing systemic detoxification capacity.",
+      "regulatoryNetwork": {
+        "upstream": [
+          "NRF2 (regulates GSTM4 expression)",
+          "Environmental toxins (induce GSTM4 expression)"
+        ],
+        "downstream": [
+          "Detoxified metabolites",
+          "Reduced oxidative stress",
+          "Cellular protection"
+        ],
+        "feedback": [
+          "Cellular stress response pathways"
+        ]
+      }
+    },
+    "provenance": {
+      "associated_regions": [
+        {
+          "matched_probe": "cg26668989",
+          "matched_gene": "GSTM4",
+          "gene_name": "GSTM4",
+          "description": "Hypermethylation upstream of GSTM4 is associated with potentially reduced gene expression and impaired detoxification capacity.",
+          "chromosome": "chr1",
+          "position": 101288388,
+          "context": "Upstream",
+          "studyIds": [
+            "10.1093/jnci/djz109"
+          ],
+          "direction": "hyper",
+          "matchStrength": 0.30856076365472096,
+          "modifyingFactors": [],
+          "modes": [
+            {
+              "center": 0.03572844633493911,
+              "spread": 0.00516585947074167,
+              "density": 11
+            },
+            {
+              "center": 0.1920350082809963,
+              "spread": 0.017746842848473547,
+              "density": 3
+            },
+            {
+              "center": 0.3982759714126587,
+              "spread": 0.016324549913406372,
+              "density": 1
+            },
+            {
+              "center": 0.47192101180553436,
+              "spread": 0.0323299765586853,
+              "density": 1
+            },
+            {
+              "center": 0.733105226578536,
+              "spread": 0.021030143756556343,
+              "density": 4.999999999999999
+            }
+          ],
+          "personal_metrics": {
+            "name": "GSTM4",
+            "value": 0.8456265330314636,
+            "methylation_state": "hyper",
+            "confidence": 0.9395442857531255,
+            "distribution_type": "multimodal",
+            "deviations": {
+              "mode_deviation": 5.35047728420059,
+              "weighted_deviation": 26.752386421002946,
+              "median_deviation": 60.2792539881948
+            },
+            "percentile": 99.8297309520612
+          }
+        }
+      ],
+      "studyContext": {
+        "studyMetrics": [
+          {
+            "studyId": "10.1093/jnci/djz109",
+            "totalSubjects": 228951,
+            "studyPopulationSummary": [
+              {
+                "groupName": "breast_cancer_patients",
+                "count": 122977,
+                "description": "Women of European descent diagnosed with breast cancer"
+              },
+              {
+                "groupName": "controls",
+                "count": 105974,
+                "description": "Women of European descent without a breast cancer diagnosis"
+              }
+            ],
+            "populationContext": "Large-scale GWAS in women of European descent, linking methylation to breast cancer risk, but relevant detoxification mechanisms are broadly applicable.",
+            "effectSizes": []
+          }
+        ]
+      }
+    },
+    "recommendations": [
+      {
+        "recommendation": "Increase consumption of cruciferous vegetables like broccoli and kale at least five times per week to enhance GSTM4 activity and support detoxification pathways.",
+        "lucideIcon": "leaf-vegetable",
+        "strength": "Moderate",
+        "source": "mechanism",
+        "rationale": "Cruciferous vegetables contain sulforaphane and other compounds that are known to induce phase II detoxification enzymes, including GSTs, supporting the function of GSTM4.",
+        "specificActions": [
+          "Add broccoli sprouts to salads or smoothies.",
+          "Include roasted or steamed kale as a side dish.",
+          "Consume cauliflower, cabbage, and Brussels sprouts regularly."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "Individuals with thyroid issues should consume cruciferous vegetables in moderation and ensure adequate iodine intake.",
+        "supportingEvidence": [
+          "Studies showing sulforaphane and other isothiocyanates induce GST enzymes.",
+          "Dietary guidelines recommending cruciferous vegetable intake for health promotion."
+        ]
+      },
+      {
+        "recommendation": "Engage in regular moderate-intensity exercise for at least 150 minutes per week to promote overall metabolic health and support natural detoxification processes.",
+        "lucideIcon": "heart-pulse",
+        "strength": "Moderate",
+        "source": "general",
+        "rationale": "Exercise improves circulation, lymphatic drainage, and sweating, all of which aid in the removal of toxins from the body, complementing cellular detoxification mechanisms.",
+        "specificActions": [
+          "Aim for 30 minutes of brisk walking, jogging, or cycling most days of the week.",
+          "Incorporate strength training exercises twice a week.",
+          "Stay hydrated before, during, and after exercise."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "Consult a physician before starting a new exercise program, especially for individuals with pre-existing health conditions.",
+        "supportingEvidence": [
+          "Research demonstrating the benefits of exercise for cardiovascular health and metabolic function.",
+          "General health guidelines recommending regular physical activity."
+        ]
+      },
+      {
+        "recommendation": "Ensure adequate intake of antioxidants through a diet rich in fruits, berries, and colorful vegetables to reduce oxidative stress and support detoxification.",
+        "lucideIcon": "apple-whole",
+        "strength": "Moderate",
+        "source": "supporting",
+        "rationale": "Antioxidants neutralize free radicals and reduce oxidative stress, lessening the burden on cellular detoxification systems and supporting the function of enzymes like GSTM4.",
+        "specificActions": [
+          "Include a variety of colorful fruits and vegetables in daily meals.",
+          "Consume berries, dark leafy greens, and citrus fruits regularly.",
+          "Consider antioxidant-rich spices like turmeric and ginger in cooking."
+        ],
+        "monitoringMetrics": [],
+        "contraindications": "Generally safe, but individuals with specific dietary restrictions or allergies should choose appropriate antioxidant sources.",
+        "supportingEvidence": [
+          "Numerous studies highlighting the role of dietary antioxidants in reducing oxidative stress and promoting health.",
+          "Dietary recommendations for antioxidant-rich foods."
+        ]
+      }
+    ],
+    "evidence": {
+      "strength": "moderate",
+      "mechanisticInsights": [
+        "Hypermethylation of GSTM4 suggests reduced gene expression.",
+        "GSTM4 is a key enzyme in phase II detoxification.",
+        "Impaired GSTM4 activity can lead to reduced detoxification capacity and increased oxidative stress."
+      ],
+      "functionalImpact": [
+        "Potentially reduced ability to detoxify environmental toxins and metabolic byproducts.",
+        "Increased susceptibility to oxidative damage.",
+        "Possible impact on cellular resilience and long-term health."
+      ],
+      "healthRelevance": "Maintaining efficient detoxification processes is crucial for overall wellness and long-term health, protecting against environmental and metabolic stressors.",
+      "knowledgeBase": {
+        "establishedMechanisms": [
+          "GSTM4 enzymatic activity in detoxification",
+          "Regulation of GSTM4 expression by methylation"
+        ],
+        "supportingStudies": [
+          "GWAS study 10.1093/jnci/djz109"
+        ],
+        "biologicalContext": [
+          "Cellular detoxification",
+          "Oxidative stress response"
         ]
       }
     }
