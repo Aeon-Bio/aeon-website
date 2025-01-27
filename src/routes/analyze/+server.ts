@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // Obtain the ID Token
     const idToken = await obtainIDToken(GOOGLE_SERVICE_KEY);
 
-    // Make the authenticated request to Cloud Run with the added signal
+    // Make the authenticated request to Cloud Run
     const uploadResponse = await fetch(
       `${ANALYSIS_SERVER_URL}/methylation-analysis?` +
         new URLSearchParams({
@@ -164,39 +164,29 @@ export const POST: RequestHandler = async ({ request }) => {
       throw new Error(`Upload failed: ${errorText}`);
     }
 
-    // Create a new ReadableStream that will handle the response
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          const reader = uploadResponse.body?.getReader();
-          if (!reader) throw new Error('No response body reader available');
+    // Ensure we have a readable stream from the response
+    if (!uploadResponse.body) {
+      throw new Error('No response body available');
+    }
 
-          while (true) {
-            try {
-              const { done, value } = await reader.read();
-              if (done) break;
-              controller.enqueue(value);
-            } catch (readError) {
-              console.error('Stream read error:', readError);
-              controller.error(readError);
-              break;
-            }
-          }
-          controller.close();
-        } catch (error) {
-          console.error('Stream processing error:', error);
-          controller.error(error);
-        } finally {
-          reader?.releaseLock();
-        }
+    // Create a transform stream to handle SSE formatting
+    const transformer = new TransformStream({
+      start(controller) {
+        // Send initial message
+        const encoder = new TextEncoder();
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'progress', progress: 0, message: 'Analysis started...' })}\n\n`));
       },
-      cancel() {
-        console.log('Stream cancelled by client');
-        uploadResponse.body?.cancel();
+      transform(chunk, controller) {
+        // Pass through the chunk as-is if it's already SSE formatted
+        controller.enqueue(chunk);
       }
     });
 
-    // Set response headers for streaming
+    // Chain the streams
+    const responseStream = uploadResponse.body
+      .pipeThrough(transformer);
+
+    // Set response headers
     const headers = new Headers({
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
@@ -204,8 +194,7 @@ export const POST: RequestHandler = async ({ request }) => {
       'X-Request-ID': requestId
     });
 
-    console.log('Upload successful. Starting stream.');
-    return new Response(stream, { headers });
+    return new Response(responseStream, { headers });
 
   } catch (error) {
     if (error instanceof Error) {
@@ -225,28 +214,5 @@ export const POST: RequestHandler = async ({ request }) => {
         console.error('Error during cleanup:', cleanupError);
       }
     }
-  }
-};
-
-// Add DELETE endpoint for cancellation
-export const DELETE: RequestHandler = async ({ url }) => {
-  const requestId = url.searchParams.get('requestId');
-  
-  if (!requestId) {
-    return json({ error: 'Missing requestId' }, { status: 400 });
-  }
-
-  try {
-    const controller = activeRequests.get(requestId);
-    if (!controller) {
-      return json({ message: 'No active analysis found' }, { status: 404 });
-    }
-
-    controller.abort();
-    activeRequests.delete(requestId);
-    return json({ message: 'Analysis cancelled' }, { status: 200 });
-  } catch (error) {
-    console.error('Error cancelling analysis:', error);
-    return json({ error: 'Failed to cancel analysis' }, { status: 500 });
   }
 };

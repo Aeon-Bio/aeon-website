@@ -21,7 +21,6 @@
     let currentPhase: 'preprocessing' | 'uploading' | 'analyzing' | null = null;
     let processedCount = 0;
     let totalExpectedFindings = 0;
-    let requestId: string | null = null;
     let currentController: AbortController | null = null;
     let delimiter: string = 'auto';
     
@@ -61,6 +60,9 @@
     // Add new state for message buffering
     let messageBuffer = '';
     let isCollectingFinding = false;
+
+    // Add requestId to the component state
+    let requestId: string | null = null;
 
     async function processCSV(newFile: File, autoProcess = false) {
         csvFile = newFile;
@@ -125,43 +127,38 @@
 
     // Extract the actual processing logic to a separate function
     async function startProcessing() {
-        if (!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.file || !csvConfig.selected_llm) {
-            error = 'Please specify both columns and select an LLM';
-            return;
-        }
-
-        // If already processing, cancel the current analysis
         if (isProcessing) {
-            currentController?.abort();
-            // Reset states
-            isProcessing = false;
-            isComplete = false;
-            currentPhase = null;
-            statusMessage = null;
-            uploadProgress = 0;
-            analysisProgress = 0;
-            processedCount = 0;
-            totalExpectedFindings = 0;
-            findings = [];
-            processedFindingIds.clear();
-            error = null;
-            requestId = null;
+            // If already processing, simply abort the current XHR request
+            if (currentController) {
+                currentController.abort();
+                isProcessing = false;
+                currentPhase = null;
+                statusMessage = 'Analysis cancelled';
+            }
             return;
         }
 
-        // Generate new requestId and AbortController for new analysis
-        requestId = crypto.randomUUID();
-        currentController = new AbortController();
-        isProcessing = true;
-        // Reset findings array here as well
-        findings = [];
+        // Reset all state variables
         error = null;
+        findings = [];
+        processedFindingIds.clear();
+        isProcessing = true;
         currentPhase = 'preprocessing';
-        statusMessage = 'Preprocessing file...';
+        uploadProgress = 0;
+        analysisProgress = 0;
+        processedCount = 0;
+        totalExpectedFindings = 0;
+        statusMessage = 'Preprocessing file...'; // Reset status message
+
+        // Generate new requestId
+        requestId = crypto.randomUUID();
+
+        // Create new AbortController for this request
+        currentController = new AbortController();
 
         try {
             const formData = new FormData();
-            formData.append('requestId', requestId);
+            formData.append('requestId', requestId); // Add requestId to FormData
             formData.append('cpgColumn', csvConfig.cpgColumn);
             formData.append('sampleColumn', csvConfig.sampleColumn);
             formData.append('selected_llm', csvConfig.selected_llm);
@@ -286,8 +283,12 @@
             });
 
             // Add error event handler
-            xhr.addEventListener('error', () => {
-                error = 'Network error occurred. Please try again.';
+            xhr.addEventListener('error', (event) => {
+                if (event.message === 'Analysis cancelled') {
+                    error = 'Analysis cancelled';
+                } else {
+                    error = 'Network error occurred. Please try again.';
+                }
                 isProcessing = false;
                 currentPhase = null;
             });
@@ -313,16 +314,22 @@
                 xhr.addEventListener('abort', reject);
             });
 
-        } catch (err) {
-            if (err instanceof Error && err.name === 'AbortError') {
-                console.log('Analysis cancelled');
-            } else {
-                console.error('Processing error:', err);
-                error = err instanceof Error ? err.message : 'Server error; try again';
+        } catch (error) {
+            // Don't log or set error state for aborted requests
+            if (error instanceof ProgressEvent && error.type === 'abort') {
+                return;
+            }
+            
+            console.error('Processing error:', error);
+            if (!error.message?.includes('abort')) {
+                error = error.message || 'Server error occurred';
             }
         } finally {
-            currentController = null;
-            currentPhase = null;
+            if (!(error instanceof ProgressEvent && error.type === 'abort')) {
+                isProcessing = false;
+                currentPhase = null;
+                requestId = null;
+            }
         }
     }
 
