@@ -65,10 +65,17 @@
     // Add requestId to the component state
     let requestId: string | null = null;
 
+    // Add new state variable
+    let isLoadingColumns = false;
+
+    // Add new state variable for alert
+    let showKeepOpenAlert = false;
+
     async function processCSV(newFile: File, autoProcess = true) {
         csvFile = newFile;
         csvConfig.file = newFile;
         isProcessing = false;
+        isLoadingColumns = true; // Set loading state
         
         // Reset columns first
         availableColumns = [];
@@ -115,6 +122,7 @@
                         if (cpgGuesses.length > 0) csvConfig.cpgColumn = cpgGuesses[0];
                         if (sampleGuesses.length > 0) csvConfig.sampleColumn = sampleGuesses[0];
                     }
+                    isLoadingColumns = false; // Clear loading state
                     resolve(null);
                 }
             });
@@ -128,6 +136,9 @@
 
     // Extract the actual processing logic to a separate function
     async function startProcessing() {
+        // Show the alert when processing starts and don't auto-dismiss it
+        showKeepOpenAlert = true;
+
         // Add a guard against multiple simultaneous requests
         if (isProcessing) {
             // If already processing, simply abort the current XHR request
@@ -375,6 +386,8 @@
                     requestId = null;
                 }
             }
+            // Only hide the alert when processing is complete
+            showKeepOpenAlert = false;
         }
     }
 
@@ -478,13 +491,15 @@
         const blob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         
-        // Determine filename based on source
-        let filename = 'findings_sample.json';
-        if (csvFile) {
-            filename = `findings_${csvFile.name.replace(/\.(csv|tsv|txt)$/, '')}.json`;
-        } else if (jsonFile) {
-            filename = jsonFile.name;
-        }
+        // Get the selected sample ID from the data
+        const selectedSampleId = csvFile ? 
+            findings[0]?.sample_id || // try to get from findings first
+            csvConfig.sampleColumn && findings[0]?.[csvConfig.sampleColumn] || // try column value
+            'findings' : // fallback
+            'personal';
+        
+        // Create filename with sample ID
+        const filename = `${selectedSampleId}_methylation_findings.json`;
         
         const a = document.createElement('a');
         a.href = url;
@@ -675,90 +690,104 @@
                 <!-- Column Configuration with Tooltips -->
                 {#if csvFile}
                     <div class="mb-4 space-y-3" transition:slide>
-                        <div class="relative">
-                            <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
-                                CpG Probe ID Column
-                                <span class="tooltip" title={cpgColumnTooltip}>
-                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
-                                </span>
-                            </label>
-                            <div class="relative">
-                                <input 
-                                    type="text"
-                                    id="cpgColumn"
-                                    bind:value={csvConfig.cpgColumn}
-                                    placeholder="Select or type header"
-                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
-                                    list="cpgColumns"
-                                    autocomplete="off"
-                                    on:focus={() => csvConfig.cpgColumn = ''}
-                                />
-                                <datalist id="cpgColumns">
-                                    {#each availableColumns as column}
-                                        <option value={column}>{column}</option>
-                                    {/each}
-                                </datalist>
+                        {#if isLoadingColumns}
+                            <div class="flex flex-col items-center py-4">
+                                <div class="loading-spinner" />
+                                <div class="text-center">
+                                    <span class="text-sm text-aeon-biolum block">
+                                        Processing {csvFile?.name}...
+                                    </span>
+                                    <span class="text-xs text-gray-400 mt-0.5 block">
+                                        Detecting columns
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="relative">
-                            <label class="text-sm text-gray-400 block mb-1" for="sampleColumn">
-                                Sample Column
-                                <span class="tooltip" title={sampleColumnTooltip}>
-                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
-                                </span>
-                            </label>
+                        {:else}
                             <div class="relative">
-                                <input 
-                                    type="text"
-                                    id="sampleColumn"
-                                    bind:value={csvConfig.sampleColumn}
-                                    placeholder="Select or type header"
-                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
-                                    list="sampleColumns"
-                                    autocomplete="off"
-                                    on:focus={() => csvConfig.sampleColumn = ''}
-                                />
-                                <datalist id="sampleColumns">
-                                    {#each availableColumns as column}
-                                        <option value={column}>{column}</option>
-                                    {/each}
-                                </datalist>
+                                <label class="text-sm text-gray-400 block mb-1" for="cpgColumn">
+                                    CpG Probe ID Column
+                                    <span class="tooltip" title={cpgColumnTooltip}>
+                                        <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                    </span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text"
+                                        id="cpgColumn"
+                                        bind:value={csvConfig.cpgColumn}
+                                        placeholder="Select or type header"
+                                        class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                        list="cpgColumns"
+                                        autocomplete="off"
+                                        on:focus={() => csvConfig.cpgColumn = ''}
+                                    />
+                                    <datalist id="cpgColumns">
+                                        {#each availableColumns as column}
+                                            <option value={column}>{column}</option>
+                                        {/each}
+                                    </datalist>
+                                </div>
                             </div>
-                        </div>
-                        <div class="relative">
-                            <label class="text-sm text-gray-400 block mb-1" for="llmSelect">
-                                Language Model
-                                <span class="tooltip" title={llmTooltip}>
-                                    <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
-                                </span>
-                            </label>
                             <div class="relative">
-                                <input 
-                                    type="text"
-                                    id="llmSelect"
-                                    bind:value={csvConfig.selected_llm}
-                                    placeholder="Select LLM"
-                                    class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
-                                    list="llmOptions"
-                                    autocomplete="off"
-                                    on:focus={() => csvConfig.selected_llm = ''}
-                                />
-                                <datalist id="llmOptions">
-                                    {#each llmOptions as llm}
-                                        <option value={llm}>{llm}</option>
-                                    {/each}
-                                </datalist>
+                                <label class="text-sm text-gray-400 block mb-1" for="sampleColumn">
+                                    Sample Column
+                                    <span class="tooltip" title={sampleColumnTooltip}>
+                                        <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                    </span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text"
+                                        id="sampleColumn"
+                                        bind:value={csvConfig.sampleColumn}
+                                        placeholder="Select or type header"
+                                        class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                        list="sampleColumns"
+                                        autocomplete="off"
+                                        on:focus={() => csvConfig.sampleColumn = ''}
+                                    />
+                                    <datalist id="sampleColumns">
+                                        {#each availableColumns as column}
+                                            <option value={column}>{column}</option>
+                                        {/each}
+                                    </datalist>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- Analyze Button -->
-                        <button
-                            on:click={() => startProcessing()}
-                            class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.selected_llm}
-                        >
-                            {isProcessing ? 'Cancel Analysis' : 'Analyze Data'}
-                        </button>
+                            <div class="relative">
+                                <label class="text-sm text-gray-400 block mb-1" for="llmSelect">
+                                    Language Model
+                                    <span class="tooltip" title={llmTooltip}>
+                                        <Info class="h-4 w-4 text-gray-400 inline-block ml-1" />
+                                    </span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="text"
+                                        id="llmSelect"
+                                        bind:value={csvConfig.selected_llm}
+                                        placeholder="Select LLM"
+                                        class="w-full px-3 py-2 bg-aeon-surface-2 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:border-aeon-primary focus:ring-1 focus:ring-aeon-primary"
+                                        list="llmOptions"
+                                        autocomplete="off"
+                                        on:focus={() => csvConfig.selected_llm = ''}
+                                    />
+                                    <datalist id="llmOptions">
+                                        {#each llmOptions as llm}
+                                            <option value={llm}>{llm}</option>
+                                        {/each}
+                                    </datalist>
+                                </div>
+                            </div>
+                            
+                            <!-- Analyze Button -->
+                            <button
+                                on:click={() => startProcessing()}
+                                class="w-full py-2 mt-2 px-4 bg-aeon-biolum hover:bg-aeon-biolum/90 text-black font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!csvConfig.cpgColumn || !csvConfig.sampleColumn || !csvConfig.selected_llm}
+                            >
+                                {isProcessing ? 'Cancel Analysis' : 'Analyze Data'}
+                            </button>
+                        {/if}
                     </div>
                 {/if}
 
@@ -901,6 +930,28 @@
                         />
                     </div>
                 {/each}
+            </div>
+        </div>
+    {/if}
+
+    <!-- Alert for keeping the tab active -->
+    {#if showKeepOpenAlert}
+        <div class="fixed bottom-4 right-4 max-w-sm" transition:slide>
+            <div class="bg-aeon-surface-1/95 backdrop-blur-md border-l-4 border border-l-yellow-500 border-aeon-primary/20 rounded-lg p-4 shadow-lg">
+                <div class="flex gap-3">
+                    <div class="flex-shrink-0 text-yellow-500">
+                        <Info class="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-yellow-500">Keep This Tab Active!</h3>
+                        <p class="mt-1 text-sm text-gray-300">
+                            Please don't close or hide this tab during analysis. Hidden or background tabs will lose connection and interrupt the process.
+                        </p>
+                        <p class="mt-2 text-sm text-gray-400">
+                            💡 Tip: Move this to a separate window if you need to work on other things.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     {/if}
@@ -1120,5 +1171,32 @@
         flex-direction: column;
         gap: 1rem;
         margin-bottom: 1rem;
+    }
+
+    /* Add loading spinner animation */
+    .loading-spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid rgba(76, 201, 240, 0.1);
+        border-left-color: var(--aeon-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 0.5rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Optional: Add a subtle pulse animation to the text while loading */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .loading-spinner + .text-center {
+        animation: pulse 2s ease-in-out infinite;
     }
 </style> 
