@@ -11,6 +11,13 @@
     let csvFile: File | null = null;
     let jsonFile: File | null = null;
     let findings: any[] = mockFindings;
+    // Create a reactive variable that filters out duplicate findings based on a unique identifier (id or matched gene)
+    $: uniqueFindings = findings.filter((finding, index, self) => {
+         const identifier = finding.id ?? finding.provenance?.associated_regions?.[0]?.matched_gene;
+         return self.findIndex(
+             f => (f.id ?? f.provenance?.associated_regions?.[0]?.matched_gene) === identifier
+         ) === index;
+    });
     let isProcessing = false;
     let isComplete = false;
     let isDragging = { csv: false, json: false };
@@ -919,7 +926,7 @@
                 </div>
             </div>
             <div class="findings-list">
-                {#each findings as finding, index (finding.provenance?.associated_regions?.[0]?.matched_gene || index)}
+                {#each uniqueFindings as finding, index ((finding.id ?? (finding.provenance?.associated_regions?.[0]?.matched_gene)) + '-' + index)}
                     <div class="finding-item" 
                          transition:slideAndFade={{duration: 300}}
                     >
