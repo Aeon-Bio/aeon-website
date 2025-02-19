@@ -1,118 +1,35 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ANALYSIS_SERVER_URL, GOOGLE_SERVICE_KEY } from '$env/static/private';
+import { obtainIDToken } from './utils/auth';
 
-/**
- * Function to obtain a Google-signed ID Token.
- * @param serviceAccountKey - Base64-encoded service account JSON key.
- * @returns A Google-signed ID Token.
- */
-async function obtainIDToken(serviceAccountKey: string): Promise<string> {
-  try {
-    const decodedKey = atob(serviceAccountKey);
-    const key = JSON.parse(decodedKey);
-    
-    // Convert PEM to ArrayBuffer for Web Crypto API
-    const pemHeader = '-----BEGIN PRIVATE KEY-----';
-    const pemFooter = '-----END PRIVATE KEY-----';
-    const pemContents = key.private_key
-      .replace(pemHeader, '')
-      .replace(pemFooter, '')
-      .replace(/\s/g, '');
-    
-    const binaryDer = atob(pemContents);
-    const buf = new Uint8Array(binaryDer.length);
-    for (let i = 0; i < binaryDer.length; i++) {
-      buf[i] = binaryDer.charCodeAt(i);
-    }
-
-    // Import key using Web Crypto API
-    const privateKey = await crypto.subtle.importKey(
-      'pkcs8',
-      buf,
-      {
-        name: 'RSASSA-PKCS1-v1_5',
-        hash: 'SHA-256',
-      },
-      false,
-      ['sign']
-    );
-
-    // Create JWT payload
-    const now = Math.floor(Date.now() / 1000);
-    const payload = {
-      target_audience: ANALYSIS_SERVER_URL,
-      iss: key.client_email,
-      sub: key.client_email,
-      aud: 'https://www.googleapis.com/oauth2/v4/token',
-      iat: now,
-      exp: now + 3600
-    };
-
-    // Create JWT header
-    const header = {
-      alg: 'RS256',
-      typ: 'JWT'
-    };
-
-    // Encode header and payload
-    const encoder = new TextEncoder();
-    const headerString = JSON.stringify(header);
-    const payloadString = JSON.stringify(payload);
-    const encodedHeader = btoa(headerString).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-    const encodedPayload = btoa(payloadString).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
-    // Create signature
-    const dataToSign = encoder.encode(`${encodedHeader}.${encodedPayload}`);
-    const signature = await crypto.subtle.sign(
-      { name: 'RSASSA-PKCS1-v1_5' },
-      privateKey,
-      dataToSign
-    );
-
-    // Convert signature to base64url
-    const signatureArray = new Uint8Array(signature);
-    let signatureBase64 = btoa(String.fromCharCode(...signatureArray));
-    const encodedSignature = signatureBase64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
-    // Combine to create final JWT
-    const jwt = `${encodedHeader}.${encodedPayload}.${encodedSignature}`;
-
-    // Exchange JWT for Google-signed ID token
-    const tokenResponse = await fetch('https://www.googleapis.com/oauth2/v4/token', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${jwt}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-        'assertion': jwt
-      })
-    });
-
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('Token exchange failed:', errorText);
-      throw new Error('Failed to exchange JWT for ID token');
-    }
-
-    const tokenData = await tokenResponse.json();
-    return tokenData.id_token; // Return the Google-signed ID token
-  } catch (error) {
-    console.error('Error in obtainIDToken:', error);
-    throw error;
-  }
+// Add interface and constants at the top
+interface ActiveRequest {
+  controller: AbortController;
+  lastHeartbeat: number;
 }
 
-// Add AbortController map to track ongoing requests
-const activeRequests = new Map<string, AbortController>();
+const HEARTBEAT_INTERVAL = 20000;
+const MAX_HEARTBEAT_AGE = 30000;
+const activeRequests = new Map<string, ActiveRequest>();
 
-export const POST: RequestHandler = async ({ request }) => {
-  let controller: AbortController | null = null;
-  let requestId: string | null = null;
-  
+// Assume you have a global map to track heartbeat intervals
+const activeHeartbeatIntervals = new Map<string, NodeJS.Timeout>();
+
+// Main POST handler
+export const POST: RequestHandler = async ({ request, url }) => {
+  // Create an AbortController to cancel pending operations if the client disconnects.
+  const controller = new AbortController();
+  let requestId: string | null = null; 
+
+  // Listen for client disconnects and clear the heartbeat when detected.
+  request.signal.addEventListener('abort', () => {
+    console.log('Client disconnected, cancelling analysis.');
+    controller.abort();
+  });
+
   try {
+    // Process formData and extract requestId.
     const formData = await request.formData();
     requestId = formData.get('requestId') as string;
     const file = formData.get('file') as File;
@@ -127,13 +44,13 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     // Create new AbortController for this request
-    controller = new AbortController();
-    activeRequests.set(requestId, controller);
+    activeRequests.set(requestId, { 
+      controller,
+      lastHeartbeat: Date.now() // Initialize heartbeat timestamp
+    });
 
-    // Obtain the ID Token
+    // Obtain an ID token and forward the file to the analysis server.
     const idToken = await obtainIDToken(GOOGLE_SERVICE_KEY);
-
-    // Make the authenticated request to Cloud Run
     const uploadResponse = await fetch(
       `${ANALYSIS_SERVER_URL}/methylation-analysis?` +
         new URLSearchParams({
@@ -153,40 +70,30 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     );
 
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
-      console.error('Upload failed:', {
-        status: uploadResponse.status,
-        statusText: uploadResponse.statusText,
-        headers: Object.fromEntries(uploadResponse.headers),
-        error: errorText,
-      });
-      throw new Error(`Upload failed: ${errorText}`);
-    }
-
-    // Ensure we have a readable stream from the response
+    // Assume uploadResponse.body is a readable stream that we process further.
     if (!uploadResponse.body) {
-      throw new Error('No response body available');
+      throw new Error('No response body received from analysis server.');
     }
-
-    // Create a transform stream to handle SSE formatting
+    
+    // Create a transform stream for SSE formatting.
     const transformer = new TransformStream({
       start(controller) {
-        // Send initial message
         const encoder = new TextEncoder();
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'progress', progress: 0, message: 'Analysis started...' })}\n\n`));
+        controller.enqueue(encoder.encode(
+          `data: ${JSON.stringify({ type: 'progress', progress: 0, message: 'Analysis started...' })}\n\n`
+        ));
       },
       transform(chunk, controller) {
-        // Pass through the chunk as-is if it's already SSE formatted
         controller.enqueue(chunk);
+      },
+      cancel(reason) {
+        console.log('Transform stream cancelled due to:', reason);
       }
     });
 
-    // Chain the streams
-    const responseStream = uploadResponse.body
-      .pipeThrough(transformer);
+    const responseStream = uploadResponse.body.pipeThrough(transformer);
 
-    // Set response headers
+    // Set response headers for SSE.
     const headers = new Headers({
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
@@ -194,25 +101,18 @@ export const POST: RequestHandler = async ({ request }) => {
       'X-Request-ID': requestId
     });
 
+    // Return streaming response WITHOUT clearing the heartbeat here.
     return new Response(responseStream, { headers });
-
+    
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        return json({ message: 'Analysis cancelled' }, { status: 499 });
+        return json({ message: 'Analysis cancelled due to client disconnect' }, { status: 499 });
       }
       console.error('POST handler error:', error.message, error.stack);
       return json({ error: error.message || 'Server error occurred' }, { status: 500 });
     }
     console.error('Unknown error:', error);
     return json({ error: 'Unknown server error occurred' }, { status: 500 });
-  } finally {
-    if (controller && requestId) {
-      try {
-        activeRequests.delete(requestId);
-      } catch (cleanupError) {
-        console.error('Error during cleanup:', cleanupError);
-      }
-    }
   }
 };

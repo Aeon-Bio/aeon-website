@@ -44,6 +44,6 @@
 	"type": "module",
 	"dependencies": {
 		"lucide-svelte": "^0.469.0",
-		"papaparse": "^5.4.1"
+		"papaparse": "^5.5.2"
 	}
 }

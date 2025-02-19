@@ -6,6 +6,7 @@
 	import Papa from 'papaparse';
     import { slide } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
+    import { onDestroy } from 'svelte';
     
     let csvFile: File | null = null;
     let jsonFile: File | null = null;
@@ -23,6 +24,7 @@
     let totalExpectedFindings = 0;
     let currentController: AbortController | null = null;
     let delimiter: string = 'auto';
+    let heartbeatInterval: number;
     
     // Add column configuration
     let csvConfig = {
@@ -36,8 +38,7 @@
     const llmOptions = [
         'gemini-2.0-flash-thinking-exp-01-21',
         'gemini-2.0-flash-exp',
-        'gemini-exp-1206',
-        'gemini-1.5-pro',
+        'gemini-2.0-pro-exp-02-05',
         'claude-3-5-sonnet-latest',
     ];
 
@@ -64,7 +65,7 @@
     // Add requestId to the component state
     let requestId: string | null = null;
 
-    async function processCSV(newFile: File, autoProcess = false) {
+    async function processCSV(newFile: File, autoProcess = true) {
         csvFile = newFile;
         csvConfig.file = newFile;
         isProcessing = false;
@@ -102,7 +103,7 @@
 
                     // Only clear error if we successfully parsed the file
                     error = null;
-                    availableColumns = Object.keys(results.data[0] || {});
+                    availableColumns = results.meta.fields || Object.keys(results.data[0] || {});
                     
                     // Auto-detect columns if possible
                     if (autoProcess) {
@@ -127,6 +128,7 @@
 
     // Extract the actual processing logic to a separate function
     async function startProcessing() {
+        // Add a guard against multiple simultaneous requests
         if (isProcessing) {
             // If already processing, simply abort the current XHR request
             if (currentController) {
@@ -138,6 +140,10 @@
             return;
         }
 
+        // Add a debounce/guard flag
+        const currentRequestId = crypto.randomUUID();
+        requestId = currentRequestId;
+
         // Reset all state variables
         error = null;
         findings = [];
@@ -148,20 +154,23 @@
         analysisProgress = 0;
         processedCount = 0;
         totalExpectedFindings = 0;
-        statusMessage = 'Preprocessing file...'; // Reset status message
-
-        // Generate new requestId
-        requestId = crypto.randomUUID();
+        statusMessage = 'Preprocessing file...';
 
         // Create new AbortController for this request
         currentController = new AbortController();
 
         try {
             const formData = new FormData();
-            formData.append('requestId', requestId); // Add requestId to FormData
+            formData.append('requestId', requestId);
             formData.append('cpgColumn', csvConfig.cpgColumn);
             formData.append('sampleColumn', csvConfig.sampleColumn);
             formData.append('selected_llm', csvConfig.selected_llm);
+
+            // Add guard to ensure we're still processing the same request
+            if (requestId !== currentRequestId) {
+                console.log('Request superseded by newer request');
+                return;
+            }
 
             let filteredData = [];
             
@@ -170,7 +179,7 @@
                     header: true,
                     skipEmptyLines: true,
                     comments: '#',
-                    step: function(row) {
+                    step: function(row: Papa.ParseStepResult<{[key: string]: string}>) {
                         // Only keep the columns we need
                         const filteredRow = {
                             [csvConfig.cpgColumn]: row.data[csvConfig.cpgColumn],
@@ -226,6 +235,11 @@
             // Handle the streaming response
             let buffer = '';
             xhr.addEventListener('readystatechange', () => {
+                console.log('XHR state changed:', {
+                    readyState: xhr.readyState,
+                    status: xhr.status,
+                    isProcessing
+                });
                 if (xhr.readyState >= 3) {
                     // Add HTTP error handling
                     if (xhr.status >= 400) {
@@ -284,34 +298,62 @@
 
             // Add error event handler
             xhr.addEventListener('error', (event) => {
-                if (event.message === 'Analysis cancelled') {
-                    error = 'Analysis cancelled';
-                } else {
-                    error = 'Network error occurred. Please try again.';
-                }
+                error = event instanceof ErrorEvent ? event.message : 'Network error occurred';
                 isProcessing = false;
                 currentPhase = null;
             });
 
             xhr.open('POST', '/analyze');
-            // Clear processedFindingIds here, before sending the request
-            processedFindingIds.clear();
             xhr.send(formData);
-            
-            // Associate the AbortController's signal with the request
-            xhr.addEventListener('abort', () => {
-                console.log('Request aborted by client');
-                isProcessing = false;
-            });
-            
-            currentController?.signal.addEventListener('abort', () => {
-                xhr.abort();
-            });
 
+            // Start heartbeat immediately after sending request with shorter interval
+            console.log(`Starting heartbeat for request ${requestId}`);
+            heartbeatInterval = setInterval(async () => {
+                console.log('Heartbeat interval executing with state:', { 
+                    requestId, 
+                    isProcessing, 
+                    currentPhase,
+                    isComplete
+                });
+                
+                if (!requestId || !isProcessing) {
+                    console.log(`Stopping heartbeat for request ${requestId} - processing complete or cancelled. State:`, {
+                        requestId,
+                        isProcessing,
+                        currentPhase,
+                        isComplete
+                    });
+                    clearInterval(heartbeatInterval);
+                    return;
+                }
+                try {
+                    console.log(`Sending heartbeat for request ${requestId}`);
+                    const response = await fetch(`/analyze/heartbeat?requestId=${requestId}`, {
+                        method: 'POST'
+                    });
+                    if (!response.ok) {
+                        console.error('Client heartbeat failed:', await response.text());
+                    } else {
+                        console.log(`Heartbeat successfully sent for request ${requestId}`);
+                    }
+                } catch (err) {
+                    console.error('Error sending client heartbeat:', err);
+                }
+            }, 5000);
+
+            // Move the Promise after setting up heartbeat
             await new Promise((resolve, reject) => {
-                xhr.addEventListener('load', () => resolve(null));
+                xhr.addEventListener('load', () => {
+                    console.log(`Request ${requestId} completed, clearing heartbeat`);
+                    clearInterval(heartbeatInterval);
+                    resolve(null);
+                });
                 xhr.addEventListener('error', reject);
-                xhr.addEventListener('abort', reject);
+                xhr.addEventListener('abort', () => {
+                    console.log(`Request ${requestId} aborted, clearing heartbeat`);
+                    clearInterval(heartbeatInterval);
+                    reject(new Error('Request aborted'));
+                });
             });
 
         } catch (error) {
@@ -325,10 +367,13 @@
                 error = error.message || 'Server error occurred';
             }
         } finally {
-            if (!(error instanceof ProgressEvent && error.type === 'abort')) {
-                isProcessing = false;
-                currentPhase = null;
-                requestId = null;
+            // Only reset state if this is still the current request
+            if (requestId === currentRequestId) {
+                if (!(error instanceof ProgressEvent && error.type === 'abort')) {
+                    isProcessing = false;
+                    currentPhase = null;
+                    requestId = null;
+                }
             }
         }
     }
@@ -364,7 +409,7 @@
     async function handleClick(type: 'csv' | 'json') {
         if ('showOpenFilePicker' in window) {
             try {
-                const [fileHandle] = await window.showOpenFilePicker({
+                const [fileHandle] = await (window as any).showOpenFilePicker({
                     types: [{
                         description: type === 'csv' ? 'Text Files' : 'JSON Files',
                         accept: {
@@ -499,7 +544,11 @@
 
     // Add new function to handle SSE messages
     function handleSSEMessage(data: any) {
-        console.log('Handling message:', data);
+        console.log('Handling SSE message:', data, 'Current state:', {
+            isProcessing,
+            currentPhase,
+            isComplete
+        });
         
         // Handle different message types
         switch (data.type) {
@@ -509,13 +558,13 @@
                 statusMessage = data.message;
                 // Handle different status types
                 if (data.status === 'error') {
+                    console.log('Error status received, setting isProcessing to false');
                     error = data.message;
                     isProcessing = false;
                     currentPhase = null;
-                    // Clear processed IDs on error
                     processedFindingIds.clear();
                 } else if (data.status === 'complete') {
-                    // Reset processing state for next file
+                    console.log('Complete status received, setting isProcessing to false');
                     isProcessing = false;
                     isComplete = true;
                     currentPhase = null;
@@ -544,6 +593,27 @@
                 break;
         }
     }
+
+    onDestroy(() => {
+        if (currentController) {
+            currentController.abort();
+            console.log('Aborted current processing via AbortController.');
+        }
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            console.log('Cleared heartbeat interval on destroy.');
+        }
+        if (requestId) {
+            fetch(`/analyze/cancel?requestId=${requestId}`, { method: 'POST' })
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(`Cancellation forwarded for request ${requestId}:`, data);
+                })
+                .catch((err) => {
+                    console.error('Error sending cancellation:', err);
+                });
+        }
+    });
 </script>
 
 <main class="analyze-container {isAnyCardExpanded ? 'sm:expanded' : ''}">
