@@ -78,11 +78,11 @@
     // Add new state variable for alert
     let showKeepOpenAlert = false;
 
-    async function processCSV(newFile: File, autoProcess = true) {
+    async function processCSV(newFile: File, autoDetectColumns = true) {
         csvFile = newFile;
         csvConfig.file = newFile;
         isProcessing = false;
-        isLoadingColumns = true; // Set loading state
+        isLoadingColumns = true;
         
         // Reset columns first
         availableColumns = [];
@@ -90,7 +90,7 @@
         
         await new Promise((resolve) => {
             Papa.parse(newFile, {
-                preview: 1, // Only parse first row for headers
+                preview: 1,
                 header: true,
                 skipEmptyLines: true,
                 delimiter: delimiter === 'auto' ? undefined : delimiter,
@@ -119,8 +119,8 @@
                     error = null;
                     availableColumns = results.meta.fields || Object.keys(results.data[0] || {});
                     
-                    // Auto-detect columns if possible
-                    if (autoProcess) {
+                    // Always try to auto-detect columns
+                    if (autoDetectColumns) {
                         const cpgGuesses = availableColumns.filter(col => 
                             /cpg|probe|cg\d+/i.test(col));
                         const sampleGuesses = availableColumns.filter(col => 
@@ -129,16 +129,11 @@
                         if (cpgGuesses.length > 0) csvConfig.cpgColumn = cpgGuesses[0];
                         if (sampleGuesses.length > 0) csvConfig.sampleColumn = sampleGuesses[0];
                     }
-                    isLoadingColumns = false; // Clear loading state
+                    isLoadingColumns = false;
                     resolve(null);
                 }
             });
         });
-
-        // Only continue if there are no errors
-        if (!error && autoProcess && csvConfig.cpgColumn && csvConfig.sampleColumn) {
-            await startProcessing();
-        }
     }
 
     // Extract the actual processing logic to a separate function
@@ -478,13 +473,12 @@
             return;
         }
         
-        // For CSV, accept any text file
         if (type === 'csv') {
             if (droppedFile && (
                 droppedFile.type.startsWith('text/') || 
                 /\.(csv|tsv|txt)$/i.test(droppedFile.name)
             )) {
-                await processCSV(droppedFile);
+                await processCSV(droppedFile, true); // Enable auto-detection of columns
             }
         } else if (droppedFile) {
             await processJSON(droppedFile);
@@ -498,15 +492,9 @@
         const blob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         
-        // Get the selected sample ID from the data
-        const selectedSampleId = csvFile ? 
-            findings[0]?.sample_id || // try to get from findings first
-            csvConfig.sampleColumn && findings[0]?.[csvConfig.sampleColumn] || // try column value
-            'findings' : // fallback
-            'personal';
-        
-        // Create filename with sample ID
-        const filename = `${selectedSampleId}_methylation_findings.json`;
+        // Use csvConfig.sampleColumn for the filename if provided. Otherwise, use 'personal'
+        const filenameBase = csvFile && csvConfig.sampleColumn ? csvConfig.sampleColumn : 'personal';
+        const filename = `${filenameBase}_methylation_findings.json`;
         
         const a = document.createElement('a');
         a.href = url;
