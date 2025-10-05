@@ -328,7 +328,7 @@
 						<circle
 							r={node.currentSize * 0.15}
 							fill={getNodeColor(node.category, hoveredNode === node.id)}
-							stroke={hoveredNode === node.id ? var(--aeon-biolum) : "rgba(255, 255, 255, 0.3)"}
+							stroke={hoveredNode === node.id ? "#80ffdb" : "rgba(255, 255, 255, 0.3)"}
 							stroke-width={hoveredNode === node.id ? "0.5" : "0.1"}
 							class="node-circle"
 							on:mouseenter={() => handleNodeHover(node.id)}
