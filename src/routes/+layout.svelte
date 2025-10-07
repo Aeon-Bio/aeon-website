@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '../app.css';
 </script>
 
@@ -11,10 +11,17 @@
 </div>
 
 <style>
+	.background-layer {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
+	}
+
 	.app {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		min-height: 100vh;
 	}
 
 	main {
@@ -25,7 +32,6 @@
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
-		overflow-y: auto;
 	}
 
 	footer {

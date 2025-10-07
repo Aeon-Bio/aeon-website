@@ -3,6 +3,7 @@
     import { spring } from 'svelte/motion';
     import { gridActivity } from '../stores/grid';
     import { interactionState } from '../stores/interaction';
+    import { SpatialHashGrid } from '../utils/spatialHash';
     
     export let particleCount = 448;
     export let baseSpeed = 0.12;
@@ -26,6 +27,7 @@
     let width = REFERENCE_WIDTH;
     let height: number;
     let particles: Particle[] = [];
+    let spatialGrid: SpatialHashGrid;
     
     // Track system state
     $: focusPoint = $gridActivity.focusPoint;
@@ -52,7 +54,10 @@
     let dpr: number;
     
     let animationFrame: number;
-    let updateInterval: ReturnType<typeof setInterval>;
+    let lastFrameTime = 0;
+    
+    // Object pools to reduce GC pressure
+    let reusablePoint = { x: 0, y: 0 };
     
     // Increase base alignment strength
     const BASE_ALIGNMENT_STRENGTH = 0.05; // Was 0.001
@@ -99,6 +104,7 @@
     }
     
     function isOverlapping(x: number, y: number, radius: number) {
+      if (!particles || particles.length === 0) return false;
       return particles.some(p => {
         const dx = p.x - x;
         const dy = p.y - y;
@@ -157,13 +163,12 @@
       };
     }
 
-    function projectToGrid(x: number, y: number) {
+    function projectToGrid(x: number, y: number, result = reusablePoint) {
       const angle = ROTATION * (Math.PI / 180);
       
-      return {
-        x: x,
-        y: y * Math.cos(angle)
-      };
+      result.x = x;
+      result.y = y * Math.cos(angle);
+      return result;
     }
     
     function updateParticles(dt: number) {
@@ -242,9 +247,9 @@
           }
         }
         
-        particles.forEach(other => {
-          if (other === p) return;
-          
+        // Use spatial grid for particle interactions (repulsion/attraction)
+        const nearbyForces = spatialGrid.getNearbyParticles(p, CONNECTION_DISTANCE);
+        nearbyForces.forEach(other => {
           const dx = other.x - p.x;
           const dy = other.y - p.y;
           const dist = Math.hypot(dx, dy);
@@ -257,7 +262,7 @@
             const force = (REPULSION_STRENGTH * dt * (1 - dist / REPULSION_DISTANCE)) * 0.5;
             p.vx -= (dx / dist) * force;
             p.vy -= (dy / dist) * force;
-          } else if (dist < CONNECTION_DISTANCE) {
+          } else {
             const force = 0.000005 * dt;
             p.vx += dx * force;
             p.vy += dy * force;
@@ -266,22 +271,71 @@
       });
     }
     
-    function draw() {
+    function tick(currentTime: number) {
+      if (lastFrameTime === 0) lastFrameTime = currentTime;
+      const deltaTime = (currentTime - lastFrameTime) / 16.67; // Normalize to 60fps
+      lastFrameTime = currentTime;
+      
+      const frameStartTime = performance.now();
+      const FRAME_BUDGET = 16.67; // 60fps target
+      
+      // Update particles
+      updateParticles(deltaTime);
+      
+      // Check frame budget before rendering
+      const updateTime = performance.now() - frameStartTime;
+      if (updateTime > FRAME_BUDGET * 0.6) {
+        // Skip this frame if update took too long
+        requestAnimationFrame(tick);
+        return;
+      }
+      
+      // Draw frame
       ctx.clearRect(0, 0, width, height);
       
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          if (particles[i].fadeIn <= 0 || particles[j].fadeIn <= 0) continue;
+      // Rebuild spatial grid for current frame
+      spatialGrid.clear();
+      particles.forEach(p => {
+        if (p.fadeIn > 0) {
+          spatialGrid.insert(p);
+        }
+      });
+      
+      // Draw connections using spatial optimization
+      const processedPairs = new Set<string>();
+      
+      particles.forEach(particle => {
+        if (particle.fadeIn <= 0) return;
+        
+        // Viewport culling - skip particles outside visible area
+        const projected = projectToGrid(particle.x, particle.y, { x: 0, y: 0 });
+        if (projected.x < -50 || projected.x > width + 50 || 
+            projected.y < -50 || projected.y > height + 50) {
+          return;
+        }
+        
+        const nearby = spatialGrid.getNearbyParticles(particle, CONNECTION_DISTANCE);
+        
+        nearby.forEach(other => {
+          if (other.fadeIn <= 0) return;
           
-          const p1 = projectToGrid(particles[i].x, particles[i].y);
-          const p2 = projectToGrid(particles[j].x, particles[j].y);
+          // Avoid duplicate connections
+          const pairKey = particle.x < other.x ? 
+            `${particle.x},${particle.y}-${other.x},${other.y}` :
+            `${other.x},${other.y}-${particle.x},${particle.y}`;
+          
+          if (processedPairs.has(pairKey)) return;
+          processedPairs.add(pairKey);
+          
+          const p1 = projectToGrid(particle.x, particle.y);
+          const p2 = projectToGrid(other.x, other.y);
           
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           
-          if (dist < CONNECTION_DISTANCE && dist > MIN_PARTICLE_DISTANCE) {
-            const combinedFade = particles[i].fadeIn * particles[j].fadeIn;
+          if (dist > MIN_PARTICLE_DISTANCE) {
+            const combinedFade = particle.fadeIn * other.fadeIn;
             
             const distanceFactor = Math.pow(1 - dist / CONNECTION_DISTANCE, 1.2);
             const edgeEmphasis = EDGE_BOOST * Math.pow(dist / CONNECTION_DISTANCE, 0.8);
@@ -289,37 +343,46 @@
             const baseOpacity = CONNECTION_BASE_OPACITY * distanceFactor * combinedFade;
             const edgeOpacity = baseOpacity * (1 + edgeEmphasis);
             
-            const gradient = ctx.createLinearGradient(
-              p1.x, p1.y,
-              p2.x, p2.y
-            );
+            const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
             
-            gradient.addColorStop(0, `rgba(76, 201, 240, ${edgeOpacity})`);
-            gradient.addColorStop(0.15, `rgba(76, 201, 240, ${baseOpacity})`);
-            gradient.addColorStop(0.5, `rgba(76, 201, 240, ${baseOpacity})`);
-            gradient.addColorStop(0.85, `rgba(76, 201, 240, ${baseOpacity})`);
-            gradient.addColorStop(1, `rgba(76, 201, 240, ${edgeOpacity})`);
+            // Pre-calculate color strings to reduce string operations
+            const edgeColor = `rgba(76, 201, 240, ${edgeOpacity})`;
+            const baseColor = `rgba(76, 201, 240, ${baseOpacity})`;
             
-            const width = Math.min(
-              MAX_LINE_WIDTH,  // Scale line width
+            gradient.addColorStop(0, edgeColor);
+            gradient.addColorStop(0.15, baseColor);
+            gradient.addColorStop(0.5, baseColor);
+            gradient.addColorStop(0.85, baseColor);
+            gradient.addColorStop(1, edgeColor);
+            
+            const lineWidth = Math.min(
+              MAX_LINE_WIDTH,
               MIN_LINE_WIDTH + distanceFactor * (2 + edgeEmphasis * 1.5)
             );
             
             ctx.beginPath();
             ctx.strokeStyle = gradient;
-            ctx.lineWidth = width;
+            ctx.lineWidth = lineWidth;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
-        }
-      }
+        });
+      });
       
       particles.forEach(p => {
         if (p.fadeIn <= 0) return;
         
         const projected = projectToGrid(p.x, p.y);
-        const particleColor = `rgba(76, 201, 240, ${p.opacity * p.fadeIn})`;
+        
+        // Viewport culling for particles
+        if (projected.x < -20 || projected.x > width + 20 || 
+            projected.y < -20 || projected.y > height + 20) {
+          return;
+        }
+        
+        const finalOpacity = p.opacity * p.fadeIn;
+        const particleColor = `rgba(76, 201, 240, ${finalOpacity})`;
         
         ctx.beginPath();
         ctx.arc(
@@ -333,7 +396,7 @@
         ctx.fill();
       });
       
-      requestAnimationFrame(draw);
+      requestAnimationFrame(tick);
     }
     
     onMount(() => {
@@ -365,17 +428,18 @@
         Math.round(BASE_PARTICLE_COUNT * scale)
       );
       
+      // Initialize spatial grid with appropriate cell size
+      spatialGrid = new SpatialHashGrid(CONNECTION_DISTANCE, width, height);
+      
       // Initialize particles after width is known
       particles = Array(particleCount)
         .fill(null)
         .map((_, i) => createParticle(i));
       
-      animationFrame = requestAnimationFrame(draw);
-      updateInterval = setInterval(() => updateParticles(1), 1000 / 60);
+      animationFrame = requestAnimationFrame(tick);
       
       return () => {
         cancelAnimationFrame(animationFrame);
-        clearInterval(updateInterval);
         if (ctx && canvas) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
         }

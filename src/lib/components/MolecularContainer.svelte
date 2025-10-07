@@ -1,9 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { spring } from 'svelte/motion';
   
   const dispatch = createEventDispatcher();
   let container: HTMLElement;
   let mousePosition = { x: 50, y: 50 };
+  let molecularGlowIntensity = 0;
+  
+  // Spring for smooth molecular glow transitions
+  const glowSpring = spring(0, {
+    stiffness: 0.08,
+    damping: 0.7
+  });
+  
+  $: glowSpring.set(molecularGlowIntensity);
   
   function handleMouseMove(e: MouseEvent) {
     const rect = container.getBoundingClientRect();
@@ -20,6 +30,46 @@
   function handleMouseLeave() {
     dispatch('leave');
   }
+  
+  // Handle section animation events for molecular glow
+  function handleSectionActivated(event: CustomEvent) {
+    const { backgroundEffect } = event.detail;
+    
+    if (backgroundEffect === 'molecular-glow') {
+      // Create pulsing molecular glow effect
+      molecularGlowIntensity = 1.0;
+      
+      // Create breathing effect
+      const pulseInterval = setInterval(() => {
+        molecularGlowIntensity = 0.3 + (Math.sin(Date.now() * 0.003) * 0.2);
+      }, 50);
+      
+      // Clean up after animation completes
+      setTimeout(() => {
+        clearInterval(pulseInterval);
+        molecularGlowIntensity = 0;
+      }, 2000);
+    }
+  }
+  
+  function handleSectionDeactivated(event: CustomEvent) {
+    const { backgroundEffect } = event.detail;
+    if (backgroundEffect === 'molecular-glow') {
+      molecularGlowIntensity = 0;
+    }
+  }
+  
+  onMount(() => {
+    window.addEventListener('section-activated', handleSectionActivated);
+    window.addEventListener('section-deactivated', handleSectionDeactivated);
+  });
+  
+  onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('section-activated', handleSectionActivated);
+      window.removeEventListener('section-deactivated', handleSectionDeactivated);
+    }
+  });
 </script>
 
 <div
@@ -32,6 +82,7 @@
   style="
     --mouse-x: {mousePosition.x}%;
     --mouse-y: {mousePosition.y}%;
+    --molecular-glow: {$glowSpring};
   "
 >
   <div class="glow-effect"></div>
@@ -49,9 +100,10 @@
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     padding: 3rem;
     box-shadow: 
-      0 0 0 1px rgba(76, 201, 240, 0.1),
+      0 0 0 1px rgba(76, 201, 240, calc(0.1 + var(--molecular-glow) * 0.3)),
       0 4px 20px rgba(0, 0, 0, 0.4),
-      0 0 60px rgba(76, 201, 240, 0.1);
+      0 0 60px rgba(76, 201, 240, calc(0.1 + var(--molecular-glow) * 0.4)),
+      0 0 120px rgba(128, 255, 219, calc(var(--molecular-glow) * 0.3));
   }
 
   .molecular-container::before {
