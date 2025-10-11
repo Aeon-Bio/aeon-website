@@ -3,7 +3,7 @@
  * Implements scroll-triggered section reveals and sophisticated interaction patterns
  */
 
-import { writable, type Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 // Motion preference detection
 export const prefersReducedMotion = writable(false);
@@ -20,22 +20,21 @@ export const easings = {
 	// Smooth bounce for element reveals
 	easeOutElastic: (t: number): number => {
 		const c4 = (2 * Math.PI) / 3;
-		return t === 0 ? 0 : t === 1 ? 1 : 
-			Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+		return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
 	},
-	
+
 	// Smooth overshoot for scale animations
 	easeOutBack: (t: number): number => {
 		const c1 = 1.70158;
 		const c3 = c1 + 1;
 		return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 	},
-	
+
 	// Fluid motion for slide animations
 	easeOutCubic: (t: number): number => {
 		return 1 - Math.pow(1 - t, 3);
 	},
-	
+
 	// Subtle entrance animation
 	easeOutQuart: (t: number): number => {
 		return 1 - Math.pow(1 - t, 4);
@@ -86,7 +85,7 @@ export function createIntersectionObserver(
 
 	const observer = new IntersectionObserver(
 		(entries) => {
-			entries.forEach(entry => {
+			entries.forEach((entry) => {
 				if (entry.isIntersecting) {
 					if (!hasTriggered || !triggerOnce) {
 						onIntersect?.(entry);
@@ -132,14 +131,14 @@ export function createStaggeredReveal(config: StaggeredRevealConfig): Promise<vo
 
 		elements.forEach((element, index) => {
 			const delay = startDelay + calculateStagger(index, staggerDelay);
-			
+
 			const promise = animateElement(element, {
 				type: animation,
 				duration,
 				delay,
 				easing: easings[easing]
 			});
-			
+
 			promises.push(promise);
 		});
 
@@ -171,7 +170,7 @@ export function animateElement(
 
 		setTimeout(() => {
 			const startTime = performance.now();
-			
+
 			function animate(currentTime: number) {
 				const elapsed = currentTime - startTime;
 				const progress = Math.min(elapsed / duration, 1);
@@ -194,7 +193,7 @@ export function animateElement(
 
 function applyInitialState(element: HTMLElement, type: string): void {
 	element.style.transition = 'none';
-	
+
 	switch (type) {
 		case 'fadeIn':
 			element.style.opacity = '0';
@@ -220,7 +219,7 @@ function applyInitialState(element: HTMLElement, type: string): void {
 
 function applyAnimationState(element: HTMLElement, type: string, progress: number): void {
 	const opacity = progress;
-	
+
 	switch (type) {
 		case 'fadeIn':
 			element.style.opacity = opacity.toString();
@@ -239,7 +238,7 @@ function applyAnimationState(element: HTMLElement, type: string, progress: numbe
 			break;
 		case 'scaleUp':
 			element.style.opacity = opacity.toString();
-			element.style.transform = `scale(${0.8 + (0.2 * progress)})`;
+			element.style.transform = `scale(${0.8 + 0.2 * progress})`;
 			break;
 	}
 }
@@ -253,7 +252,7 @@ export class ScrollVelocityTracker {
 	private lastTimestamp = 0;
 	private velocity = 0;
 	private rafId?: number;
-	
+
 	public onVelocityChange?: (velocity: number, direction: 'up' | 'down' | 'none') => void;
 
 	constructor() {
@@ -293,13 +292,12 @@ export class ScrollVelocityTracker {
 		// Decay velocity when not scrolling
 		this.velocity *= 0.95;
 
-		const direction = this.velocity > 0.1 ? 'down' : 
-						 this.velocity < -0.1 ? 'up' : 'none';
+		const direction = this.velocity > 0.1 ? 'down' : this.velocity < -0.1 ? 'up' : 'none';
 
 		this.onVelocityChange?.(this.velocity, direction);
 
 		// Update animation state store
-		animationState.update(state => ({
+		animationState.update((state) => ({
 			...state,
 			scrollVelocity: this.velocity
 		}));
@@ -331,13 +329,13 @@ export class SectionBoundaryDetector {
 	private createObserver(id: string, element: HTMLElement): void {
 		const observer = new IntersectionObserver(
 			(entries) => {
-				entries.forEach(entry => {
+				entries.forEach((entry) => {
 					if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
 						const previousSection = this.currentSection;
 						this.currentSection = id;
-						
+
 						// Update animation state
-						animationState.update(state => ({
+						animationState.update((state) => ({
 							...state,
 							activeSection: id,
 							sectionTransitions: new Map(state.sectionTransitions).set(id, true)
@@ -362,7 +360,7 @@ export class SectionBoundaryDetector {
 	}
 
 	destroy(): void {
-		this.observers.forEach(observer => observer.disconnect());
+		this.observers.forEach((observer) => observer.disconnect());
 		this.observers = [];
 		this.sections.clear();
 	}
@@ -374,7 +372,7 @@ export class SectionBoundaryDetector {
  */
 export function initMotionPreferences(): () => void {
 	const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-	
+
 	function updatePreference() {
 		prefersReducedMotion.set(mediaQuery.matches);
 	}
@@ -432,11 +430,13 @@ export class PageAnimationController {
 		this.sectionDetector.onSectionChange = (sectionId, previousSection) => {
 			// Trigger section-specific background effects
 			document.documentElement.style.setProperty('--active-section', sectionId);
-			
+
 			// Emit custom event for other components to listen to
-			window.dispatchEvent(new CustomEvent('section-change', {
-				detail: { current: sectionId, previous: previousSection }
-			}));
+			window.dispatchEvent(
+				new CustomEvent('section-change', {
+					detail: { current: sectionId, previous: previousSection }
+				})
+			);
 		};
 	}
 

@@ -16,13 +16,13 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { 
-		createIntersectionObserver, 
-		createStaggeredReveal, 
+	import {
+		createIntersectionObserver,
+		createStaggeredReveal,
 		PageAnimationController,
 		prefersReducedMotion,
 		respectMotionPreferences,
-		type StaggeredRevealConfig 
+		type StaggeredRevealConfig
 	} from '$lib/utils/animations';
 
 	// Animation configuration props
@@ -31,24 +31,25 @@
 	export let rootMargin = '-10% 0px -10% 0px';
 	export let triggerOnce = true;
 	export let staggerDelay = 100;
-	export let animationType: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleUp' = 'fadeIn';
+	export let animationType: 'fadeIn' | 'slideUp' | 'slideLeft' | 'slideRight' | 'scaleUp' =
+		'fadeIn';
 	export let duration = 600;
 	export let startDelay = 0;
 	export let childSelector = '.reveal-item';
-	
+
 	// Coordinate with background systems
 	export let backgroundEffect: 'none' | 'particle-drift' | 'grid-pulse' | 'molecular-glow' = 'none';
-	
+
 	// Hero/critical content support
 	export let initiallyVisible = false;
-	
+
 	// Component state
 	let sectionElement: HTMLElement;
 	let isVisible = false;
 	let hasAnimated = false;
 	let observerCleanup: (() => void) | null = null;
 	let animationController: PageAnimationController | null = null;
-	
+
 	// Track motion preferences
 	let reducedMotion = false;
 	let motionUnsubscribe: (() => void) | null = null;
@@ -58,7 +59,7 @@
 	 */
 	onMount(() => {
 		// Subscribe to motion preferences
-		motionUnsubscribe = prefersReducedMotion.subscribe(value => {
+		motionUnsubscribe = prefersReducedMotion.subscribe((value) => {
 			reducedMotion = value;
 		});
 
@@ -100,23 +101,25 @@
 	/**
 	 * Handle intersection - trigger sophisticated reveal animation
 	 */
-	async function handleIntersection(entry: IntersectionObserverEntry) {
+	async function handleIntersection() {
 		if (hasAnimated && triggerOnce) return;
-		
+
 		isVisible = true;
 		hasAnimated = true;
 
 		// Update section state for background coordination
 		updateBackgroundProperties();
-		
+
 		// Emit section activation event
-		window.dispatchEvent(new CustomEvent('section-activated', {
-			detail: { 
-				sectionId, 
-				element: sectionElement,
-				backgroundEffect 
-			}
-		}));
+		window.dispatchEvent(
+			new CustomEvent('section-activated', {
+				detail: {
+					sectionId,
+					element: sectionElement,
+					backgroundEffect
+				}
+			})
+		);
 
 		// Get child elements for staggered animation
 		const childElements = Array.from(
@@ -124,13 +127,15 @@
 		) as HTMLElement[];
 
 		if (childElements.length === 0) {
-			console.warn(`SectionReveal: No elements found with selector "${childSelector}" in section "${sectionId}"`);
+			console.warn(
+				`SectionReveal: No elements found with selector "${childSelector}" in section "${sectionId}"`
+			);
 			return;
 		}
 
 		// Respect motion preferences for timing and easing
 		const { duration: adjustedDuration } = respectMotionPreferences(
-			duration, 
+			duration,
 			(t: number) => t, // Easing will be handled by the animation utility
 			reducedMotion
 		);
@@ -147,11 +152,13 @@
 
 		try {
 			await createStaggeredReveal(revealConfig);
-			
+
 			// Animation complete - emit completion event
-			window.dispatchEvent(new CustomEvent('section-animation-complete', {
-				detail: { sectionId, backgroundEffect }
-			}));
+			window.dispatchEvent(
+				new CustomEvent('section-animation-complete', {
+					detail: { sectionId, backgroundEffect }
+				})
+			);
 		} catch (error) {
 			console.error(`SectionReveal: Animation failed for section "${sectionId}":`, error);
 		}
@@ -160,13 +167,15 @@
 	/**
 	 * Handle intersection exit - manage background state
 	 */
-	function handleExit(entry: IntersectionObserverEntry) {
+	function handleExit() {
 		isVisible = false;
 		updateBackgroundProperties();
-		
-		window.dispatchEvent(new CustomEvent('section-deactivated', {
-			detail: { sectionId, backgroundEffect }
-		}));
+
+		window.dispatchEvent(
+			new CustomEvent('section-deactivated', {
+				detail: { sectionId, backgroundEffect }
+			})
+		);
 	}
 
 	/**
@@ -179,7 +188,7 @@
 		sectionElement.style.setProperty('--section-visible', isVisible ? '1' : '0');
 		sectionElement.style.setProperty('--section-animated', hasAnimated ? '1' : '0');
 		sectionElement.style.setProperty('--background-effect', backgroundEffect);
-		
+
 		// Global coordination properties
 		document.documentElement.style.setProperty(`--${sectionId}-visible`, isVisible ? '1' : '0');
 		document.documentElement.style.setProperty(`--${sectionId}-animated`, hasAnimated ? '1' : '0');
@@ -190,7 +199,7 @@
 	 */
 	export function triggerAnimation() {
 		if (!hasAnimated) {
-			handleIntersection({} as IntersectionObserverEntry);
+			handleIntersection();
 		}
 	}
 
@@ -201,7 +210,7 @@
 		hasAnimated = false;
 		isVisible = false;
 		updateBackgroundProperties();
-		
+
 		// Reset child element styles
 		const childElements = sectionElement.querySelectorAll(childSelector);
 		childElements.forEach((element) => {
@@ -216,7 +225,7 @@
   Section container with reveal animation coordination
   The slot content will be animated based on the configured parameters
 -->
-<section 
+<section
 	bind:this={sectionElement}
 	class="section-reveal"
 	class:visible={isVisible}
@@ -225,7 +234,7 @@
 	data-background-effect={backgroundEffect}
 >
 	{#if isVisible || !triggerOnce}
-		<div 
+		<div
 			class="section-content"
 			transition:fade={{ duration: reducedMotion ? 100 : 300, delay: 0 }}
 		>
@@ -244,7 +253,7 @@
 		/* Base section styles */
 		position: relative;
 		transition: opacity 0.3s ease;
-		
+
 		/* CSS custom properties for background coordination */
 		--section-animation-progress: 0;
 		--section-visibility: 0;
@@ -298,14 +307,14 @@
 		.section-reveal {
 			transition: opacity 0.1s ease;
 		}
-		
+
 		:global(.reveal-item) {
 			/* Ensure no transforms in reduced motion mode */
 			transform: none !important;
 			/* Instantly show content without animation */
 			opacity: 1 !important;
 		}
-		
+
 		/* Disable all spring and transition effects */
 		* {
 			transition-duration: 0.01s !important;
@@ -314,17 +323,17 @@
 	}
 
 	/* Background coordination utilities */
-	.section-reveal[data-background-effect="particle-drift"] {
+	.section-reveal[data-background-effect='particle-drift'] {
 		/* Signal to particle system for drift effects */
 		--particle-drift-intensity: var(--section-visibility);
 	}
 
-	.section-reveal[data-background-effect="grid-pulse"] {
+	.section-reveal[data-background-effect='grid-pulse'] {
 		/* Signal to grid system for pulse effects */
 		--grid-pulse-intensity: var(--section-animation-progress);
 	}
 
-	.section-reveal[data-background-effect="molecular-glow"] {
+	.section-reveal[data-background-effect='molecular-glow'] {
 		/* Signal to molecular system for glow effects */
 		--molecular-glow-intensity: var(--section-visibility);
 	}

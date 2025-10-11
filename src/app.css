@@ -8,20 +8,20 @@
 	--aeon-deep-space: #1a1b2f;
 	--aeon-primary: #4cc9f0;
 	--aeon-biolum: #80ffdb;
-	
+
 	/* Functional Colors */
 	--aeon-surface-0: rgba(26, 27, 47, 0.95);
 	--aeon-surface-1: rgba(26, 27, 47, 0.85);
 	--aeon-surface-2: rgba(76, 201, 240, 0.1);
-	
+
 	/* Interaction Colors */
 	--aeon-interactive: rgba(128, 255, 219, 0.2);
 	--aeon-interactive-hover: rgba(128, 255, 219, 0.3);
-	
+
 	/* Typography */
 	--font-primary: 'Montserrat', sans-serif;
 	--font-mono: 'JetBrains Mono', monospace;
-	
+
 	/* Spacing System */
 	--space-unit: 0.25rem;
 	--space-xs: calc(var(--space-unit) * 2);

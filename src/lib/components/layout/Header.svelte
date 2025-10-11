@@ -11,9 +11,11 @@
 		</svg>
 		<ul>
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href="/">Home</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href="/about">About</a>
 			</li>
 		</ul>

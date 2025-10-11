@@ -6,8 +6,8 @@ This project is built using SvelteKit and is designed to showcase our landing pa
 
 ## Project Overview
 
-*   **Landing Page:**  The main landing page introduces Aeon and its mission.
-*   **`/analyze` Endpoint:** This endpoint provides a proof-of-concept for viewing biomolecular analysis results. Users can upload a `.json` file containing findings, and the application will display the formatted JSON data on the page. This allows for easy visualization and review of analysis outputs.
+- **Landing Page:** The main landing page introduces Aeon and its mission.
+- **`/analyze` Endpoint:** This endpoint provides a proof-of-concept for viewing biomolecular analysis results. Users can upload a `.json` file containing findings, and the application will display the formatted JSON data on the page. This allows for easy visualization and review of analysis outputs.
 
 ## Getting Started
 
@@ -38,7 +38,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-This will launch the development server, and you can access the landing page at `http://localhost:<port>` (usually `http://localhost:5173`).  Navigate to `/analyze` to access the proof-of-concept endpoint.
+This will launch the development server, and you can access the landing page at `http://localhost:<port>` (usually `http://localhost:5173`). Navigate to `/analyze` to access the proof-of-concept endpoint.
 
 ### Building
 
@@ -56,7 +56,7 @@ npm run preview
 
 ### Deployment
 
-To deploy your application, you will need to choose an adapter for your target environment.  Refer to the [SvelteKit documentation on adapters](https://kit.svelte.dev/docs/adapters) for more information.  {{ You might want to add specific deployment instructions here if you have a preferred platform. }}
+To deploy your application, you will need to choose an adapter for your target environment. Refer to the [SvelteKit documentation on adapters](https://kit.svelte.dev/docs/adapters) for more information. {{ You might want to add specific deployment instructions here if you have a preferred platform. }}
 
 ## Learn More
 

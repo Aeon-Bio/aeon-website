@@ -1,6 +1,5 @@
 <script lang="ts">
 	import GridSystem from '$lib/components/GridSystem.svelte';
-	import ParticleField from '$lib/components/ParticleField.svelte';
 	import ScrollDrivenParticleField from '$lib/components/ScrollDrivenParticleField.svelte';
 	import EnergyFlow from '$lib/components/EnergyFlow.svelte';
 	import MolecularContainer from '$lib/components/MolecularContainer.svelte';
@@ -11,15 +10,16 @@
 	import ComparisonChart from '$lib/components/visualizations/ComparisonChart.svelte';
 	import SectionReveal from '$lib/components/SectionReveal.svelte';
 	import { interactionState } from '$lib/stores/interaction';
-	import { sectionManager, scrollTracker, currentSection, scrollVelocity } from '$lib/stores/scroll';
+	import { sectionManager } from '$lib/stores/scroll';
 	import AeonLogo from '$lib/images/AeonLogo.svelte';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
+	import { Linkedin, Github } from 'lucide-svelte';
 
 	function handleContainerHover(event: CustomEvent) {
 		const element = event.detail.element;
-		interactionState.update(state => ({
+		interactionState.update((state) => ({
 			...state,
 			hoveredElement: element,
 			systemActivity: 0.8
@@ -27,7 +27,7 @@
 	}
 
 	function handleContainerLeave() {
-		interactionState.update(state => ({
+		interactionState.update((state) => ({
 			...state,
 			hoveredElement: null,
 			systemActivity: 0
@@ -37,12 +37,12 @@
 	let isResizing = false;
 	let resizeTimer: ReturnType<typeof setTimeout>;
 	let shouldRenderParticles = true;
-	
+
 	function handleResize() {
 		if (isResizing) return;
 		isResizing = true;
 		shouldRenderParticles = false;
-		
+
 		clearTimeout(resizeTimer);
 		resizeTimer = setTimeout(() => {
 			shouldRenderParticles = true;
@@ -53,31 +53,30 @@
 	// Modal state
 	let showPartnershipModal = false;
 	let showEmailModal = false;
-	
-	
+
 	// CTA handlers
 	function openPartnershipModal() {
 		showPartnershipModal = true;
 	}
-	
+
 	function openEmailModal() {
 		showEmailModal = true;
 	}
-	
+
 	function closePartnershipModal() {
 		showPartnershipModal = false;
 	}
-	
+
 	function closeEmailModal() {
 		showEmailModal = false;
 	}
-	
+
 	function handlePartnershipSubmit(event: CustomEvent) {
 		console.log('Partnership inquiry submitted:', event.detail);
 		// Analytics tracking would go here
 		closePartnershipModal();
 	}
-	
+
 	function handleEmailSubmit(event: CustomEvent) {
 		console.log('Email signup submitted:', event.detail);
 		// Analytics tracking would go here
@@ -86,18 +85,18 @@
 
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
-		
+
 		// Register sections for scroll tracking
 		const cleanupSections = sectionManager.registerSections([
 			'hero-section',
-			'problem-section', 
+			'problem-section',
 			'approach-section',
 			'applications-section',
 			'partnership-section',
 			'science-section',
 			'closing-cta-section'
 		]);
-		
+
 		return () => {
 			window.removeEventListener('resize', handleResize);
 			cleanupSections?.();
@@ -105,11 +104,10 @@
 	});
 </script>
 
-
 <div class="background-layer" aria-hidden="true">
 	<GridSystem />
 	{#if shouldRenderParticles}
-		<div transition:fade={{duration: 300}}>
+		<div transition:fade={{ duration: 300 }}>
 			<ScrollDrivenParticleField />
 		</div>
 	{/if}
@@ -117,11 +115,9 @@
 	<ViewportGradient />
 </div>
 
-<div class="content-layer" aria-hidden="true">
-</div>
+<div class="content-layer" aria-hidden="true"></div>
 
-
-<SectionReveal 
+<SectionReveal
 	sectionId="hero"
 	initiallyVisible={true}
 	animationType="fadeIn"
@@ -132,23 +128,28 @@
 >
 	<section id="hero-section" class="hero" aria-labelledby="hero-heading">
 		<div class="container-wrapper">
-			<MolecularContainer 
-				on:hover={handleContainerHover}
-				on:leave={handleContainerLeave}
-			>
+			<MolecularContainer on:hover={handleContainerHover} on:leave={handleContainerLeave}>
 				<div class="logo-container hero-item" role="img" aria-label="Aeon Bio company logo">
 					<AeonLogo />
 				</div>
-				<h1 id="hero-heading" class="hero-item">Building the information layer of health through biomolecular causality</h1>
-				<p class="tagline hero-item">
-					Decode mechanisms. Prevent disease.
-				</p>
+				<h1 id="hero-heading" class="hero-item">
+					Building the information layer of health through biomolecular causality
+				</h1>
+				<p class="tagline hero-item">Decode mechanisms. Prevent disease.</p>
 				<div class="cta-group hero-item" role="group" aria-label="Main actions">
-					<button class="cta-primary" on:click={openPartnershipModal} aria-describedby="partnership-desc">Explore Partnership Opportunities</button>
-					<button class="cta-secondary" on:click={openEmailModal} aria-describedby="updates-desc">Stay Updated</button>
+					<button
+						class="cta-primary"
+						on:click={openPartnershipModal}
+						aria-describedby="partnership-desc">Explore Partnership Opportunities</button
+					>
+					<button class="cta-secondary" on:click={openEmailModal} aria-describedby="updates-desc"
+						>Stay Updated</button
+					>
 				</div>
 				<div class="visually-hidden">
-					<span id="partnership-desc">Opens a form to inquire about collaboration opportunities with Aeon Bio</span>
+					<span id="partnership-desc"
+						>Opens a form to inquire about collaboration opportunities with Aeon Bio</span
+					>
 					<span id="updates-desc">Opens a form to subscribe to updates and news from Aeon Bio</span>
 				</div>
 			</MolecularContainer>
@@ -157,7 +158,7 @@
 </SectionReveal>
 
 <!-- Section 2: The Problem -->
-<SectionReveal 
+<SectionReveal
 	sectionId="problem"
 	animationType="slideUp"
 	staggerDelay={150}
@@ -169,27 +170,37 @@
 		<div class="content-wrapper">
 			<h2 class="problem-item">Why current approaches fall short</h2>
 			<p class="problem-intro problem-item">
-				Healthcare generates unprecedented data—genomics, transcriptomics, epigenomics, metabolomics, biometrics—yet these remain fragmented and underutilized.
+				Healthcare generates unprecedented data—genomics, transcriptomics, epigenomics,
+				metabolomics, biometrics—yet these remain fragmented and underutilized.
 			</p>
 			<p class="problem-item">
-				Current AI approaches find correlations in this data. But correlation isn't causation. Without understanding why a molecular pattern leads to disease, recommendations remain guesswork.
+				Current AI approaches find correlations in this data. But correlation isn't causation.
+				Without understanding why a molecular pattern leads to disease, recommendations remain
+				guesswork.
 			</p>
-			
+
 			<!-- Interactive comparison visualization -->
 			<div class="comparison-explanation">
 				<div class="explanation-item problem-item slide-left">
 					<h3>The Correlation Trap</h3>
-					<p>Traditional approaches find statistical associations but miss the underlying mechanisms. High correlation doesn't guarantee causation—leading to ineffective interventions based on spurious relationships.</p>
+					<p>
+						Traditional approaches find statistical associations but miss the underlying mechanisms.
+						High correlation doesn't guarantee causation—leading to ineffective interventions based
+						on spurious relationships.
+					</p>
 				</div>
 				<div class="explanation-item problem-item slide-right">
 					<h3>True Causal Understanding</h3>
-					<p>Aeon Bio maps direct biomolecular pathways from molecular state through biological functions to health outcomes, revealing actionable mechanisms you can influence.</p>
+					<p>
+						Aeon Bio maps direct biomolecular pathways from molecular state through biological
+						functions to health outcomes, revealing actionable mechanisms you can influence.
+					</p>
 				</div>
 			</div>
-			
+
 			<!-- Interactive comparison visualization -->
 			<div class="comparison-visual-enhanced problem-item">
-				<ComparisonChart height={450} />
+				<ComparisonChart height={360} />
 			</div>
 			<p class="solution-teaser problem-item">Aeon Bio changes this.</p>
 		</div>
@@ -197,7 +208,7 @@
 </SectionReveal>
 
 <!-- Section 3: Our Approach -->
-<SectionReveal 
+<SectionReveal
 	sectionId="approach"
 	animationType="scaleUp"
 	staggerDelay={120}
@@ -209,14 +220,14 @@
 		<div class="content-wrapper">
 			<h2 class="approach-item">Factor graphs meet multi-omics data</h2>
 			<div class="factor-graph-visual approach-item">
-				<FactorGraph height={600} />
+				<FactorGraph height={560} />
 			</div>
 			<p class="approach-item">
-				We integrate multi-omics data (genomic, epigenetic, metabolomic, biometric) with scientific literature through factor graphs—probabilistic models that map causal relationships at every biological scale.
+				We integrate multi-omics data (genomic, epigenetic, metabolomic, biometric) with scientific
+				literature through factor graphs—probabilistic models that map causal relationships at every
+				biological scale.
 			</p>
-			<p class="approach-item">
-				Think of it as a living map of human biology:
-			</p>
+			<p class="approach-item">Think of it as a living map of human biology:</p>
 			<div class="approach-breakdown">
 				<div class="breakdown-item approach-item">
 					<strong>Molecules</strong> → observed from your data (genes, metabolites, proteins)
@@ -232,11 +243,16 @@
 				</div>
 			</div>
 			<p class="approach-item">
-				Unlike foundation models that pattern-match, our approach reasons about why molecular states lead to specific health trajectories. Every recommendation traces back to a causal mechanism.
+				Unlike foundation models that pattern-match, our approach reasons about why molecular states
+				lead to specific health trajectories. Every recommendation traces back to a causal
+				mechanism.
 			</p>
 			<div class="callout-box approach-item">
 				<h3>Beyond Foundation Models</h3>
-				<p>We use foundation models as probability distributions—inputs to our factor graphs, not endpoints. This enables true causal reasoning instead of sophisticated correlation.</p>
+				<p>
+					We use foundation models as probability distributions—inputs to our factor graphs, not
+					endpoints. This enables true causal reasoning instead of sophisticated correlation.
+				</p>
 			</div>
 		</div>
 	</section>
@@ -250,17 +266,29 @@
 			<div class="use-case-card">
 				<h3>Disease Prevention</h3>
 				<h4>Detect disease-trending processes before clinical symptoms</h4>
-				<p>Traditional diagnostics catch disease after damage occurs. Our causal models identify molecular trajectories toward inflammation, metabolic syndrome, and cardiovascular disease years earlier—when intervention is most effective.</p>
+				<p>
+					Traditional diagnostics catch disease after damage occurs. Our causal models identify
+					molecular trajectories toward inflammation, metabolic syndrome, and cardiovascular disease
+					years earlier—when intervention is most effective.
+				</p>
 			</div>
 			<div class="use-case-card">
 				<h3>Personalized Interventions</h3>
 				<h4>Recommendations rooted in your molecular causality</h4>
-				<p>Rather than generic advice, we trace your specific molecular state through biological pathways to identify personalized interventions—lifestyle changes, supplements, therapies—with clear mechanistic rationale.</p>
+				<p>
+					Rather than generic advice, we trace your specific molecular state through biological
+					pathways to identify personalized interventions—lifestyle changes, supplements,
+					therapies—with clear mechanistic rationale.
+				</p>
 			</div>
 			<div class="use-case-card">
 				<h3>Research & Development</h3>
 				<h4>Partner to build custom causal models for your data</h4>
-				<p>We create specialized factor graph models tailored to specific data modalities: genomic variants, methylation patterns, metabolomics, clinical biomarkers. Each implementation strengthens the network for all partners.</p>
+				<p>
+					We create specialized factor graph models tailored to specific data modalities: genomic
+					variants, methylation patterns, metabolomics, clinical biomarkers. Each implementation
+					strengthens the network for all partners.
+				</p>
 			</div>
 		</div>
 	</div>
@@ -273,22 +301,42 @@
 		<div class="partnership-types">
 			<div class="partnership-card">
 				<h3>Co-Development Partnerships</h3>
-				<p>Collaborate on novel applications of causal biomolecular modeling. We bring the factor graph infrastructure and causal AI expertise—you bring domain knowledge and data.</p>
-				<p class="ideal-for">Ideal for: Biotech companies, longevity clinics, research institutions exploring new therapeutic targets.</p>
+				<p>
+					Collaborate on novel applications of causal biomolecular modeling. We bring the factor
+					graph infrastructure and causal AI expertise—you bring domain knowledge and data.
+				</p>
+				<p class="ideal-for">
+					Ideal for: Biotech companies, longevity clinics, research institutions exploring new
+					therapeutic targets.
+				</p>
 			</div>
 			<div class="partnership-card">
 				<h3>Data Partnerships</h3>
-				<p>Provide specialized data modalities (methylation, proteomics, clinical outcomes) to help build and validate causal models. Gain insights from the resulting models.</p>
-				<p class="ideal-for">Ideal for: Testing companies, health platforms with unique datasets, clinical research organizations.</p>
+				<p>
+					Provide specialized data modalities (methylation, proteomics, clinical outcomes) to help
+					build and validate causal models. Gain insights from the resulting models.
+				</p>
+				<p class="ideal-for">
+					Ideal for: Testing companies, health platforms with unique datasets, clinical research
+					organizations.
+				</p>
 			</div>
 			<div class="partnership-card">
 				<h3>Research Collaborations</h3>
-				<p>Joint research initiatives to advance the science of biomolecular causality and precision health.</p>
-				<p class="ideal-for">Ideal for: Academic labs, consortium partners, organizations pushing the boundaries of computational biology.</p>
+				<p>
+					Joint research initiatives to advance the science of biomolecular causality and precision
+					health.
+				</p>
+				<p class="ideal-for">
+					Ideal for: Academic labs, consortium partners, organizations pushing the boundaries of
+					computational biology.
+				</p>
 			</div>
 		</div>
 		<div class="partnership-cta">
-			<button class="cta-primary" on:click={openPartnershipModal}>Explore how we can work together</button>
+			<button class="cta-primary" on:click={openPartnershipModal}
+				>Explore how we can work together</button
+			>
 		</div>
 	</div>
 </section>
@@ -299,16 +347,57 @@
 		<h2>Built on pioneering research in causal AI</h2>
 		<div class="founder-profiles">
 			<div class="founder-card">
-				<h3>Eric Jing Mockler – CEO & Cofounder</h3>
+				<div class="founder-card-header">
+					<h3>Eric Jing Mockler – CEO & Cofounder</h3>
+					<div class="founder-links" role="group" aria-label="Eric Jing Mockler contact links">
+						<a
+							class="founder-link"
+							href="https://www.linkedin.com/in/ejmockler/"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Eric Jing Mockler on LinkedIn"
+							title="Eric Jing Mockler on LinkedIn"
+						>
+							<Linkedin size={22} strokeWidth={1.8} />
+						</a>
+						<a
+							class="founder-link"
+							href="https://github.com/ejmockler"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Eric Jing Mockler on GitHub"
+							title="Eric Jing Mockler on GitHub"
+						>
+							<Github size={22} strokeWidth={1.8} />
+						</a>
+					</div>
+				</div>
 				<ul>
 					<li>UC Santa Cruz: Bioengineering, Cognitive Science, Neuroscience</li>
-					<li>Architected genomic pipelines processing 10,000+ genomes (Gladstone Institutes, AnswerALS consortium)</li>
+					<li>
+						Architected genomic pipelines processing 10,000+ genomes (Gladstone Institutes,
+						AnswerALS consortium)
+					</li>
 					<li>Open-source contributor to causal genomics methods</li>
 					<li>Specializes in scalable bioinformatics infrastructure</li>
 				</ul>
 			</div>
 			<div class="founder-card">
-				<h3>Karen Sachs, PhD – CSO/CTO & Cofounder</h3>
+				<div class="founder-card-header">
+					<h3>Karen Sachs, PhD – CSO/CTO & Cofounder</h3>
+					<div class="founder-links" role="group" aria-label="Karen Sachs contact links">
+						<a
+							class="founder-link"
+							href="https://www.linkedin.com/in/karen-sachs-b174313/"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Karen Sachs on LinkedIn"
+							title="Karen Sachs on LinkedIn"
+						>
+							<Linkedin size={22} strokeWidth={1.8} />
+						</a>
+					</div>
+				</div>
 				<ul>
 					<li>MIT PhD in Biological Engineering, Stanford Medicine postdoc</li>
 					<li>Pioneer in single-cell causal inference and CyTOF technology</li>
@@ -325,7 +414,10 @@
 <section id="closing-cta-section" class="closing-cta-section">
 	<div class="content-wrapper">
 		<h2>Ready to explore what's possible?</h2>
-		<p>Whether you're developing precision therapeutics, building health platforms, or advancing longevity science—Aeon Bio's causal modeling infrastructure can accelerate your work.</p>
+		<p>
+			Whether you're developing precision therapeutics, building health platforms, or advancing
+			longevity science—Aeon Bio's causal modeling infrastructure can accelerate your work.
+		</p>
 		<p>Let's discuss how biomolecular causality can transform your approach to human health.</p>
 		<div class="final-cta-group">
 			<button class="cta-primary" on:click={openPartnershipModal}>Partner with Us</button>
@@ -335,33 +427,25 @@
 </section>
 
 <!-- Modals -->
-<Modal 
-	bind:isOpen={showPartnershipModal} 
-	title="Partnership Inquiry" 
+<Modal
+	bind:isOpen={showPartnershipModal}
+	title="Partnership Inquiry"
 	maxWidth="600px"
 	on:close={closePartnershipModal}
 >
-	<PartnershipInquiry 
-		on:submit={handlePartnershipSubmit}
-		on:close={closePartnershipModal}
-	/>
+	<PartnershipInquiry on:submit={handlePartnershipSubmit} on:close={closePartnershipModal} />
 </Modal>
 
-<Modal 
-	bind:isOpen={showEmailModal} 
-	title="Stay Updated" 
+<Modal
+	bind:isOpen={showEmailModal}
+	title="Stay Updated"
 	maxWidth="500px"
 	on:close={closeEmailModal}
 >
-	<EmailCapture 
-		on:submit={handleEmailSubmit}
-		on:close={closeEmailModal}
-	/>
+	<EmailCapture on:submit={handleEmailSubmit} on:close={closeEmailModal} />
 </Modal>
 
-
 <style>
-
 	.background-layer {
 		position: fixed;
 		inset: 0;
@@ -374,47 +458,66 @@
 		z-index: 0;
 		pointer-events: none;
 	}
-	
+
 	.hero {
 		min-height: 100vh;
 		display: grid;
 		place-items: center;
 	}
-	
+
 	.container-wrapper {
 		width: min(90vw, 800px);
 		height: min(90vh, 800px);
 		display: grid;
 		place-items: center;
 	}
-	
+
 	.logo-container {
-		width: min(30vw, 300px);
-		height: min(30vw, 300px);
-		margin: -2rem auto -1rem;
+		width: min(32vw, 320px);
+		height: min(32vw, 320px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: -0.5rem auto 1.25rem;
 	}
-	
+
+	:global(.logo-container svg) {
+		width: 100%;
+		height: 100%;
+		filter: drop-shadow(0 10px 32px rgba(76, 201, 240, 0.2));
+	}
+
 	h1 {
-		font-size: clamp(1.5rem, 4vw, 2.5rem);
-		margin: 0 0 1rem;
+		font-size: clamp(1.6rem, 4vw, 2.75rem);
+		margin: 0 auto 1.1rem;
+		max-width: 32ch;
 		background: linear-gradient(
-			to top,
-			var(--aeon-primary),
-			var(--aeon-biolum)
+			135deg,
+			rgba(255, 255, 255, 0.96) 0%,
+			rgba(128, 255, 219, 0.9) 55%,
+			rgba(76, 201, 240, 0.92) 100%
 		);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
 		text-align: center;
-		line-height: 1.2;
+		line-height: 1.18;
+		text-shadow:
+			0 18px 45px rgba(76, 201, 240, 0.22),
+			0 2px 8px rgba(16, 41, 66, 0.4);
 	}
-	
+
 	.tagline {
-		font-size: clamp(0.9rem, 2vw, 1.2rem);
+		font-size: clamp(1rem, 2.5vw, 1.3rem);
+		max-width: 40ch;
+		margin: 0 auto 2.75rem;
 		text-align: center;
-		color: rgba(255, 255, 255, 0.8);
-		line-height: 1.6;
-		margin-bottom: 2.5rem;
+		background: linear-gradient(130deg, rgba(192, 228, 255, 0.75), rgba(128, 255, 219, 0.7));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		line-height: 1.65;
+		text-shadow: 0 8px 24px rgba(76, 201, 240, 0.18);
 	}
 
 	.cta-group {
@@ -424,7 +527,8 @@
 		flex-wrap: wrap;
 	}
 
-	.cta-primary, .cta-secondary {
+	.cta-primary,
+	.cta-secondary {
 		min-height: 44px;
 		padding: 0.75rem 1.5rem;
 		border-radius: 0.5rem;
@@ -446,7 +550,7 @@
 		transform: translateY(-2px);
 		box-shadow: 0 8px 25px rgba(76, 201, 240, 0.3);
 	}
-	
+
 	.cta-primary:focus {
 		outline: 2px solid var(--aeon-biolum);
 		outline-offset: 2px;
@@ -464,15 +568,19 @@
 		border-color: var(--aeon-biolum);
 		color: white;
 	}
-	
+
 	.cta-secondary:focus {
 		outline: 2px solid var(--aeon-biolum);
 		outline-offset: 2px;
 	}
 
 	/* Section Layouts */
-	.problem-section, .approach-section, .applications-section, 
-	.partnership-section, .science-section, .closing-cta-section {
+	.problem-section,
+	.approach-section,
+	.applications-section,
+	.partnership-section,
+	.science-section,
+	.closing-cta-section {
 		padding: 4rem 2rem;
 		background: rgba(26, 27, 47, 0.8);
 		backdrop-filter: blur(10px);
@@ -488,11 +596,7 @@
 	section h2 {
 		font-size: clamp(1.8rem, 4vw, 2.5rem);
 		margin: 0 0 2rem;
-		background: linear-gradient(
-			to right,
-			var(--aeon-primary),
-			var(--aeon-biolum)
-		);
+		background: linear-gradient(to right, var(--aeon-primary), var(--aeon-biolum));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -530,6 +634,13 @@
 
 	.comparison-visual-enhanced {
 		margin: 2.5rem 0;
+		display: flex;
+		justify-content: center;
+		padding: 0 1rem;
+	}
+
+	.comparison-visual-enhanced :global(.comparison-chart-container) {
+		flex: 1;
 	}
 
 	.comparison-explanation {
@@ -544,7 +655,9 @@
 		border: 1px solid rgba(128, 255, 219, 0.2);
 		border-radius: 0.5rem;
 		background: rgba(128, 255, 219, 0.05);
-		transition: transform 0.3s ease, border-color 0.3s ease;
+		transition:
+			transform 0.3s ease,
+			border-color 0.3s ease;
 	}
 
 	.explanation-item:hover {
@@ -590,10 +703,10 @@
 
 	/* Approach Section */
 	.factor-graph-visual {
-		margin: 3rem auto 5rem;
+		margin: 3rem auto 4rem;
 		width: 100%;
-		max-width: 1200px;
-		padding-bottom: 2rem;
+		max-width: 1000px;
+		padding: 0 1rem;
 	}
 
 	.approach-breakdown {
@@ -635,7 +748,9 @@
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(128, 255, 219, 0.2);
 		border-radius: 0.5rem;
-		transition: transform 0.3s ease, border-color 0.3s ease;
+		transition:
+			transform 0.3s ease,
+			border-color 0.3s ease;
 	}
 
 	.use-case-card:hover {
@@ -689,6 +804,18 @@
 		border-radius: 0.5rem;
 	}
 
+	.founder-card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.founder-card-header h3 {
+		margin-bottom: 0.5rem;
+	}
+
 	.founder-card ul {
 		margin: 1rem 0;
 		padding-left: 1.5rem;
@@ -699,6 +826,39 @@
 		color: rgba(255, 255, 255, 0.8);
 	}
 
+	.founder-links {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 0.25rem;
+	}
+
+	.founder-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 999px;
+		background: rgba(128, 255, 219, 0.12);
+		border: 1px solid rgba(128, 255, 219, 0.4);
+		color: var(--aeon-biolum);
+		transition:
+			transform 0.2s ease,
+			background-color 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.founder-link:hover,
+	.founder-link:focus {
+		transform: translateY(-2px);
+		background: rgba(128, 255, 219, 0.2);
+		border-color: var(--aeon-biolum);
+	}
+
+	.founder-link:focus-visible {
+		outline: 2px solid var(--aeon-biolum);
+		outline-offset: 2px;
+	}
 
 	/* Closing CTA Section */
 	.closing-cta-section {
@@ -718,61 +878,67 @@
 		.comparison-visual {
 			grid-template-columns: 1fr;
 		}
-		
+
 		.comparison-explanation {
 			grid-template-columns: 1fr;
 			gap: 1.5rem;
 		}
-		
+
 		.explanation-item {
 			padding: 1rem;
 		}
-		
+
 		.comparison-visual-enhanced {
 			margin: 2rem 0;
 		}
-		
+
 		/* Enhanced touch targets for mobile */
-		.cta-primary, .cta-secondary {
+		.cta-primary,
+		.cta-secondary {
 			min-height: 48px;
 			min-width: 100%;
 			justify-content: center;
 			font-size: 1.1rem;
 		}
-		
-		.cta-group, .final-cta-group {
+
+		.cta-group,
+		.final-cta-group {
 			flex-direction: column;
 			align-items: stretch;
 			gap: 1rem;
 		}
-		
+
 		/* Mobile section spacing */
-		.problem-section, .approach-section, .applications-section, 
-		.partnership-section, .science-section, .closing-cta-section {
+		.problem-section,
+		.approach-section,
+		.applications-section,
+		.partnership-section,
+		.science-section,
+		.closing-cta-section {
 			padding: 2rem 1rem;
 		}
-		
+
 		/* Mobile cards and grids */
 		.use-cases {
 			grid-template-columns: 1fr;
 			gap: 1.5rem;
 		}
-		
+
 		.partnership-types {
 			grid-template-columns: 1fr;
 			gap: 1.5rem;
 		}
-		
+
 		.founder-profiles {
 			gap: 1.5rem;
 		}
-		
+
 		/* Improved mobile typography */
 		h1 {
 			font-size: clamp(1.2rem, 6vw, 1.8rem);
 			line-height: 1.3;
 		}
-		
+
 		.tagline {
 			font-size: clamp(0.85rem, 4vw, 1rem);
 			line-height: 1.5;
