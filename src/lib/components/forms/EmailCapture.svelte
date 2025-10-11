@@ -110,7 +110,7 @@
 					class:error={error && error.includes('email')}
 					aria-label="Email address for updates"
 					aria-describedby={error ? 'email-error' : undefined}
-					aria-invalid={error && error.includes('email')}
+					aria-invalid={!!(error && error.includes('email'))}
 					required
 				/>
 				{#if error}

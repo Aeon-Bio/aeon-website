@@ -92,14 +92,13 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 			isMobile: false,
 			hardwareConcurrency: 4,
 			devicePixelRatio: 1,
-			memoryGB: 4,
-			hasWebGL: false,
+			isLowEnd: false,
 			preferredQuality: 'medium'
 		};
 	}
 
 	const canvas = document.createElement('canvas');
-	const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+	const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
 
 	const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 		navigator.userAgent
@@ -107,7 +106,6 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 	const devicePixelRatio = window.devicePixelRatio || 1;
 	const hardwareConcurrency = navigator.hardwareConcurrency || 2;
 
-	// @ts-expect-error - performance.memory is non-standard
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const memoryInfo = (performance as any).memory;
 	const totalMemory = memoryInfo ? memoryInfo.jsHeapSizeLimit / (1024 * 1024 * 1024) : 2; // GB

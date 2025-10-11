@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { ChevronDown } from 'lucide-svelte';
-	import type { Finding } from '../types';
+	import type { Finding } from '$lib/types/insights';
 
 	export let finding: Finding;
 	export let expanded: boolean;

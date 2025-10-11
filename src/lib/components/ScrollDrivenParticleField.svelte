@@ -322,7 +322,7 @@
 			bounds,
 			focusPoint,
 			systemActivity,
-			neighborLookup: (particle, radius) => spatialGrid.getNearbyParticles(particle, radius),
+			neighborLookup: (particle, radius) => spatialGrid.getNearbyParticles(particle, radius) as Particle[],
 			cohesionFactor: 0.0002,
 			randomDampening: 0.7
 		});
@@ -417,8 +417,14 @@
 
 	function tick(currentTime: number) {
 		if (lastFrameTime === 0) lastFrameTime = currentTime;
-		const deltaTime = (currentTime - lastFrameTime) / 16.67; // Normalize to 60fps
+		let elapsed = currentTime - lastFrameTime;
 		lastFrameTime = currentTime;
+
+		// Cap delta time to prevent physics explosion on tab-out or lag
+		// Capping at 33ms (~30fps) ensures simulation remains stable
+		if (elapsed > 33) elapsed = 33;
+
+		const deltaTime = elapsed / 16.67; // Normalize to 60fps
 
 		const frameStartTime = performance.now();
 		const FRAME_BUDGET = 16.67; // 60fps target
@@ -553,8 +559,9 @@
 	// Listen for section animation events to coordinate particle behavior
 	let sectionAnimationIntensity = 0;
 
-	function handleSectionActivated(event: CustomEvent) {
-		const { backgroundEffect } = event.detail;
+	function handleSectionActivated(event: Event) {
+		const customEvent = event as CustomEvent;
+		const { backgroundEffect } = customEvent.detail;
 
 		if (backgroundEffect === 'particle-drift') {
 			// Enhance particle drift during section activation
@@ -571,8 +578,9 @@
 		}
 	}
 
-	function handleSectionDeactivated(event: CustomEvent) {
-		const { backgroundEffect } = event.detail;
+	function handleSectionDeactivated(event: Event) {
+		const customEvent = event as CustomEvent;
+		const { backgroundEffect } = customEvent.detail;
 		if (backgroundEffect === 'particle-drift') {
 			sectionAnimationIntensity *= 0.8;
 		}
@@ -609,16 +617,16 @@
 			.map((_, i) => createParticle(i));
 
 		// Listen for section animation events
-		window.addEventListener('section-activated', handleSectionActivated);
-		window.addEventListener('section-deactivated', handleSectionDeactivated);
+		window.addEventListener('section-activated', handleSectionActivated as EventListener);
+		window.addEventListener('section-deactivated', handleSectionDeactivated as EventListener);
 
 		animationFrame = requestAnimationFrame(tick);
 
 		return () => {
 			cancelAnimationFrame(animationFrame);
 			if (typeof window !== 'undefined') {
-				window.removeEventListener('section-activated', handleSectionActivated);
-				window.removeEventListener('section-deactivated', handleSectionDeactivated);
+				window.removeEventListener('section-activated', handleSectionActivated as EventListener);
+				window.removeEventListener('section-deactivated', handleSectionDeactivated as EventListener);
 			}
 			if (ctx && canvas) {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);

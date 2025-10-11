@@ -88,9 +88,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			},
 			transform(chunk, controller) {
 				controller.enqueue(chunk);
-			},
-			cancel(reason) {
-				console.log('Transform stream cancelled due to:', reason);
 			}
 		});
 

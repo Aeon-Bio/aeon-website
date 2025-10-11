@@ -32,8 +32,9 @@
 	}
 
 	// Handle section animation events for molecular glow
-	function handleSectionActivated(event: CustomEvent) {
-		const { backgroundEffect } = event.detail;
+	function handleSectionActivated(event: Event) {
+		const customEvent = event as CustomEvent;
+		const { backgroundEffect } = customEvent.detail;
 
 		if (backgroundEffect === 'molecular-glow') {
 			// Create pulsing molecular glow effect
@@ -52,22 +53,23 @@
 		}
 	}
 
-	function handleSectionDeactivated(event: CustomEvent) {
-		const { backgroundEffect } = event.detail;
+	function handleSectionDeactivated(event: Event) {
+		const customEvent = event as CustomEvent;
+		const { backgroundEffect } = customEvent.detail;
 		if (backgroundEffect === 'molecular-glow') {
 			molecularGlowIntensity = 0;
 		}
 	}
 
 	onMount(() => {
-		window.addEventListener('section-activated', handleSectionActivated);
-		window.addEventListener('section-deactivated', handleSectionDeactivated);
+		window.addEventListener('section-activated', handleSectionActivated as EventListener);
+		window.addEventListener('section-deactivated', handleSectionDeactivated as EventListener);
 	});
 
 	onDestroy(() => {
 		if (typeof window !== 'undefined') {
-			window.removeEventListener('section-activated', handleSectionActivated);
-			window.removeEventListener('section-deactivated', handleSectionDeactivated);
+			window.removeEventListener('section-activated', handleSectionActivated as EventListener);
+			window.removeEventListener('section-deactivated', handleSectionDeactivated as EventListener);
 		}
 	});
 </script>

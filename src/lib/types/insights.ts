@@ -43,7 +43,7 @@ export type AssociatedRegion = {
 	studyIds: string[];
 	direction: 'hyper' | 'hypo';
 	matchStrength: number;
-	methylationMetrics: MethylationMetrics;
+	methylationMetrics: PersonalMethylationMetrics;
 	modifyingFactors?: ModifyingFactor[];
 };
 

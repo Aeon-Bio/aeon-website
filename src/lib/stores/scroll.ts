@@ -147,7 +147,7 @@ export const sectionManager = {
 
 			// Determine current section (most visible)
 			const visibleSections = sections.filter((s) => s.inView);
-			let currentSection = null;
+			let currentSection: string | null = null;
 			let maxProgress = 0;
 
 			visibleSections.forEach((section) => {

@@ -115,7 +115,7 @@
 	});
 </script>
 
-<canvas bind:this={canvas} class="energy-flow" />
+<canvas bind:this={canvas} class="energy-flow"></canvas>
 
 <style>
 	.energy-flow {
