@@ -98,7 +98,8 @@ export function detectDeviceCapabilities(): DeviceCapabilities {
 	}
 
 	const canvas = document.createElement('canvas');
-	const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+	const gl = (canvas.getContext('webgl') ||
+		canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
 
 	const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 		navigator.userAgent

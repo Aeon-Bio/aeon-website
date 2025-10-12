@@ -601,7 +601,7 @@
 									{@const hoveredCy = 70 - hoveredDataPoint.causation * 50}
 
 									<!-- Connect to related points based on category -->
-									{#each comparisonData as point (point.method)}
+									{#each comparisonData as point (point.label)}
 										{#if point !== hoveredDataPoint && point.category === hoveredDataPoint.category}
 											{@const pointCx = 10 + point.correlation * 70}
 											{@const pointCy = 70 - point.causation * 50}
@@ -627,7 +627,7 @@
 								{/if}
 
 								<!-- Data points -->
-								{#each comparisonData as point (point.method)}
+								{#each comparisonData as point (point.label)}
 									{@const pointX = 10 + point.correlation * 70}
 									{@const pointY = 70 - point.causation * 50}
 									{@const isHovered = hoveredDataPoint === point}
@@ -970,7 +970,7 @@
 					<div class="pathway">
 						<strong>Pathway:</strong>
 						<div class="pathway-flow">
-							{#each hoveredDataPoint.biomolecularPath as step, i (`${hoveredDataPoint.method}-${i}`)}
+							{#each hoveredDataPoint.biomolecularPath as step, i (`${hoveredDataPoint.label}-${i}`)}
 								<span class="pathway-step">{step}</span>
 								{#if i < hoveredDataPoint.biomolecularPath.length - 1}
 									<span class="arrow">→</span>

@@ -322,7 +322,8 @@
 			bounds,
 			focusPoint,
 			systemActivity,
-			neighborLookup: (particle, radius) => spatialGrid.getNearbyParticles(particle, radius) as Particle[],
+			neighborLookup: (particle, radius) =>
+				spatialGrid.getNearbyParticles(particle, radius) as Particle[],
 			cohesionFactor: 0.0002,
 			randomDampening: 0.7
 		});
@@ -626,7 +627,10 @@
 			cancelAnimationFrame(animationFrame);
 			if (typeof window !== 'undefined') {
 				window.removeEventListener('section-activated', handleSectionActivated as EventListener);
-				window.removeEventListener('section-deactivated', handleSectionDeactivated as EventListener);
+				window.removeEventListener(
+					'section-deactivated',
+					handleSectionDeactivated as EventListener
+				);
 			}
 			if (ctx && canvas) {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
