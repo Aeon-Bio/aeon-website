@@ -688,7 +688,7 @@
 									stroke-dasharray="2,2"
 								/>
 								<text x="85" y="18" fill="rgba(128, 255, 219, 0.8)" font-size="3.5"
-									>Ideal: High correlation = High causation</text
+									>Ideal</text
 								>
 							</svg>
 
