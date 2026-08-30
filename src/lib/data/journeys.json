@@ -286,7 +286,7 @@
     },
     {
      "who": "agent",
-     "text": "Ferritin 9, hemoglobin holding. TSH 6.1. B12 fine. Your periods need their own look — that is where the iron is going.",
+     "text": "Iron stores near empty — ferritin 9, deficient under 30. Blood count still holds. Thyroid a little slow — TSH 6.1, just over the line. Recheck, not treat. B12 fine. Periods are where the iron goes. They need their own look.",
      "thinks": "anemia, iron-deficiency: ferric derisomaltose and ferric maltol, 33 indexed; hypothyroidism: thyroid and mecasermin, 10 indexed; vitamin b 12 deficiency: closed; Hypothyroidism is now the most likely branch, 100 in a hundred; vitamin b 12 deficiency is off the table"
     },
     {
@@ -322,10 +322,10 @@
      "depth": "blood",
      "items": [
       {
-       "do": "ferritin 9, hemoglobin holding"
+       "do": "iron stores near empty — ferritin 9, deficient under 30. Blood count still holds"
       },
       {
-       "do": "TSH 6.1"
+       "do": "thyroid a little slow — TSH 6.1, just over the line. Recheck, not treat"
       },
       {
        "do": "B12 fine — closed"
@@ -343,11 +343,11 @@
      "items": [
       {
        "do": "nothing on IGSF1, so the TSH is one to trust",
-       "was": "TSH 6.1"
+       "was": "thyroid a little slow — TSH 6.1, just over the line. Recheck, not treat"
       },
       {
        "do": "TMPRSS6 carries a variant — iron by mouth may not absorb",
-       "was": "ferritin 9, hemoglobin holding"
+       "was": "iron stores near empty — ferritin 9, deficient under 30. Blood count still holds"
       },
       {
        "do": "walk, daily"

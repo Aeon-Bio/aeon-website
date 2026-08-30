@@ -13,10 +13,10 @@
   variant under a drug; the drugs on offer one to a plate for clearance.
   Press is warn, read is biolum: the tie grammar of the dialogue.
 
-  Nothing here reports a result; it shows how one would be earned. Where the
-  method asks the instrument for something it does not yet have (O₂ mixing),
-  the caption says so. Vocabulary follows aevum/docs: tile, row, observer,
-  head, dock plane, fiducials, septum mat, dry inverted bay.
+  Nothing here reports a result; it shows how one is earned. The row's gas
+  mixing holds CO₂, RH, and O₂, so the headspace can cycle oxygen for the whole
+  row at once. Vocabulary follows aevum/docs: tile, row, observer, head, dock
+  plane, fiducials, septum mat, dry inverted bay.
   Geometry is schematic, not to scale.
 -->
 <script lang="ts">
@@ -115,7 +115,7 @@
 				steps: [...press(row(2), gradient), read(row(2)), read(row(0))]
 			},
 			{
-				text: 'Oxygen falls and returns, hour by hour, over the whole row. The apnea half — and a thing this question asks of the row’s gas mixing, which was drawn for CO₂.',
+				text: 'Oxygen falls and returns, hour by hour, over the whole row — every well breathes the same night. The apnea half.',
 				tempo: 0.6,
 				steps: [{ kind: 'cycle', epochs: 4 }, read(all)]
 			},
@@ -206,6 +206,14 @@
 	let pass = -1; // index into passes; passes.length while holding
 	let visible = false;
 
+	// the row's O₂, as the headspace sensor would log it: a scrolling trace, ~20 s wide
+	const TRACE = 200;
+	let o2: number[] = [];
+	let o2Level = 1;
+	$: o2Points = o2
+		.map((v, i) => `${750 - (o2.length - 1 - i) * (620 / (TRACE - 1))},${168 - v * 40}`)
+		.join(' ');
+
 	$: caption = pass < 0 ? '' : pass < passes.length ? passes[pass].text : HOLD;
 	$: nPressed = Object.keys(pressed).length;
 	$: nRead = Object.values(watched).reduce((a, b) => a + b, 0);
@@ -246,10 +254,10 @@
 				for (let e = 0; e < s.epochs; e++) {
 					if (id !== run) return;
 					hypoxic = true;
-					await sleep(900 * tempo);
+					await sleep(1600 * tempo);
 					hypoxic = false;
 					cycles += 1;
-					await sleep(700 * tempo);
+					await sleep(1100 * tempo);
 				}
 				return;
 			}
@@ -337,11 +345,20 @@
 			{ threshold: 0.35 }
 		);
 		io.observe(root);
+		// the O₂ log: eases toward the headspace's setpoint, so a fall and a return read as curves
+		const logger = reduced
+			? 0
+			: setInterval(() => {
+					if (!visible) return;
+					o2Level += ((hypoxic ? 0.3 : 1) - o2Level) * 0.18;
+					o2 = [...o2.slice(-(TRACE - 1)), o2Level];
+				}, 100);
 		mounted = true;
 		return () => {
 			alive = false;
 			run += 1;
 			io.disconnect();
+			if (logger) clearInterval(logger);
 		};
 	});
 </script>
@@ -462,12 +479,18 @@
 			<text x="762" y="186" class="label">septum mat</text>
 			<rect x="120" y="120" width="640" height="62" rx="4" class="headspace" />
 			<rect x="120" y="108" width="640" height="12" rx="3" class="cap" />
-			<text x="440" y="158" class="label" text-anchor="middle"
-				>shared headspace · CO₂ / RH{hypoxic ? ' · O₂ ↓' : ''} · one continuous volume</text
+			<!-- the O₂ the row is breathing, logged at the return: one trace for all four tiles -->
+			{#if o2.length > 1}
+				<polyline points={o2Points} class="o2trace" />
+				<text x="128" y="166" class="label o2tag">O₂</text>
+			{/if}
+			<text x="440" y="175" class="label" text-anchor="middle"
+				>shared headspace · CO₂ / RH / O₂{hypoxic ? ' ↓' : ''} · one continuous volume</text
 			>
-			<path d="M70,150 H118" class="flow" marker-end="url(#arr)" />
+			<path d="M70,150 H118" class="flow supply" marker-end="url(#arr)" />
 			<path d="M762,150 H810" class="flow" marker-end="url(#arr)" />
 			<text x="66" y="140" class="label">supply</text>
+			<text x="116" y="165" class="label blend" text-anchor="end">CO₂ · O₂ · N₂</text>
 			<text x="812" y="140" class="label" text-anchor="end">return</text>
 		</g>
 
@@ -650,15 +673,38 @@
 			stroke 700ms var(--ease-out);
 	}
 
-	/* the row breathes less: the whole headspace, all four tiles at once */
+	/* the row breathes less: the whole headspace, all four tiles at once, goes cool and dim */
 	.lid.hypoxic .headspace {
-		fill: rgba(76, 201, 240, 0.02);
-		stroke: rgba(76, 201, 240, 0.25);
+		fill: rgba(76, 201, 240, 0.13);
+		stroke: rgba(76, 201, 240, 0.6);
 	}
 
-	.lid.hypoxic .flow {
-		stroke: rgba(76, 201, 240, 0.45);
-		color: rgba(76, 201, 240, 0.45);
+	/* the blend leans to nitrogen while oxygen is down */
+	.lid.hypoxic .flow.supply {
+		stroke: var(--aeon-primary);
+		color: var(--aeon-primary);
+	}
+
+	.blend {
+		font-size: 9px;
+		fill: var(--ink-30);
+		transition: fill 400ms var(--ease-out);
+	}
+
+	.lid.hypoxic .blend {
+		fill: var(--aeon-primary);
+	}
+
+	.o2trace {
+		fill: none;
+		stroke: var(--aeon-primary);
+		stroke-width: 1.5;
+		stroke-linejoin: round;
+		opacity: 0.9;
+	}
+
+	.o2tag {
+		fill: rgba(76, 201, 240, 0.7);
 	}
 
 	.cap {

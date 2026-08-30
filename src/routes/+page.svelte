@@ -131,8 +131,8 @@
 			<InstrumentSection stake={$stake?.question ?? null} concern={$stake?.concern ?? null} />
 		</figure>
 		<p class="status" use:reveal>
-			<span class="k">now</span> first fixture printed, measured, camera-verified on an OT-2 ·
-			motion gated · one-row coupon CAD-complete, first print pending · CERN-OHL-S-2.0 + Apache-2.0
+			<span class="k">now</span> first fixture commissioned on an OT-2 · one-row coupon in revision
+			· CERN-OHL-S-2.0
 			<a href={AEVUM_REPO} target="_blank" rel="noopener noreferrer">Aeon-Bio/aevum</a>
 		</p>
 	</div>

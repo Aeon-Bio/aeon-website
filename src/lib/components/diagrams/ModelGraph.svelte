@@ -297,12 +297,14 @@
 		}
 		return out;
 	})();
+	// wide: alternate pathways step down a tier so their names never collide — the
+	// whole node steps, dot and name together, so every tie lands on its own dot
 	$: pwPos = Object.fromEntries(
 		hoodPathways.map((n, i) => [
 			n.id,
 			narrow
 				? { x: NX, y: pw0 + 12 + i * ROW }
-				: { x: spread(i, hoodPathways.length, 250, SW - 90), y: PY }
+				: { x: spread(i, hoodPathways.length, 250, SW - 90), y: PY + (i % 2) * 30 }
 		])
 	);
 
@@ -949,7 +951,7 @@
 		{/each}
 
 		<!-- mechanism -->
-		{#each hoodPathways as n, i (n.id)}
+		{#each hoodPathways as n (n.id)}
 			{@const p = pwPos[n.id]}
 			{@const lines = wrap(n.label, narrow ? 38 : 26)}
 			<g
@@ -963,7 +965,7 @@
 						{#each lines as line, k (k)}<tspan x="14" dy={k === 0 ? 0 : 13}>{line}</tspan>{/each}
 					</text>
 				{:else}
-					<text y={18 + (i % 2) * 30} text-anchor="middle" class="pl">
+					<text y="18" text-anchor="middle" class="pl">
 						{#each lines as line, k (k)}<tspan x="0" dy={k === 0 ? 0 : 13}>{line}</tspan>{/each}
 					</text>
 				{/if}

@@ -49,12 +49,12 @@ JOURNEYS = [
                 "you": "Got the blood panel back.",
                 "brings": ["blood"],
                 "finds": [
-                    {"term": "mesh:D018798", "showed": "ferritin 9, hemoglobin holding", "state": "open",
+                    {"term": "mesh:D018798", "showed": "iron stores near empty — ferritin 9, deficient under 30. Blood count still holds", "state": "open",
                      "obs": [("ferritin", "9 ng/mL", True), ("hemoglobin", "12.4 g/dL", False)]},
-                    {"term": "mesh:D007037", "showed": "TSH 6.1", "state": "open", "obs": [("TSH", "6.1 mIU/L", True)]},
+                    {"term": "mesh:D007037", "showed": "thyroid a little slow — TSH 6.1, just over the line. Recheck, not treat", "state": "open", "obs": [("TSH", "6.1 mIU/L", True)]},
                     {"term": "mesh:D014806", "showed": "B12 fine", "state": "closed", "obs": [("B12", "410 pg/mL", False)]},
                 ],
-                "ask": "Your periods need their own look — that is where the iron is going.",
+                "ask": "Periods are where the iron goes. They need their own look.",
             },
             {
                 "you": "I had my genome done last year.",
