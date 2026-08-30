@@ -11,7 +11,6 @@
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
 	import AeonLogo from '$lib/images/AeonLogo.svelte';
 	import { reveal } from '$lib/actions/reveal';
-	import { progress } from '$lib/actions/progress';
 	import { interactionState } from '$lib/stores/interaction';
 	import { stake } from '$lib/stores/stake';
 	import { glyphOf } from '$lib/data/implications';
@@ -51,8 +50,6 @@
 
 	let showContact = false;
 	let showUpdates = false;
-
-	let dishProgress = 0;
 
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
@@ -128,32 +125,12 @@
 		<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
 			A cause is earned on living cells. <em>Change something. Watch.</em>
 		</h2>
-		<figure class="diagram" use:reveal={{ delay: 140 }} use:progress={(p) => (dishProgress = p)}>
-			<InstrumentSection progress={dishProgress} stake={$stake?.question ?? null} />
+		<figure class="diagram" use:reveal={{ delay: 140 }}>
+			<InstrumentSection stake={$stake?.question ?? null} concern={$stake?.concern ?? null} />
 		</figure>
-		<dl class="facts" use:reveal>
-			<div>
-				<dt>registered</dt>
-				<dd>
-					each glass-bottom plate seats on its own datums; contact on the frame, never the glass
-				</dd>
-			</div>
-			<div>
-				<dt>incubated</dt>
-				<dd>four plates share one CO₂/RH domain, fed as a slow sheet, sensed at the return</dd>
-			</div>
-			<div>
-				<dt>observed</dt>
-				<dd>a moving head in the dry bay beneath; imaging first, Raman budgeted</dd>
-			</div>
-			<div>
-				<dt>generated</dt>
-				<dd>CAD, labware, and protocols from one parameter set, checksummed before motion</dd>
-			</div>
-		</dl>
 		<p class="status" use:reveal>
-			<span class="k">now</span> first fixture commissioned on an OT-2 · one-row coupon in revision
-			· CERN-OHL-S-2.0
+			<span class="k">now</span> first fixture printed, measured, camera-verified on an OT-2 ·
+			motion gated · one-row coupon CAD-complete, first print pending · CERN-OHL-S-2.0 + Apache-2.0
 			<a href={AEVUM_REPO} target="_blank" rel="noopener noreferrer">Aeon-Bio/aevum</a>
 		</p>
 	</div>
@@ -163,14 +140,14 @@
 <section id="return-section" class="level" aria-labelledby="return-heading">
 	<div class="content">
 		<h2 id="return-heading" use:reveal={{ delay: 60 }}>
-			What the dish earns climbs the same thread, <em>back to the one who asked.</em>
+			The answer <em>comes back up.</em>
 		</h2>
 		<p use:reveal={{ delay: 100 }}>
-			Belief goes down borrowed; it comes back watched. The next person to touch the same edge
-			stands on what the dish saw.
+			The edge went down as a guess from papers. It comes back as what the cells did — to the person
+			who asked, and to the next one with the same edge.
 		</p>
 		<p class="lede" use:reveal={{ delay: 140 }}>
-			Cure is the thread applied to a disease. Agelessness is the thread applied over time.
+			One edge is a test. Every edge a body runs on, over a life, is the point.
 		</p>
 
 		<div class="people" use:reveal>
@@ -194,8 +171,23 @@
 				</div>
 				<p class="role">CEO · cofounder</p>
 				<p>
-					Bioengineering, cognitive science, neuroscience at UC Santa Cruz. Genomic pipelines over
-					10,000+ genomes at Gladstone and AnswerALS. Designs the instrument and the gate.
+					Bioengineering, cognitive science, neuroscience at UC Santa Cruz.
+					<a
+						href="https://github.com/ejmockler/case-control-genomics"
+						target="_blank"
+						rel="noopener noreferrer">Variant discovery</a
+					>
+					across 10,000+ genomes at
+					<a href="https://gladstone.org" target="_blank" rel="noopener noreferrer">Gladstone</a>
+					and
+					<a href="https://www.answerals.org" target="_blank" rel="noopener noreferrer"
+						>Answer ALS</a
+					>. With the Gyori lab,
+					<a
+						href="https://github.com/gyorilab/indra-belief-model"
+						target="_blank"
+						rel="noopener noreferrer">the belief model</a
+					>: does the paper actually say this causes that.
 				</p>
 			</div>
 			<div class="person">
@@ -474,7 +466,7 @@
 		text-decoration-color: var(--aeon-biolum);
 	}
 
-	/* ---------- diagram / facts / status ---------- */
+	/* ---------- diagram / status ---------- */
 
 	.diagram {
 		margin: 0 0 2.5rem;
@@ -483,34 +475,6 @@
 		border-radius: 4px;
 		background: rgba(26, 27, 47, 0.55);
 		overflow-x: auto;
-	}
-
-	.facts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-		gap: 1.25rem 2rem;
-		margin: 0 0 2.5rem;
-	}
-
-	.facts > div {
-		border-top: 1px solid var(--ink-12);
-		padding-top: 0.7rem;
-	}
-
-	.facts dt {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--aeon-biolum);
-		margin-bottom: 0.4rem;
-	}
-
-	.facts dd {
-		margin: 0;
-		font-size: 0.98rem;
-		line-height: 1.5;
-		color: var(--ink-70);
 	}
 
 	.status {
