@@ -1,0 +1,1278 @@
+{
+ "generated": "2026-08-30",
+ "journeys": {
+  "tired": {
+   "dialogue": [
+    {
+     "who": "you",
+     "text": "I’m tired all the time.",
+     "grounds": [
+      {
+       "id": "MESH:D005221",
+       "label": "Fatigue",
+       "score": 0.762,
+       "said": "tired"
+      }
+     ],
+     "ungrounded": []
+    },
+    {
+     "who": "agent",
+     "text": "How do you sleep? And any bleeding — heavy periods, anything like that?"
+    },
+    {
+     "who": "you",
+     "text": "Badly. My partner says I snore. And yes, heavy.",
+     "grounds": [
+      {
+       "id": "MESH:D012913",
+       "label": "Snoring",
+       "score": 0.762,
+       "said": "snore"
+      },
+      {
+       "id": "MESH:D008595",
+       "label": "Menorrhagia",
+       "score": 0.54,
+       "said": "heavy"
+      }
+     ],
+     "ungrounded": [
+      "badly"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D005221",
+       "id": "MESH:D012891",
+       "label": "Sleep Apnea Syndromes",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9967,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D005221",
+       "id": "MESH:D010149",
+       "label": "Pain, Postoperative",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9891,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D005221",
+       "id": "MESH:D007035",
+       "label": "Hypothermia",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9875,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D005221",
+       "id": "MESH:D000138",
+       "label": "Acidosis",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9875,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D005221",
+       "id": "MESH:D000022",
+       "label": "Abortion, Spontaneous",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6634,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D000022",
+       "id": "MESH:D020521",
+       "label": "Stroke",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Do you eat much meat? And has your weight changed at all, without you meaning it to?"
+    },
+    {
+     "who": "you",
+     "text": "Not much meat. Gained, without changing anything.",
+     "grounds": [
+      {
+       "id": "MESH:D015430",
+       "label": "Weight Gain",
+       "score": 0.762,
+       "said": "gained"
+      }
+     ],
+     "ungrounded": [
+      "not much meat"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D012913",
+       "id": "MESH:D001049",
+       "label": "Apnea",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.1585,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012913",
+       "id": "MESH:D020181",
+       "label": "Sleep Apnea, Obstructive",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.4545,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D020181",
+       "id": "MESH:D050197",
+       "label": "Atherosclerosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9161,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008595",
+       "id": "MESH:D007037",
+       "label": "Hypothyroidism",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9445,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008595",
+       "id": "MESH:D062788",
+       "label": "Adenomyosis",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.7413,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008595",
+       "id": "MESH:D063766",
+       "label": "Pediatric Obesity",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6667,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008595",
+       "id": "MESH:D014777",
+       "label": "Virus Diseases",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008595",
+       "id": "MESH:D007246",
+       "label": "Infertility",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6936,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D007246",
+       "id": "MESH:D020521",
+       "label": "Stroke",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.1643,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "How long has this been going on?"
+    },
+    {
+     "who": "you",
+     "text": "More than a year.",
+     "grounds": [],
+     "ungrounded": [
+      "more than a year"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D017588",
+       "label": "Hyperandrogenism",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9619,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D006966",
+       "label": "Hyperprolactinemia",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9324,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D064806",
+       "label": "Dysbiosis",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9262,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D008106",
+       "label": "Liver Cirrhosis, Experimental",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D020257",
+       "label": "Ventricular Remodeling",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Two things you can start now, and they’re safe: walk, daily; less alcohol, if you drink. Before guessing further I’d want a TSH. Which of those is easiest for you?",
+     "thinks": "Exercise ⊣ Weight Gain 0.90, Exercise ⊣ Fatigue 0.49; Alcohol Drinking → Fatigue 0.76; TSH via TSHB (Hypothermia)"
+    }
+   ],
+   "deeper": [
+    {
+     "who": "you",
+     "text": "I wore a sleep tracker for a week.",
+     "brings": [
+      "wearable"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Your oxygen dips at night, and your sleep is broken up. I still want the blood.",
+     "thinks": "sleep apnea, obstructive: mk-0249 and orn-0829 hydrate, 47 indexed; Sleep Apnea Syndromes is now the most likely branch, 47 in a hundred"
+    },
+    {
+     "who": "you",
+     "text": "Got the blood panel back.",
+     "brings": [
+      "blood"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Ferritin 9, hemoglobin holding. TSH 6.1. B12 fine. Your periods need their own look — that is where the iron is going.",
+     "thinks": "anemia, iron-deficiency: ferric derisomaltose and ferric maltol, 33 indexed; hypothyroidism: thyroid and mecasermin, 10 indexed; vitamin b 12 deficiency: closed; Hypothyroidism is now the most likely branch, 100 in a hundred; vitamin b 12 deficiency is off the table"
+    },
+    {
+     "who": "you",
+     "text": "I had my genome done last year.",
+     "brings": [
+      "genome",
+      "methylation"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Nothing on IGSF1, so the TSH is one to trust. TMPRSS6 carries a variant — iron by mouth may not absorb. If the ferritin will not climb on the plate, it is an infusion conversation. Nothing here changes the sleep.",
+     "thinks": "hypothyroidism: thyroid and mecasermin, 10 indexed; anemia, iron-deficiency: ferric derisomaltose and ferric maltol, 33 indexed; Hypothyroidism is now the most likely branch, 100 in a hundred"
+    }
+   ],
+   "ledgers": [
+    {
+     "depth": "system",
+     "items": [
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "TSH"
+      }
+     ]
+    },
+    {
+     "depth": "blood",
+     "items": [
+      {
+       "do": "ferritin 9, hemoglobin holding"
+      },
+      {
+       "do": "TSH 6.1"
+      },
+      {
+       "do": "B12 fine — closed"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      }
+     ]
+    },
+    {
+     "depth": "genome",
+     "items": [
+      {
+       "do": "nothing on IGSF1, so the TSH is one to trust",
+       "was": "TSH 6.1"
+      },
+      {
+       "do": "TMPRSS6 carries a variant — iron by mouth may not absorb",
+       "was": "ferritin 9, hemoglobin holding"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      }
+     ]
+    },
+    {
+     "depth": "dish",
+     "items": [
+      {
+       "do": "how much of the fatigue is the apnea, and how much the iron"
+      }
+     ]
+    }
+   ]
+  },
+  "heart": {
+   "dialogue": [
+    {
+     "who": "you",
+     "text": "My father had a heart attack at 52.",
+     "grounds": [
+      {
+       "id": "MESH:D009203",
+       "label": "Myocardial Infarction",
+       "score": 0.556,
+       "said": "heart attack"
+      },
+      {
+       "id": "HP:0032318",
+       "label": "Family history of heart disease",
+       "score": 0.772,
+       "said": "my father"
+      }
+     ],
+     "ungrounded": []
+    },
+    {
+     "who": "agent",
+     "text": "Was that his only one? And anyone else on that side — strokes, stents, bypasses?"
+    },
+    {
+     "who": "you",
+     "text": "First and only. His brother had stents at 60. Me — I get winded on stairs now.",
+     "grounds": [
+      {
+       "id": "MESH:D004417",
+       "label": "Dyspnea",
+       "score": 0.762,
+       "said": "winded"
+      }
+     ],
+     "ungrounded": [
+      "stents"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D009203",
+       "id": "MESH:D063425",
+       "label": "Binge Drinking",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D009203",
+       "id": "MESH:D011236",
+       "label": "Prediabetic State",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D009203",
+       "id": "MESH:D006929",
+       "label": "Hyperaldosteronism",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D009203",
+       "id": "MESH:D004618",
+       "label": "Embolism, Air",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.8074,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D009203",
+       "id": "MESH:D007964",
+       "label": "Leukocytosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9474,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D007964",
+       "id": "MESH:D006333",
+       "label": "Heart Failure",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.4224,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Does the wind come with any tightness? And do you smoke, or did you?"
+    },
+    {
+     "who": "you",
+     "text": "No tightness. I smoked twenty years — quit five back. And a work physical once called my sugar borderline.",
+     "grounds": [
+      {
+       "id": "MESH:D012907",
+       "label": "Smoking",
+       "score": 0.762,
+       "said": "smoked"
+      },
+      {
+       "id": "MESH:D011236",
+       "label": "Prediabetic State",
+       "score": 0.556,
+       "said": "sugar borderline"
+      }
+     ],
+     "ungrounded": [
+      "no tightness"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D004417",
+       "id": "MESH:D006333",
+       "label": "Heart Failure",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.7751,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D004417",
+       "id": "MESH:D009765",
+       "label": "Obesity",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6235,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D004417",
+       "id": "MESH:D007889",
+       "label": "Leiomyoma",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.5882,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D004417",
+       "id": "MESH:D006973",
+       "label": "Hypertension",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.4391,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D004417",
+       "id": "MESH:D015430",
+       "label": "Weight Gain",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.1585,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D015430",
+       "id": "MESH:D020257",
+       "label": "Ventricular Remodeling",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "How do you sleep through all of this?"
+    },
+    {
+     "who": "you",
+     "text": "Five hours, most nights. Work runs hot.",
+     "grounds": [
+      {
+       "id": "MESH:D012892",
+       "label": "Sleep Deprivation",
+       "score": 0.762,
+       "said": "five hours"
+      }
+     ],
+     "ungrounded": [
+      "work runs hot"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D012907",
+       "id": "MESH:D000544",
+       "label": "Alzheimer Disease",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.585,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012907",
+       "id": "MESH:D012892",
+       "label": "Sleep Deprivation",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.5207,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012907",
+       "id": "MESH:D006333",
+       "label": "Heart Failure",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.2747,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012907",
+       "id": "MESH:D003704",
+       "label": "Dementia",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.2595,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012907",
+       "id": "MESH:D050197",
+       "label": "Atherosclerosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9324,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D050197",
+       "id": "MESH:D009389",
+       "label": "Neovascularization, Pathologic",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D011236",
+       "id": "MESH:D009765",
+       "label": "Obesity",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.4771,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D011236",
+       "id": "MESH:D015430",
+       "label": "Weight Gain",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.4545,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D011236",
+       "id": "MESH:D013927",
+       "label": "Thrombosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9342,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D013927",
+       "id": "MESH:D054070",
+       "label": "Postthrombotic Syndrome",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6788,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012892",
+       "id": "MESH:D000073397",
+       "label": "Occupational Stress",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.5367,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012892",
+       "id": "MESH:D059787",
+       "label": "Acute Pain",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.3846,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012892",
+       "id": "MESH:D001168",
+       "label": "Arthritis",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.275,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012892",
+       "id": "MESH:D000068376",
+       "label": "Compassion Fatigue",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.275,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D012892",
+       "id": "MESH:D006973",
+       "label": "Hypertension",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9969,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D006984",
+       "label": "Hypertrophy",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9907,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "A few things you can start now, and they’re safe: walk, daily; no smoking, if you do; less alcohol, if you drink; iron on the plate, not in a pill. Before guessing further I’d want a CRP, a cuff at home, a ferritin and a prothrombin. Have you ever had a lipid panel yourself?",
+     "thinks": "Exercise ⊣ Hypertension 0.95, Exercise ⊣ Obesity 0.93, Exercise ⊣ Myocardial Infarction 0.82, Exercise ⊣ Thrombosis 0.67, Exercise ⊣ Heart Failure 0.41; Smoking → Thrombosis 0.82, Smoking → Obesity 0.66, Smoking → Myocardial Infarction 0.47, Smoking → Hypertension 0.29; Alcohol Drinking → Hypertension 0.76, Alcohol Drinking → Obesity 0.73, Alcohol Drinking → Heart Failure 0.66, Alcohol Drinking → Sleep Deprivation 0.16; Meat → Hypertension 0.16; CRP via CRP (Heart Failure); a cuff at home via device (Hypertension); ferritin via FTL (Obesity); prothrombin via F2 (Hypertrophy)"
+    }
+   ],
+   "deeper": [
+    {
+     "who": "you",
+     "text": "I have a watch and a cuff.",
+     "brings": [
+      "wearable"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Resting rate and pressure fine. The short sleep is real — five hours twelve, most nights. The cuff clears the pressure; it says nothing about your cholesterol. Get the draw done.",
+     "thinks": "hypertension: closed; sleep deprivation: nothing indexed; Hypertrophy is now the most likely branch, 87 in a hundred; hypertension is off the table"
+    },
+    {
+     "who": "you",
+     "text": "Blood panel is back.",
+     "brings": [
+      "blood"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "ApoB 148, Lp(a) 120 — both high, in the way that runs in families. HbA1c 5.9 — the borderline was real. See your doctor this month.",
+     "thinks": "hypercholesterolemia: recaticimab and mipomersen sodium, 93 indexed; prediabetic state: bifidobacterium spp. and exenatide, 26 indexed; Hypercholesterolemia is now the most likely branch, 100 in a hundred"
+    },
+    {
+     "who": "you",
+     "text": "I sent off a genome.",
+     "brings": [
+      "genome",
+      "methylation"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "One copy of an LDLR variant: familial hypercholesterolemia. The lipids and the sugar are two different fights, and the variant only owns the first. Your children should be tested by the time they’re ten.",
+     "thinks": "hyperlipoproteinemia type ii: inclisiran sodium and mipomersen sodium, 33 indexed; Hypercholesterolemia is now the most likely branch, 100 in a hundred"
+    }
+   ],
+   "ledgers": [
+    {
+     "depth": "system",
+     "items": [
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      },
+      {
+       "do": "CRP"
+      },
+      {
+       "do": "a cuff at home"
+      },
+      {
+       "do": "ferritin"
+      },
+      {
+       "do": "prothrombin"
+      }
+     ]
+    },
+    {
+     "depth": "blood",
+     "items": [
+      {
+       "do": "ApoB 148, Lp(a) 120 — both high, in the way that runs in families"
+      },
+      {
+       "do": "HbA1c 5.9 — the borderline was real"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      }
+     ]
+    },
+    {
+     "depth": "genome",
+     "items": [
+      {
+       "do": "one copy of an LDLR variant: familial hypercholesterolemia"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      }
+     ]
+    },
+    {
+     "depth": "dish",
+     "items": [
+      {
+       "do": "how this LDLR variant handles PCSK9 inhibition in your cells"
+      }
+     ]
+    }
+   ]
+  },
+  "ninety": {
+   "dialogue": [
+    {
+     "who": "you",
+     "text": "I want to stay sharp at ninety.",
+     "grounds": [
+      {
+       "id": "HP:0025281",
+       "label": "Sharp",
+       "score": 0.762,
+       "said": "sharp"
+      }
+     ],
+     "ungrounded": []
+    },
+    {
+     "who": "agent",
+     "text": "Sharp how — memory, attention, mood?"
+    },
+    {
+     "who": "you",
+     "text": "I don’t want to lose my memory. My grandmother did, in her eighties.",
+     "grounds": [
+      {
+       "id": "MESH:D008569",
+       "label": "Memory Disorders",
+       "score": 0.549,
+       "said": "lose my memory"
+      },
+      {
+       "id": "MESH:D003704",
+       "label": "Dementia",
+       "score": 0.778,
+       "said": "lose my memory"
+      }
+     ],
+     "ungrounded": [
+      "my grandmother did"
+     ],
+     "lands": [
+      {
+       "from": "HP:0025281",
+       "id": "MESH:D014947",
+       "label": "Wounds and Injuries",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.1643,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D014947",
+       "id": "MESH:D013927",
+       "label": "Thrombosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.7969,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "How’s your hearing? Your blood pressure? Your sleep?"
+    },
+    {
+     "who": "you",
+     "text": "Hearing’s going. Pressure is “a bit high.” Sleep is fine.",
+     "grounds": [
+      {
+       "id": "MESH:D034381",
+       "label": "Hearing Loss",
+       "score": 0.778,
+       "said": "hearing’s going"
+      },
+      {
+       "id": "MESH:D006973",
+       "label": "Hypertension",
+       "score": 0.556,
+       "said": "a bit high"
+      }
+     ],
+     "ungrounded": [],
+     "lands": [
+      {
+       "from": "MESH:D008569",
+       "id": "MESH:D018352",
+       "label": "Coronavirus Infections",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008569",
+       "id": "MESH:D020521",
+       "label": "Stroke",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008569",
+       "id": "MESH:D001930",
+       "label": "Brain Injuries",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.5882,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008569",
+       "id": "MESH:D007037",
+       "label": "Hypothyroidism",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.5382,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D008569",
+       "id": "MESH:D003704",
+       "label": "Dementia",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.275,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D018908",
+       "label": "Muscle Weakness",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D015658",
+       "label": "HIV Infections",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9646,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D009084",
+       "label": "Mucopolysaccharidosis III",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9592,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D000073397",
+       "label": "Occupational Stress",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9342,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D058225",
+       "label": "Plaque, Amyloid",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9324,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D003704",
+       "id": "MESH:D018908",
+       "label": "Muscle Weakness",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D018908",
+       "id": "MESH:D006984",
+       "label": "Hypertrophy",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.1585,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "When your grandmother lost hers — was it gradual, or after something like a stroke?"
+    },
+    {
+     "who": "you",
+     "text": "Gradual, I think. Nobody ever said.",
+     "grounds": [],
+     "ungrounded": [
+      "gradual"
+     ],
+     "lands": [
+      {
+       "from": "MESH:D034381",
+       "id": "MESH:D007855",
+       "label": "Lead Poisoning",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9016,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D034381",
+       "id": "MESH:D000795",
+       "label": "Fabry Disease",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6406,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D034381",
+       "id": "MESH:D010034",
+       "label": "Otitis Media with Effusion",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6376,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D034381",
+       "id": "MESH:D010031",
+       "label": "Otitis",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.6148,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D034381",
+       "id": "MESH:D007247",
+       "label": "Infertility, Female",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.275,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D007247",
+       "id": "MESH:D013927",
+       "label": "Thrombosis",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.275,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D054559",
+       "label": "Hyperphosphatemia",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.998,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D012892",
+       "label": "Sleep Deprivation",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9969,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D001049",
+       "label": "Apnea",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9894,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D063425",
+       "label": "Binge Drinking",
+       "dir": "in",
+       "type": "Activation",
+       "belief": 0.9821,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006973",
+       "id": "MESH:D006984",
+       "label": "Hypertrophy",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.9907,
+       "kind": "disease"
+      },
+      {
+       "from": "MESH:D006984",
+       "id": "MESH:D064752",
+       "label": "Atrial Remodeling",
+       "dir": "out",
+       "type": "Activation",
+       "belief": 0.5482,
+       "kind": "disease"
+      }
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "A few things you can start now, and they’re safe: walk, daily; no smoking, if you do; less alcohol, if you drink; iron on the plate, not in a pill. Before guessing further I’d want a prothrombin, a CRP and a night’s recording. Would you get your hearing tested, and show me your pressure over a few weeks?",
+     "thinks": "Exercise ⊣ Hypertension 0.95, Exercise ⊣ Dementia 0.86, Exercise ⊣ Thrombosis 0.67; Smoking → Thrombosis 0.82, Smoking → Hypertension 0.29; Alcohol Drinking → Hypertension 0.76, Alcohol Drinking → Sleep Deprivation 0.16; Meat → Hypertension 0.16; prothrombin via F2 (Hypertrophy); CRP via CRP (Thrombosis); a night’s recording via device (Sleep Deprivation)"
+    }
+   ],
+   "deeper": [
+    {
+     "who": "you",
+     "text": "I’ve been wearing a tracker.",
+     "brings": [
+      "wearable"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Sleep really is fine; you don’t move much. Thirty minutes of walking a day is the strongest thing on this list.",
+     "thinks": "sleep deprivation: closed; Thrombosis is now the most likely branch, 74 in a hundred; sleep deprivation is off the table"
+    },
+    {
+     "who": "you",
+     "text": "Blood panel.",
+     "brings": [
+      "blood"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "Your home readings are high enough to treat. There is a blood test for the amyloid side now — p-tau — if you want to know.",
+     "thinks": "hypertension: losartan potassium and sparsentan, 247 indexed; Thrombosis is now the most likely branch, 73 in a hundred"
+    },
+    {
+     "who": "you",
+     "text": "Genome and a methylation clock.",
+     "brings": [
+      "genome",
+      "methylation"
+     ]
+    },
+    {
+     "who": "agent",
+     "text": "One copy of APOE ε4; the clock runs three years fast. Neither changes what to do this year. It changes how much it matters.",
+     "thinks": "alzheimer disease: estrogen and flutemetamol, 272 indexed; Alzheimer Disease is now the most likely branch, 100 in a hundred"
+    }
+   ],
+   "ledgers": [
+    {
+     "depth": "system",
+     "items": [
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      },
+      {
+       "do": "prothrombin"
+      },
+      {
+       "do": "CRP"
+      },
+      {
+       "do": "a night’s recording"
+      }
+     ]
+    },
+    {
+     "depth": "blood",
+     "items": [
+      {
+       "do": "your home readings are high enough to treat"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      }
+     ]
+    },
+    {
+     "depth": "genome",
+     "items": [
+      {
+       "do": "one copy of APOE ε4; the clock runs three years fast"
+      },
+      {
+       "do": "walk, daily"
+      },
+      {
+       "do": "no smoking, if you do"
+      },
+      {
+       "do": "less alcohol, if you drink"
+      },
+      {
+       "do": "iron on the plate, not in a pill"
+      }
+     ]
+    },
+    {
+     "depth": "dish",
+     "items": [
+      {
+       "do": "whether your ε4 neurons clear amyloid under the drugs on offer"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { gridActivity } from '../stores/grid';
-	import { scrollTracker, currentSection, scrollProgress } from '../stores/scroll';
+	import { scrollTracker, scrollProgress } from '../stores/scroll';
 	import {
 		detectDeviceCapabilities,
 		getQualitySettings,
@@ -40,7 +40,6 @@
 		scrollOffset: number;
 		baseY: number;
 		baseX: number;
-		sectionAffinity: string;
 	}
 
 	// Reference width for scaling
@@ -59,11 +58,11 @@
 	$: focusPoint = $gridActivity.focusPoint;
 	$: systemActivity = $gridActivity.activity;
 	$: scrollPosition = $scrollTracker;
-	$: currentSectionId = $currentSection;
 	$: pageProgress = $scrollProgress;
 
-	// Section-specific configurations
-	type SectionConfig = {
+	// Palette and motion along the page, keyed by scroll progress
+	type StopConfig = {
+		progress: number;
 		particleColor: [number, number, number];
 		connectionColor: [number, number, number];
 		clusterStrength: number;
@@ -71,66 +70,47 @@
 		parallaxIntensity: number;
 	};
 
-	const sectionConfigs: Record<string, SectionConfig> = {
-		'hero-section': {
+	const stops: StopConfig[] = [
+		{
+			progress: 0,
 			particleColor: [76, 201, 240],
 			connectionColor: [76, 201, 240],
 			clusterStrength: 0.3,
 			energyMultiplier: 1.0,
 			parallaxIntensity: 0.5
 		},
-		'problem-section': {
-			particleColor: [240, 76, 120],
-			connectionColor: [240, 76, 120],
-			clusterStrength: 0.6,
-			energyMultiplier: 1.2,
-			parallaxIntensity: 0.7
+		{
+			progress: 0.12,
+			particleColor: [76, 201, 240],
+			connectionColor: [76, 201, 240],
+			clusterStrength: 0.25,
+			energyMultiplier: 0.7,
+			parallaxIntensity: 0.3
 		},
-		'approach-section': {
+		{
+			progress: 0.3,
 			particleColor: [128, 255, 219],
 			connectionColor: [128, 255, 219],
-			clusterStrength: 0.4,
+			clusterStrength: 0.45,
 			energyMultiplier: 0.8,
 			parallaxIntensity: 0.3
 		},
-		'applications-section': {
+		{
+			progress: 0.62,
 			particleColor: [76, 201, 240],
 			connectionColor: [76, 201, 240],
 			clusterStrength: 0.5,
-			energyMultiplier: 1.1,
-			parallaxIntensity: 0.6
+			energyMultiplier: 0.8,
+			parallaxIntensity: 0.3
 		},
-		'partnership-section': {
-			particleColor: [180, 76, 240],
-			connectionColor: [180, 76, 240],
-			clusterStrength: 0.7,
-			energyMultiplier: 1.3,
-			parallaxIntensity: 0.4
-		},
-		'science-section': {
-			particleColor: [76, 240, 180],
-			connectionColor: [76, 240, 180],
+		{
+			progress: 1,
+			particleColor: [128, 255, 219],
+			connectionColor: [128, 255, 219],
 			clusterStrength: 0.3,
-			energyMultiplier: 0.9,
-			parallaxIntensity: 0.8
-		},
-		'closing-cta-section': {
-			particleColor: [255, 200, 76],
-			connectionColor: [255, 200, 76],
-			clusterStrength: 0.4,
-			energyMultiplier: 1.0,
-			parallaxIntensity: 0.5
+			energyMultiplier: 0.7,
+			parallaxIntensity: 0.4
 		}
-	};
-
-	const sectionColorStops = [
-		{ id: 'hero-section', progress: 0 },
-		{ id: 'problem-section', progress: 0.07 },
-		{ id: 'approach-section', progress: 0.22 },
-		{ id: 'applications-section', progress: 0.37 },
-		{ id: 'partnership-section', progress: 0.55 },
-		{ id: 'science-section', progress: 0.75 },
-		{ id: 'closing-cta-section', progress: 1 }
 	];
 
 	const CONNECTION_DISTANCE = 200;
@@ -154,12 +134,11 @@
 	const PARALLAX_MULTIPLIER = 0.3; // How much scroll affects particles
 	const DEPTH_PARALLAX_RANGE = [0.1, 2.0]; // Speed range for different depth layers
 
-	const DEFAULT_SECTION = 'hero-section';
 	const COLOR_BLEND_RATE = 0.18;
 	const COLOR_EASE_POWER = 0.55;
 	const REDSHIFT_INTENSITY = 0.85; // How aggressively we shift toward red
-	let blendedParticleColor = [...sectionConfigs[DEFAULT_SECTION].particleColor];
-	let blendedConnectionColor = [...sectionConfigs[DEFAULT_SECTION].connectionColor];
+	let blendedParticleColor = [...stops[0].particleColor];
+	let blendedConnectionColor = [...stops[0].connectionColor];
 
 	let dpr: number;
 	let animationFrame: number;
@@ -220,10 +199,6 @@
 			DEPTH_PARALLAX_RANGE[0] +
 			(DEPTH_PARALLAX_RANGE[1] - DEPTH_PARALLAX_RANGE[0]) * (depthLayer / 5);
 
-		// Assign section affinity
-		const sections = Object.keys(sectionConfigs);
-		const sectionAffinity = sections[Math.floor(Math.random() * sections.length)];
-
 		let attempts = 0;
 		let x, y;
 
@@ -267,7 +242,6 @@
 			scrollOffset: 0,
 			baseY: y,
 			baseX: x,
-			sectionAffinity,
 			active: true,
 			id: index
 		};
@@ -284,8 +258,7 @@
 
 	function updateParticles(dt: number): Particle[] {
 		const bounds = getWorldSpaceBounds();
-		const currentConfig =
-			sectionConfigs[currentSectionId ?? DEFAULT_SECTION] ?? sectionConfigs[DEFAULT_SECTION];
+		const currentConfig = stopAt(pageProgress ?? 0).lower;
 		const scrollY = scrollPosition.y || 0;
 		const activeParticles: Particle[] = [];
 
@@ -294,12 +267,6 @@
 			if (p.fadeIn <= 0) return;
 
 			activeParticles.push(p);
-
-			if (p.sectionAffinity === currentSectionId) {
-				p.energy = Math.min(1, p.energy + 0.02 * dt);
-			} else {
-				p.energy *= 0.98;
-			}
 		});
 
 		spatialGrid.clear();
@@ -318,7 +285,7 @@
 			minClusterSize: MIN_CLUSTER_SIZE,
 			baseAlignmentStrength: BASE_ALIGNMENT_STRENGTH,
 			energyAlignmentBoost: ENERGY_ALIGNMENT_BOOST,
-			randomMotionMagnitude: 0.05 * (currentConfig?.energyMultiplier ?? 1),
+			randomMotionMagnitude: 0.05 * currentConfig.energyMultiplier,
 			bounds,
 			focusPoint,
 			systemActivity,
@@ -331,10 +298,9 @@
 		spatialGrid.clear();
 		activeParticles.forEach((p) => spatialGrid.insert(p));
 
-		if (currentConfig && focusPoint) {
-			const clusterStrength = currentConfig.clusterStrength ?? 0.3;
+		if (focusPoint) {
+			const clusterStrength = currentConfig.clusterStrength;
 			activeParticles.forEach((p) => {
-				if (p.sectionAffinity !== currentSectionId) return;
 				const dx = focusPoint.x - p.x;
 				const dy = focusPoint.y - p.y;
 				const dist = Math.hypot(dx, dy) || 1;
@@ -344,37 +310,33 @@
 			});
 		}
 
-		const parallaxBase = scrollY * PARALLAX_MULTIPLIER;
+		const parallaxBase = scrollY * PARALLAX_MULTIPLIER * currentConfig.parallaxIntensity;
 		activeParticles.forEach((p) => {
-			const affinityConfig = sectionConfigs[p.sectionAffinity] ?? currentConfig;
-			const intensity = affinityConfig?.parallaxIntensity ?? 0.5;
-			p.scrollOffset = parallaxBase * p.parallaxSpeed * intensity;
+			p.scrollOffset = parallaxBase * p.parallaxSpeed;
 		});
 
 		return activeParticles;
 	}
 
-	function getCurrentSectionColor() {
-		const progress = clamp(pageProgress ?? 0, 0, 1);
-		let lowerStop = sectionColorStops[0];
-		let upperStop = sectionColorStops[sectionColorStops.length - 1];
-
-		for (let i = 0; i < sectionColorStops.length - 1; i++) {
-			const current = sectionColorStops[i];
-			const next = sectionColorStops[i + 1];
-			if (progress >= current.progress && progress <= next.progress) {
-				lowerStop = current;
-				upperStop = next;
+	function stopAt(raw: number) {
+		const progress = clamp(raw, 0, 1);
+		let lower = stops[0];
+		let upper = stops[stops.length - 1];
+		for (let i = 0; i < stops.length - 1; i++) {
+			if (progress >= stops[i].progress && progress <= stops[i + 1].progress) {
+				lower = stops[i];
+				upper = stops[i + 1];
 				break;
 			}
 		}
+		const range = Math.max(upper.progress - lower.progress, 0.0001);
+		const t = clamp((progress - lower.progress) / range, 0, 1);
+		return { lower, upper, t };
+	}
 
-		const range = Math.max(upperStop.progress - lowerStop.progress, 0.0001);
-		const tRaw = clamp((progress - lowerStop.progress) / range, 0, 1);
+	function getCurrentColor() {
+		const { lower: lowerConfig, upper: upperConfig, t: tRaw } = stopAt(pageProgress ?? 0);
 		const t = Math.pow(tRaw, COLOR_EASE_POWER);
-
-		const lowerConfig = sectionConfigs[lowerStop.id] ?? sectionConfigs[DEFAULT_SECTION];
-		const upperConfig = sectionConfigs[upperStop.id] ?? sectionConfigs[DEFAULT_SECTION];
 
 		const targetParticleColor = lowerConfig.particleColor.map((value, idx) =>
 			lerp(value, upperConfig.particleColor[idx], t)
@@ -443,7 +405,7 @@
 
 		// Draw frame
 		ctx.clearRect(0, 0, width, height);
-		const baseColors = getCurrentSectionColor();
+		const baseColors = getCurrentColor();
 
 		// Apply cosmological redshift overlay
 		const colors = {
@@ -536,11 +498,7 @@
 			const projected = projectToGrid(p.x, renderY);
 			const opacity = p.opacity * p.fadeIn;
 
-			// Enhanced opacity for particles matching current section
-			const sectionBoost = p.sectionAffinity === currentSectionId ? 1.3 : 1.0;
-			const finalOpacity = Math.min(1, opacity * sectionBoost);
-
-			const particleColor = rgbaColor(colors.particle, finalOpacity);
+			const particleColor = rgbaColor(colors.particle, opacity);
 
 			ctx.beginPath();
 			ctx.arc(
@@ -555,36 +513,6 @@
 		});
 
 		requestAnimationFrame(tick);
-	}
-
-	// Listen for section animation events to coordinate particle behavior
-	let sectionAnimationIntensity = 0;
-
-	function handleSectionActivated(event: Event) {
-		const customEvent = event as CustomEvent;
-		const { backgroundEffect } = customEvent.detail;
-
-		if (backgroundEffect === 'particle-drift') {
-			// Enhance particle drift during section activation
-			sectionAnimationIntensity = 1.0;
-
-			// Gradually fade intensity
-			const fadeInterval = setInterval(() => {
-				sectionAnimationIntensity *= 0.95;
-				if (sectionAnimationIntensity < 0.01) {
-					sectionAnimationIntensity = 0;
-					clearInterval(fadeInterval);
-				}
-			}, 50);
-		}
-	}
-
-	function handleSectionDeactivated(event: Event) {
-		const customEvent = event as CustomEvent;
-		const { backgroundEffect } = customEvent.detail;
-		if (backgroundEffect === 'particle-drift') {
-			sectionAnimationIntensity *= 0.8;
-		}
 	}
 
 	onMount(() => {
@@ -617,21 +545,10 @@
 			.fill(null)
 			.map((_, i) => createParticle(i));
 
-		// Listen for section animation events
-		window.addEventListener('section-activated', handleSectionActivated as EventListener);
-		window.addEventListener('section-deactivated', handleSectionDeactivated as EventListener);
-
 		animationFrame = requestAnimationFrame(tick);
 
 		return () => {
 			cancelAnimationFrame(animationFrame);
-			if (typeof window !== 'undefined') {
-				window.removeEventListener('section-activated', handleSectionActivated as EventListener);
-				window.removeEventListener(
-					'section-deactivated',
-					handleSectionDeactivated as EventListener
-				);
-			}
 			if (ctx && canvas) {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 			}
