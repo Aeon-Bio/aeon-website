@@ -391,7 +391,7 @@
 		<g class="bay">
 			<rect x="120" y="236" width="640" height="116" />
 			<path d="M140,300 H740" class="corridor" />
-			<text x="750" y="258" class="label" text-anchor="end">dry inverted bay · 80 mm</text>
+			<text x="750" y="252" class="label" text-anchor="end">dry inverted bay · 80 mm</text>
 			<!-- the dock plane: mechanical authority hands off to the gantry here -->
 			<path d="M136,334 H760" class="dock" />
 			<text x="750" y="346" class="label" text-anchor="end">dock plane · heads swap here</text>
@@ -412,8 +412,13 @@
 			<path d="M368,280 V246" />
 			<circle cx="368" cy="244" r="4" />
 			<path d="M368,244 V214" class="beam" class:on={beam} />
-			<!-- named beside the stem, clear of the dock-plane label beneath -->
-			<text x="378" y="272" class="label">observer · {HEADS[head].name}</text>
+			<!-- named beside the stem, on whichever side has room; clear of the labels above and below -->
+			<text
+				x={$obsX > 440 ? 358 : 378}
+				y="274"
+				class="label"
+				text-anchor={$obsX > 440 ? 'end' : 'start'}>observer · {HEADS[head].name}</text
+			>
 		</g>
 
 		<g class="tiles">
