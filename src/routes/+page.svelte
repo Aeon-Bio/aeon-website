@@ -20,6 +20,8 @@
 
 	const HARNESS_REPO = 'https://github.com/Aeon-Bio/ot2-harness';
 	const AEVUM_REPO = 'https://github.com/Aeon-Bio/aevum';
+	/** the write-to-us block, hidden for now */
+	const SHOW_CONTACT = false;
 
 	function handleContainerHover(event: CustomEvent) {
 		interactionState.update((s) => ({
@@ -215,13 +217,15 @@
 			</div>
 		</div>
 
-		<div class="contact" use:reveal>
-			<p>If you run a wet lab, or hold perturbation data, write.</p>
-			<div class="cta-group left">
-				<button class="cta-primary" on:click={() => (showContact = true)}>Write to us</button>
-				<button class="cta-secondary" on:click={() => (showUpdates = true)}>Follow</button>
+		{#if SHOW_CONTACT}
+			<div class="contact" use:reveal>
+				<p>If you run a wet lab, or hold perturbation data, write.</p>
+				<div class="cta-group left">
+					<button class="cta-primary" on:click={() => (showContact = true)}>Write to us</button>
+					<button class="cta-secondary" on:click={() => (showUpdates = true)}>Follow</button>
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 </section>
 
