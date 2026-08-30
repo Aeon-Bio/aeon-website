@@ -16,7 +16,7 @@
 	import { glyphOf } from '$lib/data/implications';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Linkedin, Github, ArrowDown } from 'lucide-svelte';
+	import { Linkedin, Github, GraduationCap, ArrowDown } from 'lucide-svelte';
 
 	const HARNESS_REPO = 'https://github.com/Aeon-Bio/ot2-harness';
 	const AEVUM_REPO = 'https://github.com/Aeon-Bio/aevum';
@@ -139,16 +139,7 @@
 <!-- 03 · return -->
 <section id="return-section" class="level" aria-labelledby="return-heading">
 	<div class="content">
-		<h2 id="return-heading" use:reveal={{ delay: 60 }}>
-			The answer <em>comes back up.</em>
-		</h2>
-		<p use:reveal={{ delay: 100 }}>
-			The edge went down as a guess from papers. It comes back as what the cells did — to the person
-			who asked, and to the next one with the same edge.
-		</p>
-		<p class="lede" use:reveal={{ delay: 140 }}>
-			One edge is a test. Every edge a body runs on, over a life, is the point.
-		</p>
+		<h2 id="return-heading" use:reveal={{ delay: 60 }}>Founders</h2>
 
 		<div class="people" use:reveal>
 			<div class="person">
@@ -166,6 +157,13 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label="Eric Jing Mockler on GitHub"><Github size={16} strokeWidth={1.8} /></a
+						>
+						<a
+							href="https://scholar.google.com/citations?user=ONHY9lsAAAAJ&hl=en"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Eric Jing Mockler on Google Scholar"
+							><GraduationCap size={16} strokeWidth={1.8} /></a
 						>
 					</span>
 				</div>
@@ -199,6 +197,13 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label="Karen Sachs on LinkedIn"><Linkedin size={16} strokeWidth={1.8} /></a
+						>
+						<a
+							href="https://scholar.google.com/citations?user=lS0tvhoAAAAJ&hl=en"
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label="Karen Sachs on Google Scholar"
+							><GraduationCap size={16} strokeWidth={1.8} /></a
 						>
 					</span>
 				</div>
