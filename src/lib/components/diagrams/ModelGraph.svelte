@@ -4,8 +4,7 @@
   The person's phrases sit in a line — the sentence. One is in focus: everything
   the model ties to it is drawn around it (causes above by depth, consequences
   below, the medications that can cause it, its observations with the person's
-  values), the pathways those terms share beneath as mechanism, and under the
-  sentence the question the agent would ask to narrow this branch. Clicking a
+  values), and the pathways those terms share beneath as mechanism. Clicking a
   phrase, or the arrow keys, turn the focus; the page scrolls freely over the
   drawing. Nodes that persist glide,
   nodes that leave fade, edges redraw. Fill is posterior; a halo is an
@@ -128,7 +127,6 @@
 	let focusIndex = 0;
 	$: focusIndex = Math.min(focusIndex, Math.max(0, said.length - 1));
 	$: focus = said[focusIndex];
-	$: asks = (cur.asks ?? []).filter((a) => a.for === focus?.id);
 
 	// the neighbourhood: everything a factor ties to the focus, plus observations beneath those
 	$: hood = (() => {
@@ -183,8 +181,7 @@
 		let y = 44;
 		for (const l of levels) {
 			out[l] = y;
-			y +=
-				(l === 0 ? 124 + (asks.length ? 30 : 0) : 96) + (maxObsAt[l] ? 34 + maxObsAt[l] * OBS : 0);
+			y += (l === 0 ? 124 : 96) + (maxObsAt[l] ? 34 + maxObsAt[l] * OBS : 0);
 		}
 		return { out, end: y };
 	})();
@@ -196,7 +193,7 @@
 			out[l] = y;
 			const row = l === 0 ? said : hood.vars.filter((n) => (n.level ?? 1) === l);
 			for (const n of row) y += ROW + (obsUnder[n.id]?.length ?? 0) * OBS;
-			y += 42 + (l === 0 && asks.length ? 40 : 0);
+			y += 42;
 		}
 		return { out, end: y };
 	})();
@@ -468,7 +465,6 @@
 		focusIndex = next;
 		clearHold();
 		hoverEdge = null;
-		hoverAsk = null;
 		hoverImp = null;
 		return true;
 	}
@@ -649,8 +645,6 @@
 		? []
 		: (medicationExamples[hot.startsWith('DRUGS:') ? hot : 'DRUGS:' + hot] ?? []);
 
-	// ---- the asks: each question is an unfinished edge, reaching for its node ----
-	let hoverAsk: Ask | null = null;
 	let hoverImp: Implication | null = null;
 	/** dwell on an implication chip opens its papers sheet; grace timers carry the trip */
 	let impDwell = false;
@@ -684,28 +678,10 @@
 		dwell = true;
 		attention.set({ kind: 'term', id: n.id, from: 'graph' });
 	}
-	/** which pending question probes which node */
-	$: askByAbout = new Map(asks.map((a) => [a.about, a] as const));
-	/** the question on show: the one probing the attended node, else the strongest */
-	$: activeAsk = (hot && askByAbout.get(hot)) || asks[0] || null;
-	/** a dashed thread from the question's words up into the node it would fill */
-	function askThread(a: Ask) {
-		const b = pos[drawId(a.about)];
-		if (!b || !focus) return '';
-		const x0 = saidX(focus);
-		const y0 = rowY.out[0] + 64 + 17 + 10;
-		// Finish beneath the painted core. Because nodes render after this path,
-		// the final dash disappears into the circle instead of hanging by its label.
-		const y1 = b.y;
-		const dy = (y1 - y0) * 0.5;
-		return `M${x0},${y0} C${x0},${y0 + dy} ${b.x},${y1 - dy} ${b.x},${y1}`;
-	}
 	const labelOf = (id: string) => nodeOf[id]?.label ?? id;
 	/** how the agent would follow up on this node — always its next real move,
 	 *  never a number about the person */
 	function followUp(n: MNode): string {
-		const ask = askByAbout.get(n.id);
-		if (ask) return `would ask “${ask.text}”`;
 		if (n.id.startsWith('DRUGS:'))
 			return `would ask what you take — ${knownIn(n.label)} known to cause this`;
 		if (n.state === 'pruned') return 'would let this go — the data ruled it down';
@@ -813,23 +789,6 @@
 					/>
 				{/each}
 			</g>
-
-			<!-- the pending question, reaching for the node it would fill -->
-			{#if !narrow && activeAsk}
-				{#key activeAsk.about}
-					<path
-						d={askThread(activeAsk)}
-						class="askthread"
-						class:dim={(hot && hot !== activeAsk.about && hot !== focus?.id) ||
-							!!hoverEdge ||
-							!!aim ||
-							!!hoverImp}
-						on:mouseenter={() => (hoverAsk = activeAsk)}
-						on:mouseleave={() => (hoverAsk = null)}
-						role="presentation"
-					/>
-				{/key}
-			{/if}
 		{/key}
 
 		<!-- row names -->
@@ -890,19 +849,6 @@
 			</g>
 		{/each}
 
-		<!-- the question that narrows this branch, under the sentence -->
-		{#key (focus?.id ?? '') + (activeAsk?.about ?? '')}
-			{#each activeAsk ? [activeAsk] : [] as a (a.about)}
-				<text
-					x={narrow ? NX + 16 : saidX(focus)}
-					y={narrow ? groupY.out[0] + 12 + said.length * ROW + 25 : rowY.out[0] + 81}
-					text-anchor={narrow ? 'start' : 'middle'}
-					class="ask"
-					class:dim={!!aim || !!hoverImp}>{a.text}</text
-				>
-			{/each}
-		{/key}
-
 		<!-- the neighbourhood -->
 		{#each hood.vars.filter((n) => !n.said) as n (n.id)}
 			{@const p = pos[n.id]}
@@ -942,11 +888,6 @@
 						r="13.5"
 						class="impring"
 						class:inh={hoverImp.type === 'Inhibition'}
-					/>{/if}
-				{#if askByAbout.has(n.id)}<circle
-						r="10"
-						class="slot"
-						class:live={activeAsk?.about === n.id}
 					/>{/if}
 				{#if n.state === 'observed'}<circle r="11" class="halo" />{/if}
 				<circle r={3.2 + n.p * 4.5} class="core" style:fill-opacity={0.15 + n.p * 0.85} />
@@ -1194,9 +1135,6 @@
 						: 'the gene presses this branch'} · belief {hoverImp.belief} · {hoverImp.evidence}
 					{hoverImp.evidence === 1 ? 'paper' : 'papers'} · INDRA</span
 				>
-			{:else if hoverAsk}
-				“{hoverAsk.text}”
-				<span class="m">probing {labelOf(hoverAsk.about)}</span>
 			{:else if hoverEdge}
 				{#if hoverEdge.type === 'Observation'}
 					<span class="k">observation</span>{labelOf(hoverEdge.target)}
@@ -1333,55 +1271,6 @@
 	@keyframes draw {
 		to {
 			stroke-dashoffset: 0;
-		}
-	}
-
-	/* the pending question: an unfinished edge, dashes drifting toward the node it would fill */
-	.askthread {
-		fill: none;
-		stroke: var(--aeon-biolum);
-		stroke-width: 0.9;
-		stroke-dasharray: 3 5.5;
-		opacity: 0.5;
-		pointer-events: stroke;
-		cursor: help;
-		animation:
-			drift 1.5s linear infinite,
-			settle 640ms var(--ease-out) both;
-		transition: opacity var(--t-move) var(--ease-out);
-	}
-
-	.askthread.dim {
-		opacity: 0.07;
-	}
-
-	@keyframes drift {
-		to {
-			stroke-dashoffset: -8.5;
-		}
-	}
-
-	/* the open slot a question is reaching for: dashes circling until an answer lands */
-	.slot {
-		fill: none;
-		stroke: var(--aeon-biolum);
-		stroke-width: 1;
-		stroke-dasharray: 2.6 4.2;
-		opacity: 0.3;
-		transform-box: fill-box;
-		transform-origin: center;
-		animation: circling 9s linear infinite;
-		transition: opacity var(--t-move) var(--ease-out);
-	}
-
-	.slot.live {
-		opacity: 0.85;
-		animation-duration: 5s;
-	}
-
-	@keyframes circling {
-		to {
-			transform: rotate(360deg);
 		}
 	}
 
@@ -1539,8 +1428,7 @@
 	.ig,
 	.ib,
 	.dg,
-	.rowk,
-	.ask {
+	.rowk {
 		paint-order: stroke;
 		stroke: var(--aeon-deep-space);
 		stroke-width: 6px;
@@ -1581,19 +1469,6 @@
 
 	.narrow .v.said.focus .tl {
 		font-size: 22px;
-	}
-
-	/* the agent's narrowing question */
-	.ask {
-		font-family: var(--font-display);
-		font-style: italic;
-		font-size: 15px;
-		fill: var(--ink-70);
-		animation: settle 640ms var(--ease-out) 300ms both;
-	}
-
-	.ask.dim {
-		opacity: 0.15;
 	}
 
 	.o .mark {
@@ -1692,6 +1567,12 @@
 
 	.imp.lit .ig {
 		fill: var(--ink-100);
+	}
+
+	@keyframes circling {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	/* the relation's landing: a ring circling the term it speaks about */
@@ -2031,15 +1912,12 @@
 		.halo,
 		.v,
 		.o,
-		.pw,
-		.ask {
+		.pw {
 			animation: none;
 			stroke-dashoffset: 0;
 			opacity: 1;
 			transform: none;
 		}
-		.askthread,
-		.slot,
 		.actring,
 		.probering,
 		.impring,
