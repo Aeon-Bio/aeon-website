@@ -67,6 +67,8 @@
 	const data = concerns as Concern[];
 
 	let index = 0;
+	/** the glyph that cycles to another concern — hidden for now, one narrative only */
+	const SHOW_REFRESH = false;
 	let seenDialogue = -1; // furthest dialogue exchange revealed
 	let seenDeeper = -1; // furthest deeper exchange revealed
 	let systemSeen = false;
@@ -204,7 +206,7 @@
 			<div class="msg {m.who}">
 				<span class="who">{m.who === 'you' ? 'you' : 'agent'}</span>
 				<span class="text"
-					>{m.text}{#if i === 0}
+					>{m.text}{#if i === 0 && SHOW_REFRESH}
 						<button
 							class="refresh"
 							on:click={refresh}
