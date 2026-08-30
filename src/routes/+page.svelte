@@ -9,7 +9,6 @@
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import ConcernCanvas from '$lib/components/ConcernCanvas.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
-	import ControlStack from '$lib/components/diagrams/ControlStack.svelte';
 	import AeonLogo from '$lib/images/AeonLogo.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { progress } from '$lib/actions/progress';
@@ -54,7 +53,6 @@
 	let showUpdates = false;
 
 	let dishProgress = 0;
-	let gateProgress = 0;
 
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
@@ -161,28 +159,7 @@
 	</div>
 </section>
 
-<!-- 03 · gate -->
-<section id="gate-section" class="level" aria-labelledby="gate-heading">
-	<div class="content">
-		<h2 id="gate-heading" use:reveal={{ delay: 60 }}>
-			Nothing moves <em>until the evidence says it can.</em>
-		</h2>
-		<div use:reveal={{ delay: 140 }} use:progress={(p) => (gateProgress = p)}>
-			<ControlStack progress={gateProgress} />
-		</div>
-		<p class="chain" use:reveal aria-label="Evidence chain">
-			<span>source</span><span class="arrow">→</span><span>packet</span><span class="arrow">→</span
-			><span>claim</span><span class="arrow">→</span><span>gate</span><span class="arrow">→</span
-			><span>readiness</span>
-		</p>
-		<p class="status" use:reveal>
-			<span class="k">now</span> core · CLI · daemon · allow-listed MCP · Apache-2.0
-			<a href={HARNESS_REPO} target="_blank" rel="noopener noreferrer">Aeon-Bio/ot2-harness</a>
-		</p>
-	</div>
-</section>
-
-<!-- 04 · return -->
+<!-- 03 · return -->
 <section id="return-section" class="level" aria-labelledby="return-heading">
 	<div class="content">
 		<h2 id="return-heading" use:reveal={{ delay: 60 }}>
