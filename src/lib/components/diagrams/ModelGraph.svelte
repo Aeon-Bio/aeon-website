@@ -204,7 +204,7 @@
 	$: SH = narrow
 		? gy0 + 12 + shownImps.length * ROW + 24
 		: shownImps.length
-			? gy0 + 66
+			? gy0 + 66 + impTiers * IMP_TIER
 			: PY + (hoodPathways.length ? 96 : 8);
 	const spread = (i: number, n: number, lo: number, hi: number) =>
 		n <= 1 ? (lo + hi) / 2 : lo + (i * (hi - lo)) / (n - 1);
@@ -312,14 +312,37 @@
 		? pw0 + 12 + hoodPathways.length * ROW + (hoodPathways.length ? 18 : 0)
 		: PY + (hoodPathways.length ? 96 : 6);
 	const impKey = (im: Implication) => im.gene + im.id + im.type;
-	$: impPos = Object.fromEntries(
-		shownImps.map((im, i) => [
-			impKey(im),
-			narrow
-				? { x: NX, y: gy0 + 12 + i * ROW }
-				: { x: spread(i, shownImps.length, 250, SW - 90), y: gy0 + 26 }
-		])
-	);
+	/** a chip's half-width in the mono face (12.5px Fira Mono ≈ 7.5px per glyph) */
+	const impHalf = (im: Implication) => (impText(im).length * 7.5) / 2;
+	/** the drop between staggered baselines: one two-line chip plus breathing room */
+	const IMP_TIER = 40;
+	const IMP_GAP = 18;
+	/** wide layout: chips spread evenly, but one that would run into the last chip
+	 *  on its baseline steps down to the next, so no label clips its neighbour */
+	$: impLayout = (() => {
+		const pos: Record<string, { x: number; y: number }> = {};
+		if (narrow) {
+			shownImps.forEach((im, i) => (pos[impKey(im)] = { x: NX, y: gy0 + 12 + i * ROW }));
+			return { pos, tiers: 0 };
+		}
+		const right: number[] = [];
+		let tiers = 0;
+		shownImps.forEach((im, i) => {
+			const x = spread(i, shownImps.length, 250, SW - 90);
+			const hw = impHalf(im);
+			let t = right.findIndex((r) => x - hw >= r + IMP_GAP);
+			if (t < 0) {
+				if (right.length < 3) t = right.length;
+				else t = right.indexOf(Math.min(...right));
+			}
+			right[t] = x + hw;
+			tiers = Math.max(tiers, t);
+			pos[impKey(im)] = { x, y: gy0 + 26 + t * IMP_TIER };
+		});
+		return { pos, tiers };
+	})();
+	$: impPos = impLayout.pos;
+	$: impTiers = impLayout.tiers;
 	function impThread(im: Implication) {
 		const a = pos[im.id];
 		const b = impPos[impKey(im)];
