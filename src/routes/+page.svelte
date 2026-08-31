@@ -399,10 +399,11 @@
 
 	/* ---------- levels ---------- */
 
+	/* opaque below the hero: the particle field belongs to the hero, not a haze under everything */
 	.level {
+		position: relative;
 		padding: clamp(5rem, 12vh, 9rem) 2rem;
-		background: rgba(26, 27, 47, 0.84);
-		backdrop-filter: blur(10px);
+		background: var(--aeon-deep-space);
 		border-top: 1px solid var(--ink-12);
 		scroll-margin-top: 0;
 	}

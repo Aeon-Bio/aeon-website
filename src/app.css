@@ -1,8 +1,10 @@
-@import '@fontsource/fira-mono';
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-serif/400-italic.css';
-@import '@fontsource-variable/newsreader/opsz.css';
-@import '@fontsource-variable/newsreader/opsz-italic.css';
+@import '@fontsource-variable/josefin-sans';
+@import '@fontsource-variable/josefin-sans/wght-italic.css';
+@import '@fontsource-variable/dm-sans/opsz.css';
+@import '@fontsource-variable/dm-sans/opsz-italic.css';
+@import '@fontsource/dm-mono/400.css';
+@import '@fontsource/dm-mono/400-italic.css';
+@import '@fontsource/dm-mono/500.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,9 +33,10 @@
 	--aeon-interactive-hover: rgba(128, 255, 219, 0.3);
 
 	/* Typography */
-	--font-display: 'Instrument Serif', 'Newsreader Variable', Georgia, serif;
-	--font-body: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
-	--font-mono: 'Fira Mono', ui-monospace, Menlo, monospace;
+	/* Josefin is the poster on top (display only; tiny x-height, so never for reading). DM Sans and DM Mono are one family: the person reads in one, the instrument speaks in the other. */
+	--font-display: 'Josefin Sans Variable', 'Futura', 'Helvetica Neue', sans-serif;
+	--font-body: 'DM Sans Variable', 'Helvetica Neue', Arial, sans-serif;
+	--font-mono: 'DM Mono', ui-monospace, Menlo, monospace;
 	--font-primary: var(--font-body);
 
 	/* Timing */
@@ -66,7 +69,6 @@ body {
 	background: var(--aeon-deep-space);
 	color: var(--ink-100);
 	font-family: var(--font-body);
-	font-variation-settings: 'opsz' 16;
 	overflow-y: auto;
 	overflow-x: hidden;
 	min-height: 100vh;
@@ -74,12 +76,12 @@ body {
 }
 
 h1,
-h2,
-p {
-	font-weight: 400;
+h2 {
+	font-weight: 300;
 }
 
 p {
+	font-weight: 400;
 	line-height: 1.5;
 }
 
