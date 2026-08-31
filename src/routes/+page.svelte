@@ -18,7 +18,7 @@
 	import { fade } from 'svelte/transition';
 	import { Linkedin, Github, GraduationCap, ArrowDown } from 'lucide-svelte';
 
-	const HARNESS_REPO = 'https://github.com/Aeon-Bio/ot2-harness';
+	const GITHUB_ORG = 'https://github.com/Aeon-Bio';
 	const AEVUM_REPO = 'https://github.com/Aeon-Bio/aevum';
 	/** the write-to-us block, hidden for now */
 	const SHOW_CONTACT = false;
@@ -88,7 +88,7 @@
 					<span>Descend</span>
 					<ArrowDown size={16} strokeWidth={2} aria-hidden="true" />
 				</a>
-				<a class="cta-secondary" href={HARNESS_REPO} target="_blank" rel="noopener noreferrer">
+				<a class="cta-secondary" href={GITHUB_ORG} target="_blank" rel="noopener noreferrer">
 					<Github size={16} strokeWidth={1.8} aria-hidden="true" />
 					<span>Source</span>
 				</a>
@@ -448,7 +448,6 @@
 		color: var(--ink-70);
 		max-width: 58ch;
 		margin: 0 0 1rem;
-		font-variation-settings: 'opsz' 18;
 	}
 
 	.level p.lede {
@@ -531,6 +530,7 @@
 	}
 
 	.chain.stake .q {
+		font-family: var(--font-body);
 		font-style: italic;
 		color: var(--ink-100);
 		border-color: var(--ink-30);
