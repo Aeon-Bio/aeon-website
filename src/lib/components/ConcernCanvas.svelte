@@ -16,6 +16,7 @@
 	import { culmination } from '$lib/data/culmination';
 	import { implications as geneImplications, glyphOf } from '$lib/data/implications';
 	import { stake } from '$lib/stores/stake';
+	import { attention } from '$lib/stores/attention';
 	import AttractorPlane from '$lib/components/diagrams/AttractorPlane.svelte';
 	import ModelGraph, { type MDepth } from '$lib/components/diagrams/ModelGraph.svelte';
 
@@ -90,9 +91,23 @@
 		if (brings.includes('wearable')) return 1;
 		return 0;
 	}
-	$: attractorPhase = journey.deeper
-		.slice(0, seenDeeper + 1)
-		.reduce((phase, message) => Math.max(phase, passOf(message.brings ?? [])), 0);
+	// the strand behind the dialogue takes its form from where data lands on the page,
+	// and brightens where the term the reader is attending to entered the conversation
+	let dialogueEls: HTMLElement[] = [];
+	let deeperEls: HTMLElement[] = [];
+	$: landings = journey.deeper
+		.map((m, i) => ({ m, i }))
+		.filter(({ m }) => m.brings?.length)
+		.map(({ m, i }) => ({ el: deeperEls[i], phase: passOf(m.brings ?? []), seen: i <= seenDeeper }))
+		.filter((l) => !!l.el);
+	$: spot = (() => {
+		const a = $attention;
+		if (!a || a.kind !== 'term') return null;
+		const i = journey.dialogue.findIndex(
+			(m) => m.grounds?.some((g) => g.id === a.id) || m.lands?.some((l) => l.id === a.id)
+		);
+		return i >= 0 ? (dialogueEls[i] ?? null) : null;
+	})();
 	$: indexed = Object.fromEntries(bodyNodes.map((n) => [n.id, n.interventions?.count ?? 0]));
 	$: treatments = Object.fromEntries(
 		bodyNodes
@@ -196,12 +211,13 @@
 </script>
 
 <div class="canvas">
-	<AttractorPlane phase={attractorPhase} />
+	<AttractorPlane {landings} {spot} />
 	{#snippet turn(m: Message, i: number, offers: Step[] = [])}
 		<div
 			class="exchange"
 			class:seen={i <= seenDialogue}
 			use:seen={() => (seenDialogue = Math.max(seenDialogue, i))}
+			bind:this={dialogueEls[i]}
 		>
 			<div class="msg {m.who}">
 				<span class="who">{m.who === 'you' ? 'you' : 'agent'}</span>
@@ -341,6 +357,7 @@
 						class="exchange"
 						class:seen={i <= seenDeeper}
 						use:seen={() => (seenDeeper = Math.max(seenDeeper, i))}
+						bind:this={deeperEls[i]}
 					>
 						<div class="msg {m.who}">
 							<span class="who">{m.who === 'you' ? 'you' : 'agent'}</span>
