@@ -510,9 +510,12 @@
 <style>
 	.attractor {
 		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
+		/* bleeds past the dialogue on every side: a mote pulled to the edge is never cut
+		   mid-body. the opaque sections around paint over the bleed where it shouldn't show */
+		inset: -140px -120px;
+		/* a canvas is a replaced element: `auto` would fall back to its intrinsic size */
+		width: calc(100% + 240px);
+		height: calc(100% + 280px);
 		pointer-events: none;
 		z-index: 0;
 		/* the only ground beneath the dialogue — and ground, so it stays behind the type */
