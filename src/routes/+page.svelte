@@ -211,8 +211,28 @@
 				</div>
 				<p class="role">CSO/CTO · cofounder</p>
 				<p>
-					MIT PhD, biological engineering. Stanford Medicine postdoc. Causal networks from
-					single-cell perturbation data; Science Breakthrough of the Year runner-up. 60+ papers.
+					<a href="https://be.mit.edu" target="_blank" rel="noopener noreferrer"
+						>MIT PhD, biological engineering</a
+					>.
+					<a href="https://med.stanford.edu" target="_blank" rel="noopener noreferrer"
+						>Stanford Medicine</a
+					>
+					postdoc.
+					<a
+						href="https://doi.org/10.1126/science.1105809"
+						target="_blank"
+						rel="noopener noreferrer">Causal networks from single-cell perturbation data</a
+					>;
+					<a
+						href="https://doi.org/10.1126/science.310.5756.1878"
+						target="_blank"
+						rel="noopener noreferrer">Science Breakthrough of the Year runner-up</a
+					>.
+					<a
+						href="https://scholar.google.com/citations?user=lS0tvhoAAAAJ&hl=en"
+						target="_blank"
+						rel="noopener noreferrer">60+ papers</a
+					>.
 				</p>
 			</div>
 		</div>
