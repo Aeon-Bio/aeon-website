@@ -386,6 +386,8 @@
 			const d = (y - spotYNow) / sigma;
 			return glowNow * Math.exp(-d * d);
 		};
+		// the strand dissolves at the canvas's ends rather than being cut on a line
+		const edge = (y: number) => Math.max(0, Math.min(1, y / 140, (height - y) / 280));
 
 		// the form itself is never drawn: it is only where the inhabitants go. anything
 		// static — a dot, or a junction where faint lines meet — would read as a frozen
@@ -402,7 +404,8 @@
 				const boost = lit((a.y + b.y) / 2);
 				const h = hueNow[Math.min(N - 1, Math.round((a.rank + b.rank) / 2))];
 				// ground, not figure: faint enough to sit behind the type; the glow lifts it where attention points
-				const alpha = Math.pow(1 - distance / reach, 2) * (0.12 + boost * 0.3);
+				const alpha =
+					Math.pow(1 - distance / reach, 2) * (0.12 + boost * 0.3) * edge((a.y + b.y) / 2);
 				ctx.strokeStyle = `rgba(${rgb(h)}, ${alpha})`;
 				ctx.beginPath();
 				ctx.moveTo(a.x, a.y);
@@ -413,7 +416,7 @@
 		for (const m of motes) {
 			const boost = lit(m.y);
 			const h = hueNow[Math.min(N - 1, Math.max(0, Math.round(m.rank)))];
-			ctx.fillStyle = `rgba(${rgb(h)}, ${0.1 + m.weight * 0.07 + boost * 0.4})`;
+			ctx.fillStyle = `rgba(${rgb(h)}, ${(0.1 + m.weight * 0.07 + boost * 0.4) * edge(m.y)})`;
 			ctx.beginPath();
 			ctx.arc(m.x, m.y, 0.7 + m.weight * 0.5 + boost * 1.2, 0, Math.PI * 2);
 			ctx.fill();
