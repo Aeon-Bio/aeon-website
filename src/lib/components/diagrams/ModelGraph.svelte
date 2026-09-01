@@ -208,6 +208,11 @@
 			: PY + (hoodPathways.length ? 96 : 8);
 	const spread = (i: number, n: number, lo: number, hi: number) =>
 		n <= 1 ? (lo + hi) / 2 : lo + (i * (hi - lo)) / (n - 1);
+	/** a row name's half-width in the display face (19px Josefin ≈ 9.2px per glyph) */
+	const labelHalf = (n: MNode) => (n.label.length * 9.2) / 2;
+	/** the drop between a row's tiers, and the air kept between neighbouring names */
+	const TIER = 34;
+	const LABEL_GAP = 16;
 	const byP = (a: MNode, b: MNode) => b.p - a.p || a.label.localeCompare(b.label);
 	function saidX(n: MNode | undefined) {
 		if (!n) return SW / 2;
@@ -249,12 +254,18 @@
 			} else {
 				const span = Math.min(SW - 340, 150 * Math.max(1, row.length - 1));
 				const cx = Math.min(Math.max(saidX(focus), 250 + span / 2), SW - 90 - span / 2);
+				// a node whose name would run into the last name on its tier steps down a
+				// tier, dot and name together, so no label clips its neighbour
+				const right: number[] = [];
 				row.forEach((n, i) => {
 					const x = spread(i, row.length, cx - span / 2, cx + span / 2);
-					out[n.id] = { x, y: rowY.out[l] };
-					(obsUnder[n.id] ?? []).forEach(
-						(o, k) => (out[o.id] = { x, y: rowY.out[l] + 52 + k * OBS })
-					);
+					const hw = labelHalf(n);
+					let t = right.findIndex((r) => x - hw >= r + LABEL_GAP);
+					if (t < 0) t = right.length < 3 ? right.length : right.indexOf(Math.min(...right));
+					right[t] = x + hw;
+					const y = rowY.out[l] + t * TIER;
+					out[n.id] = { x, y };
+					(obsUnder[n.id] ?? []).forEach((o, k) => (out[o.id] = { x, y: y + 52 + k * OBS }));
 				});
 			}
 		}
@@ -288,15 +299,6 @@
 		return { x: x0, y: top, w: x1 - x0, h: bottom - top };
 	}
 
-	$: rowSlot = (() => {
-		const out: Record<string, { i: number; n: number }> = {};
-		for (const l of levels) {
-			if (l === 0) continue;
-			const row = hood.vars.filter((n) => (n.level ?? 1) === l).sort(byP);
-			row.forEach((n, i) => (out[n.id] = { i, n: row.length }));
-		}
-		return out;
-	})();
 	// wide: alternate pathways step down a tier so their names never collide — the
 	// whole node steps, dot and name together, so every tie lands on its own dot
 	$: pwPos = Object.fromEntries(
@@ -919,8 +921,7 @@
 				{#if narrow}
 					<text x="16" y="5" class="tl">{shownLabel}</text>
 				{:else}
-					{@const up = rowSlot[n.id]?.n > 6 && rowSlot[n.id]?.i % 2 === 1 ? 19 : 0}
-					<text y={-15 - up} text-anchor="middle" class="tl">{shownLabel}</text>
+					<text y="-15" text-anchor="middle" class="tl">{shownLabel}</text>
 				{/if}
 				{#if n.id.startsWith('DRUGS:') && activeMeds.length && !narrow}
 					{#key drugLabelFor}
