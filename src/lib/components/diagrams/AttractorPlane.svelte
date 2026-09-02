@@ -18,6 +18,8 @@
 	export let landings: { el: HTMLElement; phase: number; seen: boolean }[] = [];
 	/** the exchange the reader's attention points at, if any */
 	export let spot: HTMLElement | null = null;
+	/** the dialogue's exchanges: where the page grows between them, the strand grows in place */
+	export let anchors: HTMLElement[] = [];
 
 	type Point = { x: number; y: number };
 	type Regime = { a: number; b: number; c: number; d: number };
@@ -131,17 +133,67 @@
 		}));
 	}
 
-	let builtW = 0;
-	let builtH = 0;
+	/** the width and height the strand is laid out for */
+	let laidW = 0;
+	let laidH = 0;
+	/**
+	 * the strand's height, unit → page px: a polyline, straight until the page grows
+	 * between two exchanges (a frame opening), where it stretches in place instead of
+	 * restretching the whole strand over the new height
+	 */
+	let knots: { u: number; y: number }[] = [];
+	/** the strand overshoots the canvas a little at both ends, so it is not seen to start or stop */
+	const OVER = 0.035;
+	function seatKnots(h: number) {
+		knots = [
+			{ u: 0, y: -OVER * h },
+			{ u: 1, y: (1 + OVER) * h }
+		];
+	}
+	/** page y of a unit height along the strand */
+	function Y(u: number) {
+		if (u <= knots[0].u) return knots[0].y;
+		for (let i = 1; i < knots.length; i++) {
+			if (u <= knots[i].u) {
+				const a = knots[i - 1];
+				const b = knots[i];
+				return a.y + ((b.y - a.y) * (u - a.u)) / Math.max(1e-6, b.u - a.u);
+			}
+		}
+		return knots[knots.length - 1].y;
+	}
+	/** unit height along the strand of a page y */
+	function U(y: number) {
+		if (y <= knots[0].y) return knots[0].u;
+		for (let i = 1; i < knots.length; i++) {
+			if (y <= knots[i].y) {
+				const a = knots[i - 1];
+				const b = knots[i];
+				return a.u + ((b.u - a.u) * (y - a.y)) / Math.max(1e-6, b.y - a.y);
+			}
+		}
+		return knots[knots.length - 1].u;
+	}
+	/** where each anchor sat at the last layout, px from the canvas top */
+	let tops = new Map<HTMLElement, number>();
+	function measure() {
+		const now = new Map<HTMLElement, number>();
+		if (!canvas) return now;
+		const top = canvas.getBoundingClientRect().top;
+		for (const el of anchors) if (el) now.set(el, el.getBoundingClientRect().top - top);
+		return now;
+	}
+
+	/** the strand's density: N points and the inhabitants, for the height at hand */
 	function build() {
 		const scale = Math.max(1, Math.min(5, height / 900));
 		const prev = current;
 		const prevHue = hueNow;
+		const prevN = N;
 		N = Math.round(240 * scale);
 		forms = regimes.map((r) => strandOf(r, N));
-		if (prev.length > 1 && builtW && builtH && !reduced) {
+		if (prev.length > 1 && !reduced) {
 			// carry the strand across the rebuild by rank, so it glides to its new form
-			// instead of snapping when a frame opening grows the canvas
 			const at = (r: number) => (r * (prev.length - 1)) / Math.max(1, N - 1);
 			current = Array.from({ length: N }, (_, r) => {
 				const t = at(r);
@@ -149,44 +201,33 @@
 				const f = t - i;
 				const a = prev[i];
 				const b = prev[Math.min(prev.length - 1, i + 1)];
-				return {
-					x: ((a.x + (b.x - a.x) * f) * width) / builtW,
-					y: ((a.y + (b.y - a.y) * f) * height) / builtH
-				};
+				return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
 			});
 			hueNow = Array.from({ length: N }, (_, r) => {
 				const t = at(r);
 				const i = Math.floor(t);
 				return prevHue[i] + (prevHue[Math.min(prevHue.length - 1, i + 1)] - prevHue[i]) * (t - i);
 			});
-			// the inhabitants come along too, keeping their place along the strand
-			const fw = width / builtW;
-			const fh = height / builtH;
-			const fr = (N - 1) / Math.max(1, prev.length - 1);
-			for (const m of motes) {
-				m.x *= fw;
-				m.y *= fh;
-				m.rank *= fr;
-			}
-			builtW = width;
-			builtH = height;
+			// the inhabitants keep their place along the strand
+			const fr = (N - 1) / Math.max(1, prevN - 1);
+			for (const m of motes) m.rank *= fr;
 			retarget(false);
 		} else {
-			builtW = width;
-			builtH = height;
 			retarget(true);
 		}
-		if (motes.length !== Math.round(220 * scale)) people(scale);
+		populate();
 	}
 
-	/** seat the motes along the strand, spread by rank, each with its own pace */
-	function people(scale: number) {
-		const count = Math.round(220 * scale);
-		const rand = random(0xbe11);
-		motes = Array.from({ length: count }, (_, i) => {
-			const rank = ((i + rand() * 0.8) * (N - 1)) / count;
+	/** seat motes along the strand between two unit heights, spread by rank, each with its own pace */
+	function seatMotes(count: number, uLo = 0, uHi = 1) {
+		if (count <= 0 || !N) return;
+		const rand = random(0xbe11 + motes.length);
+		const rLo = uLo * (N - 1);
+		const rHi = uHi * (N - 1);
+		for (let i = 0; i < count; i++) {
+			const rank = rLo + ((i + rand() * 0.8) / count) * (rHi - rLo);
 			const seat = current[Math.min(N - 1, Math.round(rank))] ?? { x: 0, y: 0 };
-			return {
+			motes.push({
 				x: seat.x + (rand() - 0.5) * 24,
 				y: seat.y + (rand() - 0.5) * 18,
 				vx: 0,
@@ -197,19 +238,22 @@
 				turb: 0,
 				// more run near the warp than at the selvedge
 				side: (rand() + rand() - 1) * 1.15
-			};
-		});
+			});
+		}
+	}
+
+	/** as many inhabitants as the height asks for: top up along the whole strand, or trim */
+	function populate() {
+		const want = Math.round(220 * Math.max(1, Math.min(5, height / 900)));
+		if (motes.length > want) motes.length = want;
+		else seatMotes(want - motes.length);
 	}
 
 	/** the band the strand occupies: a fabric's breadth down the left of the canvas */
-	function place(point: Point): Point {
+	function placeX(x: number) {
 		const narrow = width <= 720;
-		const across = (point.x + 1) * 0.5;
-		const down = (point.y + 1) * 0.5;
-		return {
-			x: width * ((narrow ? 0.04 : 0.03) + across * (narrow ? 0.9 : 0.27)),
-			y: height * (-0.035 + down * 1.07)
-		};
+		const across = (x + 1) * 0.5;
+		return width * ((narrow ? 0.04 : 0.03) + across * (narrow ? 0.9 : 0.27));
 	}
 
 	const smooth = (t: number) => {
@@ -217,42 +261,43 @@
 		return c * c * (3 - 2 * c);
 	};
 
-	/** where each seen landing sits on the canvas, as a fraction of its height */
+	/** where each seen landing sits along the strand, as a unit height */
 	function landingBands() {
 		if (!canvas) return [];
 		const top = canvas.getBoundingClientRect().top;
 		return landings
 			.filter((l) => l.seen && l.el)
 			.map((l) => ({
-				f: (l.el.getBoundingClientRect().top - top) / Math.max(1, height),
+				u: U(l.el.getBoundingClientRect().top - top),
 				phase: Math.max(0, Math.min(regimes.length - 1, l.phase))
 			}))
-			.sort((a, b) => a.f - b.f);
+			.sort((a, b) => a.u - b.u);
 	}
 
 	/** the strand's target form: regime 0 at the top, blending into each landing's regime below it */
-	/** the landings in effect, for inspection */
+	/** the landings in effect, and the strand's height map, for inspection */
 	let bandsNow = '';
+	let knotsNow = '';
 	function retarget(snap = false) {
 		if (!N || !width || !height) return;
 		const bands = landingBands();
-		bandsNow = bands.map((b) => `${b.phase}@${b.f.toFixed(2)}`).join(' ');
+		bandsNow = bands.map((b) => `${b.phase}@${b.u.toFixed(2)}`).join(' ');
+		knotsNow = knots.map((k) => `${k.u.toFixed(3)}:${Math.round(k.y)}`).join(' ');
 		// half the height of the band over which one regime becomes the next: wide enough
 		// that the handoff reads as the strand bending, not stepping
 		const HALF = 0.06;
 		target = new Array(N);
 		hue = new Array(N);
 		for (let r = 0; r < N; r++) {
-			const f = -0.035 + (r / Math.max(1, N - 1)) * 1.07;
-			let p = forms[0][r];
+			const u = r / Math.max(1, N - 1);
+			let x = forms[0][r].x;
 			let h = 0;
 			for (const b of bands) {
-				const s = smooth((f - (b.f - HALF)) / (2 * HALF));
-				const q = forms[b.phase][r];
-				p = { x: p.x + (q.x - p.x) * s, y: p.y + (q.y - p.y) * s };
+				const s = smooth((u - (b.u - HALF)) / (2 * HALF));
+				x += (forms[b.phase][r].x - x) * s;
 				h += (b.phase / (regimes.length - 1) - h) * s;
 			}
-			target[r] = place(p);
+			target[r] = { x: placeX(x), y: Y(u) };
 			hue[r] = h;
 		}
 		if (snap || reduced || current.length !== N) {
@@ -280,20 +325,110 @@
 		run();
 	}
 
+	/**
+	 * where the page grew, if it grew as one opening between the anchors (a frame
+	 * settling in): the old y of the cut. null when it grew some other way.
+	 */
+	function cutAt(now: Map<HTMLElement, number>, delta: number): number | null {
+		if (delta < 24) return null;
+		const known = [...now.keys()]
+			.filter((el) => tops.has(el))
+			.sort((p, q) => (tops.get(p) ?? 0) - (tops.get(q) ?? 0));
+		if (known.length < 2) return null;
+		// an exchange mid-reveal is translating a little; that is not the page growing
+		const SLACK = 24;
+		let cut: number | null = null;
+		for (const el of known) {
+			const moved = (now.get(el) ?? 0) - (tops.get(el) ?? 0);
+			if (cut === null && Math.abs(moved) <= SLACK) continue;
+			if (Math.abs(moved - delta) > SLACK) return null;
+			cut ??= tops.get(el) ?? null;
+		}
+		return cut;
+	}
+
+	/** the strand and its inhabitants scaled with the canvas, as one figure */
+	function rescale(fw: number, fh: number) {
+		for (const k of knots) k.y *= fh;
+		for (const c of current) {
+			c.x *= fw;
+			c.y *= fh;
+		}
+		for (const m of motes) {
+			m.x *= fw;
+			m.y *= fh;
+		}
+		spotY *= fh;
+		spotYNow *= fh;
+	}
+
+	/**
+	 * the page grew by `delta` at `y0` — a frame opened. the strand keeps its place
+	 * above, stretches a little across the opening, and moves down with the dialogue
+	 * below, in the same instant the page itself reflowed. nothing streams.
+	 */
+	function grow(y0: number, delta: number) {
+		const S = Math.max(120, delta * 1.5);
+		const a = Math.max(Y(0), Math.min(y0, Y(1) - S));
+		const ua = U(a);
+		const ub = U(a + S);
+		const was = Array.from({ length: N }, (_, r) => Y(r / Math.max(1, N - 1)));
+		const spotU = U(spotY);
+		const spotUNow = U(spotYNow);
+		knots = [
+			...knots.filter((k) => k.u < ua),
+			{ u: ua, y: a },
+			{ u: ub, y: a + S + delta },
+			...knots.filter((k) => k.u > ub).map((k) => ({ u: k.u, y: k.y + delta }))
+		];
+		const dy = was.map((y, r) => Y(r / Math.max(1, N - 1)) - y);
+		for (let r = 0; r < N; r++) current[r].y += dy[r];
+		for (const m of motes) m.y += dy[Math.min(N - 1, Math.max(0, Math.round(m.rank)))];
+		spotY = Y(spotU);
+		spotYNow = Y(spotUNow);
+		// the new ground is peopled at the density the rest of the strand has
+		seatMotes(Math.round((motes.length * delta) / Math.max(1, Y(1) - Y(0))), ua, ub);
+		retarget(false);
+	}
+
 	function resize() {
 		if (!canvas || !context) return;
 		const rect = canvas.getBoundingClientRect();
 		if (rect.width < 2 || rect.height < 2) return;
-		const grown = height ? Math.abs(rect.height - height) / height : 1;
+		const now = measure();
+		const delta = rect.height - laidH;
+		const cut = N ? cutAt(now, delta) : null;
+		tops = now;
 		width = rect.width;
 		height = rect.height;
 		const dpr = Math.min(window.devicePixelRatio || 1, 2);
 		canvas.width = Math.round(width * dpr);
 		canvas.height = Math.round(height * dpr);
 		context.setTransform(dpr, 0, 0, dpr, 0, 0);
-		// grown by much (a frame opened): re-density; otherwise just re-place
-		if (grown > 0.2 || !N) build();
-		else retarget(true);
+		if (!N) {
+			seatKnots(height);
+			laidW = width;
+			laidH = height;
+			build();
+			return;
+		}
+		const fw = width / laidW;
+		if (cut !== null) {
+			// a frame opened: grow in place
+			if (fw !== 1) rescale(fw, 1);
+			laidW = width;
+			laidH = height;
+			grow(cut, delta);
+			return;
+		}
+		// grown some other way (the window, another concern): the whole figure scales;
+		// by much, and it is re-densified too
+		const grown = Math.abs(delta) / laidH;
+		rescale(fw, height / laidH);
+		laidW = width;
+		laidH = height;
+		if (grown > 0.2) build();
+		else retarget(false);
 	}
 
 	/** how far a tie reaches: enough to cross the weave, so the fabric stays joined */
@@ -328,14 +463,16 @@
 
 	/** the inhabitants: run down the strand, pulled by the pointer, eased by the spring */
 	function flow(dt: number) {
-		if (!N) return;
-		const pxPerRank = (height * 1.07) / Math.max(1, N - 1);
+		if (!N || target.length !== N) return;
 		const seconds = (dt * 16.67) / 1000;
 		// the pointer's reach scales with the page; its pull at the centre stays as it was
 		const R2 = Math.max(33, width * 0.05) ** 2;
 		const G = (6.2 * R2) / 1100;
 		for (const m of motes) {
 			const r = Math.min(N - 1, Math.max(0, Math.round(m.rank)));
+			// the current runs at its pace in px, so it is no quicker where the strand is stretched
+			const next = Math.min(N - 1, r + 1);
+			const pxPerRank = Math.max(0.5, target[next].y - target[next - 1].y);
 			// quicker below each landing: the deeper the regime, the faster the current
 			m.rank += (FLOW * (1 + hueNow[r] * 0.6) * m.pace * seconds) / pxPerRank;
 			if (m.rank > N - 1) {
@@ -455,6 +592,8 @@
 
 	$: if (mounted && landings) retarget();
 	$: if (mounted) aim(spot);
+	// the anchors are known before the page grows between them
+	$: if (mounted && anchors) tops = measure();
 
 	onMount(() => {
 		context = canvas.getContext('2d');
@@ -507,6 +646,7 @@
 	class="attractor"
 	data-landings={landings.length}
 	data-bands={bandsNow}
+	data-knots={knotsNow}
 	aria-hidden="true"
 ></canvas>
 

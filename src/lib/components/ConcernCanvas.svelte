@@ -95,6 +95,9 @@
 	// and brightens where the term the reader is attending to entered the conversation
 	let dialogueEls: HTMLElement[] = [];
 	let deeperEls: HTMLElement[] = [];
+	let stakeEl: HTMLElement | null = null;
+	/** every exchange, so the strand can tell where the page grows when a frame opens between them */
+	$: anchors = [...dialogueEls, ...deeperEls, stakeEl].filter((el): el is HTMLElement => !!el);
 	$: landings = journey.deeper
 		.map((m, i) => ({ m, i }))
 		.filter(({ m }) => m.brings?.length)
@@ -211,7 +214,7 @@
 </script>
 
 <div class="canvas">
-	<AttractorPlane {landings} {spot} />
+	<AttractorPlane {landings} {spot} {anchors} />
 	{#snippet turn(m: Message, i: number, offers: Step[] = [])}
 		<div
 			class="exchange"
@@ -396,7 +399,7 @@
 					</div>
 				{/if}
 				<section class="dialogue stake-line">
-					<div class="exchange" class:seen={dishSeen} use:seen={stakeDish}>
+					<div class="exchange" class:seen={dishSeen} use:seen={stakeDish} bind:this={stakeEl}>
 						<div class="msg stake">
 							<span class="who">the dish</span>
 							<span class="text">{dishItem.do}</span>
