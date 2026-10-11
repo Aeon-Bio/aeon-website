@@ -1,139 +1,123 @@
 <script lang="ts">
-	import GridSystem from '$lib/components/GridSystem.svelte';
-	import ScrollDrivenParticleField from '$lib/components/ScrollDrivenParticleField.svelte';
-	import EnergyFlow from '$lib/components/EnergyFlow.svelte';
-	import MolecularContainer from '$lib/components/MolecularContainer.svelte';
-	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import PartnershipInquiry from '$lib/components/forms/PartnershipInquiry.svelte';
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
-	import ConcernCanvas from '$lib/components/ConcernCanvas.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
-	import AeonLogo from '$lib/images/AeonLogo.svelte';
-	import { reveal } from '$lib/actions/reveal';
+	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
+	import ScrollDrivenParticleField from '$lib/components/ScrollDrivenParticleField.svelte';
+	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { interactionState } from '$lib/stores/interaction';
-	import { stake } from '$lib/stores/stake';
-	import { glyphOf } from '$lib/data/implications';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Linkedin, Github, GraduationCap, ArrowDown } from 'lucide-svelte';
+	import { reveal } from '$lib/actions/reveal';
+	import { Linkedin, Github, GraduationCap } from 'lucide-svelte';
 
-	const GITHUB_ORG = 'https://github.com/Aeon-Bio';
-	const AEVUM_REPO = 'https://github.com/Aeon-Bio/aevum';
-	/** the write-to-us block, hidden for now */
-	const SHOW_CONTACT = false;
-
-	function handleContainerHover(event: CustomEvent) {
-		interactionState.update((s) => ({
-			...s,
-			hoveredElement: event.detail.element,
-			systemActivity: 0.8
-		}));
-	}
-
-	function handleContainerLeave() {
-		interactionState.update((s) => ({ ...s, hoveredElement: null, systemActivity: 0 }));
-	}
-
-	let isResizing = false;
-	let resizeTimer: ReturnType<typeof setTimeout>;
-	let shouldRenderParticles = true;
-
-	function handleResize() {
-		if (isResizing) return;
-		isResizing = true;
-		shouldRenderParticles = false;
-		clearTimeout(resizeTimer);
-		resizeTimer = setTimeout(() => {
-			shouldRenderParticles = true;
-			isResizing = false;
-		}, 500);
-	}
+	/** the write-to-us block */
+	const SHOW_CONTACT = true;
 
 	let showContact = false;
 	let showUpdates = false;
 
+	/* the ground: the field sizes itself once, so it is remounted after a resize settles */
+	let shouldRenderParticles = true;
+	let resizeTimer: ReturnType<typeof setTimeout>;
+	function handleResize() {
+		shouldRenderParticles = false;
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(() => (shouldRenderParticles = true), 500);
+	}
+
+	/* attention on the text column lifts the dust a little (the old container's coupling) */
+	function lift(el: HTMLElement) {
+		interactionState.update((s) => ({ ...s, hoveredElement: el, systemActivity: 0.8 }));
+	}
+	function settle() {
+		interactionState.update((s) => ({ ...s, hoveredElement: null, systemActivity: 0 }));
+	}
+
 	onMount(() => {
 		window.addEventListener('resize', handleResize);
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
+		return () => window.removeEventListener('resize', handleResize);
 	});
 </script>
 
+<svelte:head>
+	<title>aeon.science</title>
+	<meta
+		name="description"
+		content="An instrument that sits on a liquid-handling robot, keeps cells alive in standard plates, and images them while the robot changes their conditions, so you can see which conditions make the cells work well."
+	/>
+	<meta property="og:title" content="aeon.science" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://aeon.science/" />
+	<meta
+		property="og:description"
+		content="An instrument that sits on a liquid-handling robot, keeps cells alive in standard plates, and images them while the robot changes their conditions."
+	/>
+	<meta name="twitter:card" content="summary" />
+</svelte:head>
+
 <div class="background-layer" aria-hidden="true">
-	<GridSystem />
 	{#if shouldRenderParticles}
-		<div transition:fade={{ duration: 300 }}>
+		<div transition:fade={{ duration: 320 }}>
 			<ScrollDrivenParticleField />
 		</div>
 	{/if}
-	<EnergyFlow />
-	<ViewportGradient />
+	<ViewportGradient opacity={0.9} />
 </div>
 
-<!-- 00 · person -->
+<!-- 00 · the card at viewport scale: text in the mark's light, the mark owns the right -->
 <section id="hero-section" class="hero" aria-labelledby="hero-heading">
-	<div class="container-wrapper">
-		<MolecularContainer on:hover={handleContainerHover} on:leave={handleContainerLeave}>
-			<div class="logo-container" role="img" aria-label="Aeon Bio">
-				<AeonLogo />
+	<div class="hero-grid">
+		<div
+			class="hero-text"
+			role="presentation"
+			on:mouseenter={(e) => lift(e.currentTarget)}
+			on:mouseleave={settle}
+		>
+			<div class="hero-head">
+				<p class="wordmark">aeon<span>.science</span></p>
+				<p class="line">Open hardware for live-cell experiments.</p>
 			</div>
-			<h1 id="hero-heading">
-				Building the information layer of health through biomolecular causality
-			</h1>
-			<p class="tagline">We are biology, studying itself.</p>
-			<div class="cta-group" role="group" aria-label="Main actions">
-				<a class="cta-primary" href="#speak-section">
-					<span>Descend</span>
-					<ArrowDown size={16} strokeWidth={2} aria-hidden="true" />
-				</a>
-				<a class="cta-secondary" href={GITHUB_ORG} target="_blank" rel="noopener noreferrer">
-					<Github size={16} strokeWidth={1.8} aria-hidden="true" />
-					<span>Source</span>
-				</a>
+			<div class="hero-foot">
+				<h1 id="hero-heading">Change something. Watch.</h1>
+				<a class="cue" href="#dish-section">See how it works <span aria-hidden="true">↓</span></a>
 			</div>
-		</MolecularContainer>
+		</div>
+		<div class="hero-mark">
+			<AeonMarkLive />
+		</div>
 	</div>
 </section>
 
-<!-- 01 · words -->
-<section
-	id="speak-section"
-	class="level canvas-level"
-	aria-label="Say what’s wrong. Watch it resolve."
->
-	<div class="content wide">
-		<ConcernCanvas />
-	</div>
-</section>
-
-<!-- 02 · dish -->
-<section id="dish-section" class="level" aria-labelledby="dish-heading">
-	<div class="content">
-		{#if $stake}
-			<p class="chain stake" aria-label="What the dialogue stakes on the dish" transition:fade>
-				<span class="q">“{$stake.question}”</span>
-				{#if $stake.edge}
-					<span>{$stake.edge.source} {glyphOf[$stake.edge.type]} {$stake.edge.target}</span>
-					<span
-						>belief {$stake.edge.belief.toFixed(2)} · {$stake.edge.evidence} papers · borrowed</span
-					>
-				{/if}
-				<span class="arrow">↓</span>
-				<span>this plate</span>
-			</p>
-		{/if}
+<!-- 01 · dish -->
+<!-- one screen: one sentence hung on the exposure, sized by the viewport so the words are
+     never read apart from the figure. The figure says the rest. -->
+<section id="dish-section" class="level dish" aria-labelledby="dish-heading">
+	<div class="content dish-grid">
 		<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
-			A cause is earned on living cells. <em>Change something. Watch.</em>
+			The cells never leave the plate. <em>The robot changes their conditions. We watch.</em>
 		</h2>
 		<figure class="diagram" use:reveal={{ delay: 140 }}>
-			<InstrumentSection stake={$stake?.question ?? null} concern={$stake?.concern ?? null} />
+			<InstrumentSection />
 		</figure>
-		<p class="status" use:reveal>
-			<span class="k">now</span> first fixture commissioned on an OT-2 · one-row coupon in revision
-			· CERN-OHL-S-2.0
-			<a href={AEVUM_REPO} target="_blank" rel="noopener noreferrer">Aeon-Bio/aevum</a>
+	</div>
+</section>
+
+<!-- 02 · readout -->
+<section id="readout-section" class="level readout" aria-labelledby="readout-heading">
+	<div class="content">
+		<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
+			What comes back is a model.
+			<em>Which conditions make these cells work, with the evidence attached.</em>
+		</h2>
+		<p use:reveal={{ delay: 100 }}>
+			Every condition the robot sets is a perturbation; every frame is a measurement. From that time
+			series we fit a causal model of how the cells respond, the approach Karen Sachs introduced for
+			single-cell perturbation data in
+			<a href="https://doi.org/10.1126/science.1105809" target="_blank" rel="noopener noreferrer"
+				>Science (2005)</a
+			>.
 		</p>
 	</div>
 </section>
@@ -145,6 +129,16 @@
 
 		<div class="people" use:reveal>
 			<div class="person">
+				<div class="person-figure">
+					<img
+						src="/founders/eric-mockler-384.webp"
+						width="384"
+						height="512"
+						loading="lazy"
+						decoding="async"
+						alt="Eric Jing Mockler, smiling in glasses and a burgundy shirt"
+					/>
+				</div>
 				<div class="person-head">
 					<h3>Eric Jing Mockler</h3>
 					<span class="links">
@@ -169,8 +163,8 @@
 						>
 					</span>
 				</div>
-				<p class="role">CEO · cofounder</p>
-				<p>
+				<p class="role">Co-founder &amp; Engineer</p>
+				<p class="bio">
 					Bioengineering, cognitive science, neuroscience at UC Santa Cruz.
 					<a
 						href="https://github.com/ejmockler/case-control-genomics"
@@ -191,6 +185,16 @@
 				</p>
 			</div>
 			<div class="person">
+				<div class="person-figure">
+					<img
+						src="/founders/karen-sachs-384.webp"
+						width="384"
+						height="512"
+						loading="lazy"
+						decoding="async"
+						alt="Karen Sachs, smiling, with sunglasses pushed up into her curly hair"
+					/>
+				</div>
 				<div class="person-head">
 					<h3>Karen Sachs, PhD</h3>
 					<span class="links">
@@ -209,25 +213,14 @@
 						>
 					</span>
 				</div>
-				<p class="role">CSO/CTO · cofounder</p>
-				<p>
-					<a href="https://be.mit.edu" target="_blank" rel="noopener noreferrer"
-						>MIT PhD, biological engineering</a
-					>.
-					<a href="https://med.stanford.edu" target="_blank" rel="noopener noreferrer"
-						>Stanford Medicine</a
-					>
-					postdoc.
+				<p class="role">Co-founder · CSO/CTO</p>
+				<p class="bio">
+					MIT PhD, biological engineering. Stanford Medicine postdoc.
 					<a
 						href="https://doi.org/10.1126/science.1105809"
 						target="_blank"
 						rel="noopener noreferrer">Causal networks from single-cell perturbation data</a
-					>;
-					<a
-						href="https://doi.org/10.1126/science.310.5756.1878"
-						target="_blank"
-						rel="noopener noreferrer">Science Breakthrough of the Year runner-up</a
-					>.
+					>; Science Breakthrough of the Year runner-up.
 					<a
 						href="https://scholar.google.com/citations?user=lS0tvhoAAAAJ&hl=en"
 						target="_blank"
@@ -246,89 +239,148 @@
 				</div>
 			</div>
 		{/if}
+
+		<p class="colophon" use:reveal>
+			Open hardware under CERN-OHL-S-2.0 ·
+			<a
+				href="https://github.com/Aeon-Bio"
+				target="_blank"
+				rel="noopener noreferrer"
+				style="white-space: nowrap">Aeon-Bio on GitHub</a
+			>
+		</p>
 	</div>
 </section>
 
 <Modal bind:isOpen={showContact} title="Write to us" maxWidth="600px">
-	<PartnershipInquiry
-		on:submit={() => (showContact = false)}
-		on:close={() => (showContact = false)}
-	/>
+	<PartnershipInquiry on:close={() => (showContact = false)} />
 </Modal>
 
 <Modal bind:isOpen={showUpdates} title="Follow" maxWidth="500px">
-	<EmailCapture on:submit={() => (showUpdates = false)} on:close={() => (showUpdates = false)} />
+	<EmailCapture on:close={() => (showUpdates = false)} />
 </Modal>
 
 <style>
-	.background-layer {
-		position: fixed;
-		inset: 0;
-		z-index: -1;
-	}
-
 	/* ---------- reveal (owned by use:reveal) ---------- */
 
+	/* an entrance is a fade and nothing else: the page never moves except under the hand */
 	:global([data-reveal]) {
 		opacity: 0;
-		transform: translateY(14px);
-		transition:
-			opacity var(--t-settle) var(--ease-out),
-			transform var(--t-settle) var(--ease-out);
+		transition: opacity var(--t-settle) var(--ease-out);
 		transition-delay: var(--reveal-delay, 0ms);
 	}
 
 	:global([data-reveal][data-revealed]) {
 		opacity: 1;
-		transform: none;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		:global([data-reveal]) {
 			opacity: 1;
-			transform: none;
 			transition: none;
 		}
+	}
+
+	/* ---------- ground ---------- */
+
+	.background-layer {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
 	}
 
 	/* ---------- hero ---------- */
 
 	.hero {
 		min-height: 100vh;
+		min-height: 100svh;
 		display: grid;
-		place-items: center;
-	}
-
-	.container-wrapper {
-		width: min(90vw, 800px);
-		height: min(90vh, 800px);
-		display: grid;
-		place-items: center;
-	}
-
-	.logo-container {
-		width: min(30vw, 300px);
-		height: min(30vw, 300px);
-		display: flex;
 		align-items: center;
-		justify-content: center;
-		margin: -0.5rem auto 1.25rem;
+		/* clip only sideways: the mark may run off the right edge without widening the
+		   page, but its wash must bleed down into the next section. Clipped at the hero's
+		   bottom it was a hard line across the seam, the one edge this page refuses. */
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 
-	:global(.logo-container svg) {
-		width: 100%;
-		height: 100%;
-		filter: drop-shadow(0 10px 32px rgba(76, 201, 240, 0.2));
+	.hero-grid {
+		box-sizing: border-box;
+		width: min(92vw, 1280px);
+		margin-inline: auto;
+		min-height: 100svh;
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); /* the mark overflows its track, it does not squeeze the text */
+		align-items: center;
+	}
+
+	.hero-text {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		min-height: 84svh;
+		padding-block: 8vh;
+		position: relative;
+		z-index: 1;
+	}
+
+	/* the field the attractor owns, including the void around it; the card's wash behind */
+	.hero-mark {
+		position: relative;
+		width: 60vw;
+		max-width: 900px;
+		justify-self: end;
+		transform: translateX(22%);
+	}
+
+	.hero-mark::before {
+		content: '';
+		position: absolute;
+		inset: -28%;
+		background: radial-gradient(
+			closest-side,
+			rgba(76, 201, 240, 0.15),
+			rgba(76, 201, 240, 0.05) 55%,
+			transparent
+		);
+		pointer-events: none;
+	}
+
+	/* Same hierarchy as the card: display face, 600 name / 400 muted domain. */
+	.wordmark {
+		font-family: var(--font-display);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		font-size: clamp(1.4rem, 3vw, 1.9rem);
+		line-height: 1;
+		color: var(--ink-100);
+		margin: 0;
+	}
+
+	.wordmark span {
+		font-weight: 400;
+		color: var(--ink-50);
+	}
+
+	.line {
+		font-family: var(--font-display);
+		font-style: italic;
+		font-weight: 300;
+		font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+		line-height: 1.3;
+		color: var(--ink-70);
+		max-width: 40ch;
+		margin: 0.6rem 0 0;
 	}
 
 	h1 {
 		font-family: var(--font-display);
-		font-size: clamp(1.9rem, 4.6vw, 3.3rem);
-		line-height: 1.08;
+		font-size: clamp(2.6rem, 4.2vw, 3.6rem);
+		line-height: 1.06;
 		letter-spacing: -0.012em;
-		margin: 0 auto 1rem;
-		max-width: 22ch;
-		text-align: center;
+		margin: 0 0 1.5rem;
+		max-width: 20ch; /* 'Change something.' stays on one line at 3.6 rem */
+		text-align: left;
 		background: linear-gradient(
 			135deg,
 			var(--ink-100) 0%,
@@ -340,13 +392,61 @@
 		color: transparent;
 	}
 
-	.tagline {
-		font-family: var(--font-display);
-		font-style: italic;
-		font-size: clamp(1.1rem, 2.4vw, 1.45rem);
-		color: var(--ink-70);
-		text-align: center;
-		margin: 0 auto 2.5rem;
+	.cue {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 44px;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--ink-50);
+		text-decoration: none;
+		transition: color var(--t-snap) var(--ease-out);
+	}
+
+	.cue:hover,
+	.cue:focus-visible {
+		color: var(--aeon-biolum);
+	}
+
+	@media (max-width: 1023px) {
+		.hero-grid {
+			grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); /* 'Change something.' on one line at 3 rem */
+		}
+		.hero-mark {
+			width: 68vw;
+		}
+		h1 {
+			font-size: 3rem;
+		}
+	}
+
+	@media (max-width: 719px) {
+		.hero-grid {
+			grid-template-columns: 1fr;
+			width: 100%;
+			padding-inline: 16px;
+			align-content: space-between; /* mark at the top, name block at the foot, like the card */
+		}
+		.hero-mark {
+			order: -1;
+			width: 112vw;
+			max-width: none;
+			justify-self: start;
+			margin-left: calc(50% - 56vw - 16px + 16px);
+			margin-top: 6vh;
+			transform: none;
+		}
+		.hero-text {
+			min-height: 0;
+			padding: 0 0 6vh;
+			gap: 2.2rem;
+		}
+		h1 {
+			font-size: 2.2rem;
+		}
 	}
 
 	/* ---------- CTAs ---------- */
@@ -376,7 +476,7 @@
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		cursor: pointer;
-		border: 1px solid transparent;
+		border: 0;
 		min-width: 8.5rem;
 		transition:
 			background-color var(--t-snap) var(--ease-out),
@@ -407,7 +507,6 @@
 
 	.cta-secondary:hover,
 	.cta-secondary:focus-visible {
-		border-color: var(--aeon-biolum);
 		color: var(--ink-100);
 	}
 
@@ -419,32 +518,16 @@
 
 	/* ---------- levels ---------- */
 
-	/* opaque below the hero: the particle field belongs to the hero, not a haze under everything */
 	.level {
 		position: relative;
 		padding: clamp(5rem, 12vh, 9rem) 2rem;
-		background: var(--aeon-deep-space);
-		border-top: 1px solid var(--ink-12);
+		overflow: clip; /* the diagram's wash may not widen the document */
 		scroll-margin-top: 0;
 	}
 
 	.content {
 		max-width: 60rem;
 		margin: 0 auto;
-	}
-
-	.content.wide {
-		max-width: 78rem;
-	}
-
-	.canvas-level {
-		padding-top: 0;
-	}
-
-	@media (min-width: 901px) {
-		.content.wide {
-			padding-left: 6rem;
-		}
 	}
 
 	.level h2 {
@@ -470,20 +553,6 @@
 		margin: 0 0 1rem;
 	}
 
-	.level p.lede {
-		font-family: var(--font-display);
-		font-size: clamp(1.3rem, 2.4vw, 1.7rem);
-		line-height: 1.3;
-		color: var(--ink-100);
-		max-width: 34ch;
-		margin-bottom: 3rem;
-	}
-
-	.level p.after {
-		margin-top: 2.5rem;
-		color: var(--ink-50);
-	}
-
 	.level a {
 		color: var(--aeon-biolum);
 		text-decoration: underline;
@@ -497,63 +566,98 @@
 
 	/* ---------- diagram / status ---------- */
 
-	.diagram {
-		margin: 0 0 2.5rem;
-		padding: 1.25rem;
-		border: 1px solid var(--ink-12);
-		border-radius: 4px;
-		background: rgba(26, 27, 47, 0.55);
-		overflow-x: auto;
+	/* ---------- the dish screen ---------- */
+
+	/* the section is one viewport: text column left, the exposure right, sized by the
+	   viewport height so the figure, its sentence and the words around it are seen at once */
+	.dish {
+		min-height: 100svh;
+		padding: 3rem 2rem;
+		display: grid;
+		align-content: center;
 	}
 
-	.status {
+	/* the sentence hangs on the figure: centred on the square, in its light */
+	.dish-grid {
+		max-width: 76rem;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas: 'head fig';
+		column-gap: clamp(2rem, 4vw, 4rem);
+		align-items: center;
+	}
+
+	.dish h2 {
+		grid-area: head;
+		font-size: clamp(1.9rem, 3vw, 2.6rem);
+		max-width: 16ch;
+		margin: 0;
+	}
+
+	/* the drawing sits on the dark with its own faint wash: no box, no rule */
+	.diagram {
+		grid-area: fig;
+		position: relative;
+		width: min(880px, calc(100svh - 6rem), calc(100vw - 4rem));
+		margin: 0;
+		padding: 0;
+	}
+
+	@media (max-width: 63.99rem) {
+		.dish {
+			padding: clamp(3rem, 8vh, 5rem) 2rem;
+		}
+
+		.dish-grid {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				'head'
+				'fig';
+		}
+
+		.dish h2 {
+			max-width: 30ch;
+			margin: 0 0 1.5rem;
+		}
+
+		.diagram {
+			width: min(100%, max(18rem, calc(100svh - 14rem)));
+			margin: 0;
+		}
+	}
+
+	/* the wash never reaches the section's clipped edge: a clipped gradient is a hard
+	   line across the seam between sections, the one kind of edge this page refuses */
+	.diagram::before {
+		content: '';
+		position: absolute;
+		inset: calc(-1 * min(2.75rem, 8%));
+		background: radial-gradient(closest-side, rgba(76, 201, 240, 0.06), transparent);
+		pointer-events: none;
+	}
+
+	/* ---------- readout ---------- */
+
+	/* a screen whose centre is the claim; the void around it is composed, not leftover */
+	.readout {
+		min-height: 100svh;
+		display: grid;
+		align-content: center;
+	}
+
+	.readout h2 {
+		max-width: 22ch;
+	}
+
+	/* ---------- colophon ---------- */
+
+	.colophon {
 		font-family: var(--font-mono);
 		font-size: 0.76rem !important;
 		line-height: 1.8 !important;
 		color: var(--ink-50) !important;
 		max-width: none !important;
-		margin: 0 !important;
-	}
-
-	.status .k {
-		color: var(--aeon-biolum);
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		margin-right: 0.6rem;
-	}
-
-	.chain {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.4rem;
-		font-family: var(--font-mono);
-		font-size: 0.76rem !important;
-		margin: 2.5rem 0 1.5rem !important;
-		max-width: none !important;
-	}
-
-	.chain > span:not(.arrow) {
-		padding: 0.25rem 0.65rem;
-		border: 1px solid rgba(128, 255, 219, 0.35);
-		border-radius: 999px;
-		color: var(--aeon-biolum);
-	}
-
-	.chain .arrow {
-		color: var(--ink-30);
-	}
-
-	/* the stake, arriving from the canvas above */
-	.chain.stake {
-		margin: 0 0 3rem !important;
-	}
-
-	.chain.stake .q {
-		font-family: var(--font-body);
-		font-style: italic;
-		color: var(--ink-100);
-		border-color: var(--ink-30);
+		margin: 5rem 0 0 !important;
 	}
 
 	/* ---------- people / contact ---------- */
@@ -561,16 +665,56 @@
 	.people {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-		gap: 2rem 3rem;
+		gap: 2.5rem 3rem;
 		margin: 0 0 3rem;
 	}
 
+	/* Each founder spans four rows of the parent grid (photo, name, role, bio) so the
+	   name rows of both columns sit on one line even when only one photo exists. */
 	.person {
-		border-top: 1px solid var(--ink-12);
-		padding-top: 1rem;
+		display: grid;
+		grid-template-rows: subgrid;
+		grid-row: span 4;
+		row-gap: 0;
+		align-content: start;
+		border-top: 0;
+	}
+
+	/* The real inside the abstraction: a true-colour photograph, untreated, lit by the
+	   card's own wash. 15rem wide (2x of the 480 px asset), 3:4, 2 px radius, no border. */
+	.person-figure {
+		grid-row: 1;
+		position: relative;
+		width: 15rem;
+		max-width: 100%;
+		margin: 0.35rem 0 1.4rem;
+	}
+
+	.person-figure::before {
+		content: '';
+		position: absolute;
+		inset: -30%;
+		background: radial-gradient(
+			closest-side,
+			rgba(76, 201, 240, 0.15),
+			rgba(76, 201, 240, 0.05) 55%,
+			transparent
+		);
+		pointer-events: none;
+	}
+
+	.person-figure img {
+		position: relative;
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+		border-radius: 2px;
 	}
 
 	.person-head {
+		grid-row: 2;
 		display: flex;
 		justify-content: space-between;
 		align-items: baseline;
@@ -590,7 +734,7 @@
 	}
 
 	.links a {
-		color: var(--ink-30);
+		color: var(--ink-50);
 		text-decoration: none;
 		display: inline-flex;
 	}
@@ -600,6 +744,7 @@
 	}
 
 	.person .role {
+		grid-row: 3;
 		font-family: var(--font-mono);
 		font-size: 0.7rem !important;
 		letter-spacing: 0.1em;
@@ -612,9 +757,14 @@
 		line-height: 1.55;
 	}
 
+	.person .bio {
+		grid-row: 4;
+		margin: 0;
+	}
+
 	.contact {
-		border-top: 1px solid var(--ink-12);
-		padding-top: 2rem;
+		border-top: 0;
+		margin-top: 1rem;
 	}
 
 	.contact p {

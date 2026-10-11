@@ -136,7 +136,6 @@
 
 	const COLOR_BLEND_RATE = 0.18;
 	const COLOR_EASE_POWER = 0.55;
-	const REDSHIFT_INTENSITY = 0.85; // How aggressively we shift toward red
 	let blendedParticleColor = [...stops[0].particleColor];
 	let blendedConnectionColor = [...stops[0].connectionColor];
 
@@ -150,8 +149,11 @@
 	const ENERGY_ALIGNMENT_BOOST = 0.01;
 
 	// Base constants for 1920px width
-	const BASE_PARTICLE_COUNT = 448;
-	const MIN_PARTICLE_COUNT = 100;
+	// Dust, not a network: the far passes of the same light the mark is made of.
+	// Retuned by the design brief (figure/ground): sparse, dim, no connection pass.
+	const BASE_PARTICLE_COUNT = 120;
+	const MIN_PARTICLE_COUNT = 60;
+	const DRAW_CONNECTIONS = false;
 
 	function getWorldSpaceBounds() {
 		const angle = ROTATION * (Math.PI / 180);
@@ -191,7 +193,7 @@
 		const bounds = getWorldSpaceBounds();
 		const useCluster = Math.random() < CLUSTER_PROBABILITY;
 		const fadeDelay = index * 1.5;
-		const radius = Math.random() * 1.5 + 0.5;
+		const radius = Math.random() * 1.0 + 0.4;
 
 		// Assign depth layer and parallax properties
 		const depthLayer = Math.floor(Math.random() * 5) + 1;
@@ -234,7 +236,7 @@
 			vx: (Math.random() - 0.5) * baseSpeed,
 			vy: (Math.random() - 0.5) * baseSpeed,
 			radius,
-			opacity: Math.random() * 0.4 + 0.2,
+			opacity: Math.random() * 0.16 + 0.06,
 			energy: 0,
 			fadeIn: -fadeDelay,
 			parallaxSpeed,
@@ -359,25 +361,6 @@
 		};
 	}
 
-	function applyRedshift(color: number[]): number[] {
-		// Cosmological redshift: monotonically shift toward red as we scroll
-		const progress = clamp(pageProgress ?? 0, 0, 1);
-
-		// Target: warm red-orange [255, 100, 60]
-		const targetRed = 255;
-		const targetGreen = 100;
-		const targetBlue = 60;
-
-		// Apply redshift with easing for smooth transition
-		const redshiftAmount = Math.pow(progress, 0.8) * REDSHIFT_INTENSITY;
-
-		return [
-			lerp(color[0], targetRed, redshiftAmount),
-			lerp(color[1], targetGreen, redshiftAmount),
-			lerp(color[2], targetBlue, redshiftAmount)
-		];
-	}
-
 	function tick(currentTime: number) {
 		if (lastFrameTime === 0) lastFrameTime = currentTime;
 		let elapsed = currentTime - lastFrameTime;
@@ -407,88 +390,94 @@
 		ctx.clearRect(0, 0, width, height);
 		const baseColors = getCurrentColor();
 
-		// Apply cosmological redshift overlay
+		// Colours come straight from the scroll stops: one family, no shift
 		const colors = {
-			particle: applyRedshift(baseColors.particle),
-			connection: applyRedshift(baseColors.connection)
+			particle: baseColors.particle, // one colour family: no redshift with scroll
+			connection: baseColors.connection
 		};
 
 		// Draw connections using spatial optimization
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const processedPairs = new Set<string>();
 
-		activeParticles.forEach((particle) => {
-			if (particle.fadeIn <= 0) return;
+		if (DRAW_CONNECTIONS) {
+			activeParticles.forEach((particle) => {
+				if (particle.fadeIn <= 0) return;
 
-			const renderParticle = projectToGrid(particle.x, particle.y + (particle.scrollOffset ?? 0));
-			const nearby = spatialGrid.getNearbyParticles(particle, CONNECTION_DISTANCE);
+				const renderParticle = projectToGrid(particle.x, particle.y + (particle.scrollOffset ?? 0));
+				const nearby = spatialGrid.getNearbyParticles(particle, CONNECTION_DISTANCE);
 
-			nearby.forEach((other) => {
-				if (other.fadeIn <= 0) return;
+				nearby.forEach((other) => {
+					if (other.fadeIn <= 0) return;
 
-				// Avoid duplicate connections
-				const pairKey =
-					particle.x < other.x
-						? `${particle.x},${particle.y}-${other.x},${other.y}`
-						: `${other.x},${other.y}-${particle.x},${particle.y}`;
+					// Avoid duplicate connections
+					const pairKey =
+						particle.x < other.x
+							? `${particle.x},${particle.y}-${other.x},${other.y}`
+							: `${other.x},${other.y}-${particle.x},${particle.y}`;
 
-				if (processedPairs.has(pairKey)) return;
-				processedPairs.add(pairKey);
+					if (processedPairs.has(pairKey)) return;
+					processedPairs.add(pairKey);
 
-				const renderOther = projectToGrid(other.x, other.y + (other.scrollOffset ?? 0));
+					const renderOther = projectToGrid(other.x, other.y + (other.scrollOffset ?? 0));
 
-				const dx = renderParticle.x - renderOther.x;
-				const dy = renderParticle.y - renderOther.y;
-				const dist = Math.sqrt(dx * dx + dy * dy);
+					const dx = renderParticle.x - renderOther.x;
+					const dy = renderParticle.y - renderOther.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
 
-				if (!Number.isFinite(dist) || dist <= MIN_PARTICLE_DISTANCE || dist > CONNECTION_DISTANCE) {
-					return;
-				}
+					if (
+						!Number.isFinite(dist) ||
+						dist <= MIN_PARTICLE_DISTANCE ||
+						dist > CONNECTION_DISTANCE
+					) {
+						return;
+					}
 
-				const combinedFade = particle.fadeIn * other.fadeIn;
-				if (combinedFade <= 0) return;
+					const combinedFade = particle.fadeIn * other.fadeIn;
+					if (combinedFade <= 0) return;
 
-				const normalized = Math.max(0, 1 - dist / CONNECTION_DISTANCE);
-				const distanceFactor = Math.pow(normalized, 1.2);
-				if (!Number.isFinite(distanceFactor) || distanceFactor <= 0) return;
+					const normalized = Math.max(0, 1 - dist / CONNECTION_DISTANCE);
+					const distanceFactor = Math.pow(normalized, 1.2);
+					if (!Number.isFinite(distanceFactor) || distanceFactor <= 0) return;
 
-				const edgeRatio = Math.min(1, dist / CONNECTION_DISTANCE);
-				const edgeEmphasis = EDGE_BOOST * Math.pow(edgeRatio, 0.8);
+					const edgeRatio = Math.min(1, dist / CONNECTION_DISTANCE);
+					const edgeEmphasis = EDGE_BOOST * Math.pow(edgeRatio, 0.8);
 
-				const baseOpacity = CONNECTION_BASE_OPACITY * distanceFactor * combinedFade;
-				if (!Number.isFinite(baseOpacity) || baseOpacity <= 0) return;
+					const baseOpacity = CONNECTION_BASE_OPACITY * distanceFactor * combinedFade;
+					if (!Number.isFinite(baseOpacity) || baseOpacity <= 0) return;
 
-				const edgeOpacity = baseOpacity * (1 + edgeEmphasis);
+					const edgeOpacity = baseOpacity * (1 + edgeEmphasis);
 
-				const gradient = ctx.createLinearGradient(
-					renderParticle.x,
-					renderParticle.y,
-					renderOther.x,
-					renderOther.y
-				);
+					const gradient = ctx.createLinearGradient(
+						renderParticle.x,
+						renderParticle.y,
+						renderOther.x,
+						renderOther.y
+					);
 
-				const connectionColor = rgbaColor(colors.connection, edgeOpacity);
-				const connectionColorMid = rgbaColor(colors.connection, baseOpacity);
+					const connectionColor = rgbaColor(colors.connection, edgeOpacity);
+					const connectionColorMid = rgbaColor(colors.connection, baseOpacity);
 
-				gradient.addColorStop(0, connectionColor);
-				gradient.addColorStop(0.15, connectionColorMid);
-				gradient.addColorStop(0.5, connectionColorMid);
-				gradient.addColorStop(0.85, connectionColorMid);
-				gradient.addColorStop(1, connectionColor);
+					gradient.addColorStop(0, connectionColor);
+					gradient.addColorStop(0.15, connectionColorMid);
+					gradient.addColorStop(0.5, connectionColorMid);
+					gradient.addColorStop(0.85, connectionColorMid);
+					gradient.addColorStop(1, connectionColor);
 
-				const lineWidth = Math.min(
-					MAX_LINE_WIDTH,
-					MIN_LINE_WIDTH + distanceFactor * (2 + edgeEmphasis * 1.5)
-				);
+					const lineWidth = Math.min(
+						MAX_LINE_WIDTH,
+						MIN_LINE_WIDTH + distanceFactor * (2 + edgeEmphasis * 1.5)
+					);
 
-				ctx.beginPath();
-				ctx.strokeStyle = gradient;
-				ctx.lineWidth = lineWidth;
-				ctx.moveTo(renderParticle.x, renderParticle.y);
-				ctx.lineTo(renderOther.x, renderOther.y);
-				ctx.stroke();
+					ctx.beginPath();
+					ctx.strokeStyle = gradient;
+					ctx.lineWidth = lineWidth;
+					ctx.moveTo(renderParticle.x, renderParticle.y);
+					ctx.lineTo(renderOther.x, renderOther.y);
+					ctx.stroke();
+				});
 			});
-		});
+		}
 
 		// Draw particles
 		activeParticles.forEach((p) => {
@@ -499,23 +488,26 @@
 			const opacity = p.opacity * p.fadeIn;
 
 			const particleColor = rgbaColor(colors.particle, opacity);
+			const r = Math.min(2.2, (p.radius * (1 + renderY / PERSPECTIVE)) / dpr);
 
+			// a mote is a far pass of the trajectory: soft halo, then a core
 			ctx.beginPath();
-			ctx.arc(
-				projected.x,
-				projected.y,
-				(p.radius * (1 + renderY / PERSPECTIVE)) / dpr,
-				0,
-				Math.PI * 2
-			);
+			ctx.arc(projected.x, projected.y, Math.min(r * 3, 5), 0, Math.PI * 2);
+			ctx.fillStyle = rgbaColor(colors.particle, opacity * 0.22);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.arc(projected.x, projected.y, r, 0, Math.PI * 2);
 			ctx.fillStyle = particleColor;
 			ctx.fill();
 		});
 
-		requestAnimationFrame(tick);
+		if (!reducedMotion) requestAnimationFrame(tick);
 	}
 
+	let reducedMotion = false;
+
 	onMount(() => {
+		reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		// Initialize performance settings on client side
 		deviceCapabilities = detectDeviceCapabilities();
 		qualitySettings = getQualitySettings(deviceCapabilities.preferredQuality);
@@ -557,12 +549,7 @@
 	});
 </script>
 
-<canvas
-	bind:this={canvas}
-	class="particle-field"
-	style="transform-origin: top; transform: perspective({PERSPECTIVE}px) rotateX({ROTATION}deg)"
->
-</canvas>
+<canvas bind:this={canvas} class="particle-field"> </canvas>
 
 <style>
 	.particle-field {

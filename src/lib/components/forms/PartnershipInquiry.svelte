@@ -26,11 +26,9 @@
 	let errors: Partial<FormData> = {};
 
 	const partnershipTypes = [
-		{ value: 'co-development', label: 'Co-Development Partnership' },
-		{ value: 'data-partnership', label: 'Data Partnership' },
-		{ value: 'research-collaboration', label: 'Research Collaboration' },
-		{ value: 'general-inquiry', label: 'General Inquiry' },
-		{ value: 'other', label: 'Other' }
+		{ value: 'wet-lab', label: 'I run a wet lab' },
+		{ value: 'data', label: 'I hold perturbation data' },
+		{ value: 'other', label: 'Something else' }
 	];
 
 	function validateStep(step: number): boolean {
@@ -44,7 +42,7 @@
 		}
 
 		if (step === 2) {
-			if (!formData.partnershipType) errors.partnershipType = 'Please select a partnership type';
+			if (!formData.partnershipType) errors.partnershipType = 'Please pick one';
 		}
 
 		return Object.keys(errors).length === 0;
@@ -76,7 +74,7 @@
 			formPayload.append('partnership_type', formData.partnershipType);
 			formPayload.append('use_case', formData.useCase);
 			formPayload.append('form_type', 'partnership_inquiry');
-			formPayload.append('subject', 'New Partnership Inquiry - Aeon Bio');
+			formPayload.append('subject', 'Write to us - aeon.science');
 
 			const response = await fetch('https://api.web3forms.com/submit', {
 				method: 'POST',
@@ -123,17 +121,13 @@
 			aria-valuenow={currentStep}
 			aria-label="Form progress"
 		>
-			<div class="progress-bar">
-				<div class="progress-fill" style="width: {(currentStep / 2) * 100}%"></div>
-			</div>
 			<span id="step-progress" class="progress-text">Step {currentStep} of 2</span>
 		</div>
 
 		<form on:submit|preventDefault={currentStep === 2 ? submitForm : nextStep}>
 			{#if currentStep === 1}
 				<div class="form-step" transition:fade={{ duration: 200 }}>
-					<h3>Let's get acquainted</h3>
-					<p>Tell us a bit about yourself and your organization.</p>
+					<h3>Who you are</h3>
 
 					<div class="form-group">
 						<label for="name">Full Name *</label>
@@ -203,7 +197,7 @@
 
 					<div class="form-actions">
 						<button type="submit" class="btn-primary" aria-describedby="step-progress">
-							Continue to Step 2
+							Continue
 							<svg
 								width="16"
 								height="16"
@@ -222,11 +216,11 @@
 
 			{#if currentStep === 2}
 				<div class="form-step" transition:fade={{ duration: 200 }}>
-					<h3>How can we collaborate?</h3>
-					<p>Help us understand your interests and how we might work together.</p>
+					<h3>What would you like to talk about?</h3>
+					<p>A few lines is enough.</p>
 
 					<div class="form-group">
-						<label for="partnership-type">Partnership Type *</label>
+						<label for="partnership-type">What brings you here *</label>
 						<select
 							id="partnership-type"
 							bind:value={formData.partnershipType}
@@ -235,7 +229,7 @@
 							aria-invalid={!!errors.partnershipType}
 							required
 						>
-							<option value="">Select partnership type</option>
+							<option value="">Pick one</option>
 							{#each partnershipTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -255,7 +249,7 @@
 						<textarea
 							id="use-case"
 							bind:value={formData.useCase}
-							placeholder="Describe your project, research goals, data types, or how you envision working with Aeon Bio..."
+							placeholder="Tell us about your cells, what you measure today, and what is slow about it."
 							rows="4"
 							aria-label="Describe your use case, project details, research goals, data types, or collaboration vision"
 						></textarea>
@@ -289,9 +283,9 @@
 						>
 							{#if isSubmitting}
 								<div class="spinner" aria-hidden="true"></div>
-								<span id="submit-status">Submitting partnership inquiry...</span>
+								<span id="submit-status">Sending…</span>
 							{:else}
-								<span id="submit-status">Submit Partnership Inquiry</span>
+								<span id="submit-status">Send</span>
 							{/if}
 						</button>
 					</div>
@@ -313,17 +307,15 @@
 					<circle cx="12" cy="12" r="10" />
 				</svg>
 			</div>
-			<h3>Thank you for your interest!</h3>
-			<p>
-				We've received your partnership inquiry and will be in touch within 48 hours to discuss how
-				we can collaborate.
-			</p>
+			<h3>Thanks, we have it.</h3>
+			<p>Eric reads every message and replies himself.</p>
 			<p class="next-steps">
-				In the meantime, feel free to explore our research publications or schedule a demo call.
+				There is no product to demo yet. What we can offer is a conversation about how you measure
+				whether your cells work, and what is slow about it.
 			</p>
 			<div class="success-actions">
 				<button class="btn-primary" on:click={() => dispatch('close')}>Close</button>
-				<button class="btn-secondary" on:click={resetForm}>Submit Another Inquiry</button>
+				<button class="btn-secondary" on:click={resetForm}>Write another</button>
 			</div>
 		</div>
 	{/if}
@@ -337,20 +329,6 @@
 	.form-progress {
 		margin-bottom: 2rem;
 		text-align: center;
-	}
-
-	.progress-bar {
-		height: 4px;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 2px;
-		margin-bottom: 0.5rem;
-		overflow: hidden;
-	}
-
-	.progress-fill {
-		height: 100%;
-		background: linear-gradient(45deg, var(--aeon-primary), var(--aeon-biolum));
-		transition: width 0.3s ease;
 	}
 
 	.progress-text {
@@ -386,7 +364,7 @@
 		width: 100%;
 		padding: 0.75rem 1rem;
 		border: 1px solid rgba(128, 255, 219, 0.2);
-		border-radius: 0.5rem;
+		border-radius: 2px;
 		background: rgba(255, 255, 255, 0.05);
 		color: white;
 		font-size: 1rem;
@@ -429,9 +407,13 @@
 
 	.btn-primary,
 	.btn-secondary {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		min-height: 44px;
 		padding: 0.75rem 1.5rem;
-		border-radius: 0.5rem;
+		border-radius: 2px;
 		font-size: 1rem;
 		font-weight: 500;
 		cursor: pointer;
@@ -443,7 +425,12 @@
 	}
 
 	.btn-primary {
-		background: linear-gradient(45deg, var(--aeon-primary), var(--aeon-biolum));
+		background: var(--aeon-biolum);
+		color: var(--aeon-deep-space);
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		color: var(--aeon-deep-space);
 	}
 

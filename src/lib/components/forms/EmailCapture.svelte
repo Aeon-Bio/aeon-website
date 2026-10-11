@@ -19,10 +19,10 @@
 	let error = '';
 
 	const interestOptions = [
-		{ value: 'research', label: 'Research collaborations' },
-		{ value: 'partnerships', label: 'Partnership opportunities' },
-		{ value: 'product-updates', label: 'Product updates' },
-		{ value: 'events', label: 'Events and webinars' }
+		{ value: 'build-progress', label: 'Build progress' },
+		{ value: 'hardware-files', label: 'Hardware files, when they publish' },
+		{ value: 'analysis', label: 'Analysis and models' },
+		{ value: 'visit-or-call', label: 'A visit or a call' }
 	];
 
 	function validateEmail(email: string): boolean {
@@ -58,7 +58,7 @@
 			formPayload.append('email', formData.email);
 			formPayload.append('interests', formData.interests.join(', '));
 			formPayload.append('form_type', 'email_capture');
-			formPayload.append('subject', 'New Email Signup - Aeon Bio');
+			formPayload.append('subject', 'New follower - aeon.science');
 
 			const response = await fetch('https://api.web3forms.com/submit', {
 				method: 'POST',
@@ -94,10 +94,10 @@
 <div class="email-capture">
 	{#if !isSubmitted}
 		<form on:submit|preventDefault={submitForm}>
-			<h3>Stay updated with Aeon Bio</h3>
+			<h3>Follow the build</h3>
 			<p>
-				Get insights on biomolecular causality, partnership opportunities, and breakthrough
-				research.
+				Occasional notes as the instrument comes together: what we measured, what we changed, and
+				when there is something to see. No more than one email a month.
 			</p>
 
 			<div class="form-group">
@@ -155,9 +155,9 @@
 			>
 				{#if isSubmitting}
 					<div class="spinner" aria-hidden="true"></div>
-					<span id="submit-status">Subscribing...</span>
+					<span id="submit-status">Sending…</span>
 				{:else}
-					<span id="submit-status">Stay Updated</span>
+					<span id="submit-status">Follow</span>
 					<svg
 						width="16"
 						height="16"
@@ -187,15 +187,12 @@
 					<polyline points="22,4 12,14.01 9,11.01" />
 				</svg>
 			</div>
-			<h3>Welcome to the Aeon Bio community!</h3>
-			<p>
-				You're all set. We'll keep you updated on our latest research, partnership opportunities,
-				and breakthroughs in biomolecular causality.
-			</p>
-			<p class="next-steps">Check your email for a confirmation message.</p>
+			<h3>Thanks, you're on the list.</h3>
+			<p>We'll write when there is something real to show.</p>
+			<p class="next-steps">No confirmation email. We only write when there is news.</p>
 			<div class="success-actions">
 				<button class="btn-primary" on:click={() => dispatch('close')}> Close </button>
-				<button class="btn-secondary" on:click={resetForm}> Add Another Email </button>
+				<button class="btn-secondary" on:click={resetForm}> Add another address </button>
 			</div>
 		</div>
 	{/if}
@@ -228,7 +225,7 @@
 		width: 100%;
 		padding: 0.875rem 1rem;
 		border: 1px solid rgba(128, 255, 219, 0.2);
-		border-radius: 0.5rem;
+		border-radius: 2px;
 		background: rgba(255, 255, 255, 0.05);
 		color: white;
 		font-size: 1rem;
@@ -292,7 +289,7 @@
 		align-items: center;
 		cursor: pointer;
 		padding: 0.5rem;
-		border-radius: 0.375rem;
+		border-radius: 2px;
 		transition: background-color 0.2s ease;
 	}
 
@@ -308,7 +305,7 @@
 		width: 18px;
 		height: 18px;
 		border: 2px solid rgba(128, 255, 219, 0.3);
-		border-radius: 3px;
+		border-radius: 2px;
 		margin-right: 0.75rem;
 		display: flex;
 		align-items: center;
@@ -318,7 +315,7 @@
 	}
 
 	.interest-checkbox input:checked + .checkmark {
-		background: linear-gradient(45deg, var(--aeon-primary), var(--aeon-biolum));
+		background: var(--aeon-primary);
 		border-color: var(--aeon-biolum);
 	}
 
@@ -340,8 +337,8 @@
 		min-height: 44px;
 		padding: 0.875rem 1.5rem;
 		border: none;
-		border-radius: 0.5rem;
-		background: linear-gradient(45deg, var(--aeon-primary), var(--aeon-biolum));
+		border-radius: 2px;
+		background: var(--aeon-primary);
 		color: var(--aeon-deep-space);
 		font-size: 1rem;
 		font-weight: 500;
@@ -422,8 +419,12 @@
 
 	.btn-primary,
 	.btn-secondary {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		padding: 0.75rem 1.5rem;
-		border-radius: 0.5rem;
+		border-radius: 2px;
 		font-size: 0.95rem;
 		font-weight: 500;
 		cursor: pointer;
@@ -432,7 +433,12 @@
 	}
 
 	.btn-primary {
-		background: linear-gradient(45deg, var(--aeon-primary), var(--aeon-biolum));
+		background: var(--aeon-biolum);
+		color: var(--aeon-deep-space);
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		color: var(--aeon-deep-space);
 	}
 

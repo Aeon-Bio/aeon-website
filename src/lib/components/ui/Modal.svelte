@@ -82,9 +82,11 @@
 			// Focus the modal content after a short delay to ensure it's rendered
 			setTimeout(() => {
 				if (modalContent) {
-					const firstFocusable = modalContent.querySelector(
-						'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-					) as HTMLElement;
+					const firstFocusable =
+						modalContent.querySelector('input, select, textarea') ||
+						(modalContent.querySelector(
+							'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+						) as HTMLElement);
 					if (firstFocusable) {
 						firstFocusable.focus();
 					} else {
@@ -167,7 +169,7 @@
 	.modal-content {
 		background: var(--aeon-surface-0);
 		border: 1px solid rgba(128, 255, 219, 0.2);
-		border-radius: 1rem;
+		border-radius: 4px;
 		box-shadow:
 			0 0 0 1px rgba(76, 201, 240, 0.1),
 			0 8px 32px rgba(0, 0, 0, 0.6),
@@ -200,7 +202,7 @@
 		color: rgba(255, 255, 255, 0.7);
 		cursor: pointer;
 		padding: 0.5rem;
-		border-radius: 0.5rem;
+		border-radius: 2px;
 		transition:
 			color 0.3s ease,
 			background-color 0.3s ease;

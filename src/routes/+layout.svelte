@@ -11,13 +11,6 @@
 </div>
 
 <style>
-	.background-layer {
-		position: fixed;
-		inset: 0;
-		z-index: 0;
-		pointer-events: none;
-	}
-
 	.app {
 		display: flex;
 		flex-direction: column;
@@ -36,10 +29,6 @@
 
 	footer {
 		display: none;
-	}
-
-	footer a {
-		font-weight: bold;
 	}
 
 	@media (min-width: 480px) {
