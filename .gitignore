@@ -23,3 +23,6 @@ vite.config.ts.timestamp-*
 # Debug artifacts
 .playwright-mcp/
 __pycache__/
+
+# disclosure gate terms stay local
+tests/th/_deny.local.mjs
