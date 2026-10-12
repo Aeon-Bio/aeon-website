@@ -125,3 +125,125 @@ button:focus:not(:focus-visible) {
 	width: 1px;
 	white-space: nowrap;
 }
+
+/* ---------- Japanese (BRIEF §4) ----------
+   Zen Kaku Gothic New is the card's Japanese face, used for display and body alike.
+   unicode-range keeps it to kana/kanji/full-width forms, so the English page never
+   downloads it and Latin fragments inside Japanese copy stay in the Latin faces. */
+@font-face {
+	font-family: 'Zen Kaku Gothic New';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 400;
+	src: url('../node_modules/@fontsource/zen-kaku-gothic-new/files/zen-kaku-gothic-new-japanese-400-normal.woff2')
+		format('woff2');
+	unicode-range: U+3000-30FF, U+31F0-31FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: 'Zen Kaku Gothic New';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 500;
+	src: url('../node_modules/@fontsource/zen-kaku-gothic-new/files/zen-kaku-gothic-new-japanese-500-normal.woff2')
+		format('woff2');
+	unicode-range: U+3000-30FF, U+31F0-31FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
+}
+@font-face {
+	font-family: 'Zen Kaku Gothic New';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 700;
+	src: url('../node_modules/@fontsource/zen-kaku-gothic-new/files/zen-kaku-gothic-new-japanese-700-normal.woff2')
+		format('woff2');
+	unicode-range: U+3000-30FF, U+31F0-31FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FF00-FFEF;
+}
+
+/* the token block is untouched: the two face tokens are re-pointed for Japanese only.
+   Latin first so the wordmark and Latin fragments keep Josefin / DM Sans. */
+:root:lang(ja),
+:lang(ja) {
+	--font-display: 'Josefin Sans Variable', 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+	--font-body: 'DM Sans Variable', 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+	--font-primary: var(--font-body);
+}
+
+/* a span marked English inside Japanese copy gets the Latin faces back */
+:lang(ja) :lang(en) {
+	--font-display: 'Josefin Sans Variable', 'Futura', 'Helvetica Neue', sans-serif;
+	--font-body: 'DM Sans Variable', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* no italics in Japanese: synthetic oblique kana is wrong. !important because the
+   page's scoped rules (.line, .level h2 em, ConcernCanvas) set italic at higher specificity. */
+:lang(ja),
+:lang(ja) * {
+	font-style: normal !important;
+}
+
+/* headings: the plain half at 500, the <em> half at 400 and a lower ink, as on the card */
+:lang(ja) h1,
+:lang(ja) h2,
+:lang(ja) h3 {
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	text-wrap: balance;
+	line-break: strict;
+	word-break: normal;
+	/* Chrome breaks at 文節 (built-in phrase segmenter); others fall back to normal */
+	word-break: auto-phrase;
+	overflow-wrap: normal;
+}
+
+:lang(ja) h1 em,
+:lang(ja) h2 em,
+:lang(ja) h3 em,
+:lang(ja) h1 i,
+:lang(ja) h2 i,
+:lang(ja) h3 i {
+	font-weight: 400 !important;
+	color: var(--ink-70);
+}
+
+:lang(ja) em,
+:lang(ja) i {
+	font-weight: 400;
+}
+
+/* the em half of the dish and readout headings starts its own line, so no 文節 (条件を, どの)
+   straddles the ink change; also covers browsers without word-break: auto-phrase */
+:lang(ja) #dish-heading .h-em,
+:lang(ja) #readout-heading .h-em {
+	display: block;
+}
+
+/* body copy: Japanese needs more leading than Latin */
+:lang(ja) p {
+	line-break: strict;
+	line-height: 1.8;
+}
+
+/* hero: 変えて、観る。 is seven full-width characters; 8em holds it on one line at 3.6rem
+   (the English 20ch budget is Latin-sized). The id beats the page's scoped h1 rule. */
+:lang(ja) #hero-heading {
+	max-width: 8em;
+	letter-spacing: 0.02em;
+}
+
+/* dish: 13 + 13 + 8 characters → three lines at 1440 (2.6rem); 16ch would be ~8 kanji wide */
+:lang(ja) #dish-heading {
+	max-width: 13.5em;
+}
+
+@media (max-width: 63.99rem) {
+	:lang(ja) #dish-heading {
+		max-width: 100%;
+	}
+}
+
+/* the hero cue in Japanese is a line of text, not tracked mono caps */
+:lang(ja) a.cue {
+	font-family: var(--font-body);
+	font-size: 0.86rem;
+	letter-spacing: 0.06em;
+	text-transform: none;
+}

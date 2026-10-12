@@ -1,6 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { compileSvelte } from './_compile.mjs';
+import { pathToFileURL } from 'node:url';
+import { resolve } from 'node:path';
+// the beat captions live in the messages module; the figure says them by key (or, before i18n, literally)
+const { en } = await import(pathToFileURL(resolve('src/lib/i18n/en.ts')).href);
+const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** en.beats.<key> is exactly `text`, and a beat says it: `say: '<text>'` or `say: m.beats.<key>` */
+function says(source, key, text, tail, label) {
+	assert.equal(en.beats[key], text, `en.beats.${key} (${label})`);
+	assert.match(source, new RegExp(`say: (?:'${esc(text)}'|m\\.beats\\.${key})${tail}`), label);
+}
 
 const FILE = 'src/lib/components/diagrams/InstrumentSection.svelte';
 
@@ -38,22 +48,23 @@ test('the experiment is the grammar a cause is earned in, named after it is show
 	assert.match(source, /const DROP_H = 150/, 'a change is released from a fixed height');
 	assert.match(source, /const HOVER = 0\.3/, 'it waits there');
 	assert.match(source, /DROP_H \* \(1 - fk \* fk\)/, 'and falls under gravity');
-	assert.match(source, /say: 'Changes come from above\.' \}/, 'named as it happens');
+	says(source, 'above', 'Changes come from above.', ' \\}', 'named as it happens');
 	assert.match(source, /fade: MACRO, dur: 0\.9/, 'a cross-fade on the well, never an edge-on swing');
-	assert.match(source, /say: 'We watch from below\.' \}/, 'named as it happens');
+	says(source, 'below', 'We watch from below.', ' \\}', 'named as it happens');
 	assert.match(source, /const MACRO = \{ tx: 200, ty: 392, az: 0, el: -90 \* D2R, dist: 8000, f: 8000 \* 3\.3/, 'close on one well, from below');
 	assert.match(source, /cam: PLATE, dur: 1\.6/, 'pulls back to the plate');
 	assert.match(source, /fade: SYSTEM, dur: 1\.2/, 'fades back to the side');
 	assert.match(source, /const NIGHT = \[28\.5, 34\.0\]/, 'a night before the day after');
 	assert.match(source, /the exposure fades at the edges of the frame/, 'no straight cuts through wells');
 	assert.match(source, /threshold: 0\.5/, 'the clock starts when the figure is half in view');
-	assert.match(source, /say: 'The same change, again\.'/, 'replication');
-	assert.match(source, /say: 'Three strengths\.'/, 'dose');
+	says(source, 'again', 'The same change, again.', '', 'replication');
+	says(source, 'strengths', 'Three strengths.', '', 'dose');
 	assert.match(source, /change: \['T0', 0\.3\] \}[\s\S]*change: \['T1', 0\.55\] \}[\s\S]*change: \['T2', 1\] \}/, 'a geometric series, in order');
-	assert.match(source, /say: 'These were never touched\.'/, 'control, there all along, named late');
-	assert.match(source, /say: 'A day later\. The same cells\.'/, 'time');
+	says(source, 'untouched', 'These were never touched.', '', 'control, there all along, named late');
+	says(source, 'later', 'A day later. The same cells.', '', 'time');
 	assert.match(source, /const CYCLE = 50/, 'under a minute, front-loaded');
 	assert.doesNotMatch(source, /or it is not|is earned\.'/, 'no sermon: sentences name what was shown');
+	for (const v of Object.values(en.beats)) assert.doesNotMatch(`${v}'`, /or it is not|is earned\.'/, 'no sermon in en.beats');
 	assert.match(source, /for \(let r = -1; r <= 3; r\+\+\)/, 'a ring of wells runs off the frame: a patch of something larger');
 	assert.match(source, /w\.entryA = ENTRY_A \+ \(rnd\(\) - 0\.5\) \* 0\.16/, 'one hand: the same place in every well, every time');
 });

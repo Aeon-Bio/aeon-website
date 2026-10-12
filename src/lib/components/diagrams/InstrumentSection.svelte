@@ -28,6 +28,9 @@
 -->
 <script>
 	import { onMount } from 'svelte';
+	import { useMessages, useLang } from '$lib/i18n';
+	const m = useMessages();
+	const lang = useLang();
 
 	const FW = 800;
 	const PITCH = 220;
@@ -65,20 +68,20 @@
 		{ at: 2.0, cam: CLOSE, dur: 1.5 },
 		{ at: 3.5, cam: CLOSE_DRIFT, dur: 3.0 },
 		{ at: 3.5, change: ['M0', 1] },
-		{ at: 3.8, say: 'Changes come from above.' },
+		{ at: 3.8, say: m.beats.above },
 		{ at: 5.2, fade: MACRO, dur: 0.9 },
-		{ at: 6.4, say: 'We watch from below.' },
+		{ at: 6.4, say: m.beats.below },
 		{ at: 11.0, cam: PLATE, dur: 1.6 },
-		{ at: 12.8, say: 'The same change, again.' },
+		{ at: 12.8, say: m.beats.again },
 		{ at: 13.0, change: ['M1', 1] },
 		{ at: 13.6, change: ['M2', 1] },
-		{ at: 18.0, say: 'Three strengths.' },
+		{ at: 18.0, say: m.beats.strengths },
 		{ at: 18.2, change: ['T0', 0.3] },
 		{ at: 18.8, change: ['T1', 0.55] },
 		{ at: 19.4, change: ['T2', 1] },
-		{ at: 24.0, say: 'These were never touched.' },
+		{ at: 24.0, say: m.beats.untouched },
 		{ at: 28.5, say: '' },
-		{ at: 34.0, say: 'A day later. The same cells.' },
+		{ at: 34.0, say: m.beats.later },
 		{ at: 34.2, change: ['T0', 0.3] },
 		{ at: 34.8, change: ['T1', 0.55] },
 		{ at: 35.4, change: ['T2', 1] },
@@ -92,8 +95,7 @@
 	];
 	// the watcher's walk: a steady pace, neighbour to neighbour, stopping under the well the change will go into
 	const WALK = [[0, 'T2'], [1.0, 'T1'], [2.0, 'T0'], [3.0, 'M0'], [7.5, 'M0'], [8.5, 'M1'], [9.5, 'M2'], [10.5, 'B2'], [11.5, 'B1'], [12.5, 'B0'], [13.5, 'M0'], [14.5, 'T0'], [15.5, 'T1'], [16.5, 'T2']];
-	const STILL =
-		'Changes come from above; we watch from below. Three strengths, three repeats, three never touched; a day later the same cells answer again.';
+	const STILL = m.beats.still;
 	// (the sentence of the still exposure)
 
 	let canvas;
@@ -738,7 +740,7 @@
 	>
 		<canvas class="instrument" class:shown={live} bind:this={canvas} aria-hidden="true"></canvas>
 	</div>
-	<p class="pass" class:off={capOff} aria-live="polite">{caption}</p>
+	<p class="pass" class:off={capOff} aria-live="polite" {lang}>{caption}</p>
 </div>
 
 <style>

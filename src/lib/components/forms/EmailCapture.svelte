@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
+	import { useMessages } from '$lib/i18n';
+
+	const f = useMessages().follow;
 
 	const dispatch = createEventDispatcher();
 
@@ -17,12 +20,14 @@
 	let isSubmitting = false;
 	let isSubmitted = false;
 	let error = '';
+	// true when the error concerns the address itself (was: error.includes('email'), which only holds in English)
+	let emailError = false;
 
 	const interestOptions = [
-		{ value: 'build-progress', label: 'Build progress' },
-		{ value: 'hardware-files', label: 'Hardware files, when they publish' },
-		{ value: 'analysis', label: 'Analysis and models' },
-		{ value: 'visit-or-call', label: 'A visit or a call' }
+		{ value: 'build-progress', label: f.optBuild },
+		{ value: 'hardware-files', label: f.optHardware },
+		{ value: 'analysis', label: f.optAnalysis },
+		{ value: 'visit-or-call', label: f.optVisit }
 	];
 
 	function validateEmail(email: string): boolean {
@@ -39,14 +44,17 @@
 
 	async function submitForm() {
 		error = '';
+		emailError = false;
 
 		if (!formData.email.trim()) {
-			error = 'Email address is required';
+			error = f.emailRequired;
+			emailError = true;
 			return;
 		}
 
 		if (!validateEmail(formData.email)) {
-			error = 'Please enter a valid email address';
+			error = f.emailInvalid;
+			emailError = true;
 			return;
 		}
 
@@ -75,7 +83,7 @@
 			}
 		} catch (err) {
 			console.error('Error submitting email:', err);
-			error = 'Something went wrong. Please try again.';
+			error = f.failed;
 		} finally {
 			isSubmitting = false;
 		}
@@ -88,29 +96,27 @@
 		};
 		isSubmitted = false;
 		error = '';
+		emailError = false;
 	}
 </script>
 
 <div class="email-capture">
 	{#if !isSubmitted}
 		<form on:submit|preventDefault={submitForm}>
-			<h3>Follow the build</h3>
-			<p>
-				Occasional notes as the instrument comes together: what we measured, what we changed, and
-				when there is something to see. No more than one email a month.
-			</p>
+			<h3>{f.title}</h3>
+			<p>{f.body}</p>
 
 			<div class="form-group">
-				<label for="email" class="visually-hidden">Email Address</label>
+				<label for="email" class="visually-hidden">{f.email}</label>
 				<input
 					id="email"
 					type="email"
 					bind:value={formData.email}
-					placeholder="Enter your email address"
-					class:error={error && error.includes('email')}
-					aria-label="Email address for updates"
+					placeholder={f.emailPlaceholder}
+					class:error={error && emailError}
+					aria-label={f.emailAria}
 					aria-describedby={error ? 'email-error' : undefined}
-					aria-invalid={!!(error && error.includes('email'))}
+					aria-invalid={!!(error && emailError)}
 					required
 				/>
 				{#if error}
@@ -126,7 +132,7 @@
 			<div class="interests-group">
 				<fieldset>
 					<legend class="interests-label"
-						>I'm interested in: <span class="optional">(optional)</span></legend
+						>{f.interest} <span class="optional">{f.optional}</span></legend
 					>
 					<div class="interests-grid">
 						{#each interestOptions as option, index (option.value)}
@@ -155,9 +161,9 @@
 			>
 				{#if isSubmitting}
 					<div class="spinner" aria-hidden="true"></div>
-					<span id="submit-status">Sending…</span>
+					<span id="submit-status">{f.sending}</span>
 				{:else}
-					<span id="submit-status">Follow</span>
+					<span id="submit-status">{f.submit}</span>
 					<svg
 						width="16"
 						height="16"
@@ -187,12 +193,12 @@
 					<polyline points="22,4 12,14.01 9,11.01" />
 				</svg>
 			</div>
-			<h3>Thanks, you're on the list.</h3>
-			<p>We'll write when there is something real to show.</p>
-			<p class="next-steps">No confirmation email. We only write when there is news.</p>
+			<h3>{f.thanks}</h3>
+			<p>{f.reply}</p>
+			<p class="next-steps">{f.nextSteps}</p>
 			<div class="success-actions">
-				<button class="btn-primary" on:click={() => dispatch('close')}> Close </button>
-				<button class="btn-secondary" on:click={resetForm}> Add another address </button>
+				<button class="btn-primary" on:click={() => dispatch('close')}> {f.close} </button>
+				<button class="btn-secondary" on:click={resetForm}> {f.another} </button>
 			</div>
 		</div>
 	{/if}

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
+	import { useMessages } from '$lib/i18n';
+
+	const f = useMessages().form;
 
 	const dispatch = createEventDispatcher();
 
@@ -26,23 +29,23 @@
 	let errors: Partial<FormData> = {};
 
 	const partnershipTypes = [
-		{ value: 'wet-lab', label: 'I run a wet lab' },
-		{ value: 'data', label: 'I hold perturbation data' },
-		{ value: 'other', label: 'Something else' }
+		{ value: 'wet-lab', label: f.optWetLab },
+		{ value: 'data', label: f.optData },
+		{ value: 'other', label: f.optOther }
 	];
 
 	function validateStep(step: number): boolean {
 		errors = {};
 
 		if (step === 1) {
-			if (!formData.name.trim()) errors.name = 'Name is required';
-			if (!formData.email.trim()) errors.email = 'Email is required';
-			else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Valid email is required';
-			if (!formData.organization.trim()) errors.organization = 'Organization is required';
+			if (!formData.name.trim()) errors.name = f.nameRequired;
+			if (!formData.email.trim()) errors.email = f.emailRequired;
+			else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = f.emailInvalid;
+			if (!formData.organization.trim()) errors.organization = f.orgRequired;
 		}
 
 		if (step === 2) {
-			if (!formData.partnershipType) errors.partnershipType = 'Please pick one';
+			if (!formData.partnershipType) errors.partnershipType = f.pickOneError;
 		}
 
 		return Object.keys(errors).length === 0;
@@ -91,7 +94,7 @@
 			}
 		} catch (error) {
 			console.error('Error submitting form:', error);
-			errors.partnershipType = 'Something went wrong. Please try again.';
+			errors.partnershipType = f.failed;
 		} finally {
 			isSubmitting = false;
 		}
@@ -119,24 +122,24 @@
 			aria-valuemin="1"
 			aria-valuemax="2"
 			aria-valuenow={currentStep}
-			aria-label="Form progress"
+			aria-label={f.progress}
 		>
-			<span id="step-progress" class="progress-text">Step {currentStep} of 2</span>
+			<span id="step-progress" class="progress-text">{f.step.replace('{n}', String(currentStep)).replace('{total}', '2')}</span>
 		</div>
 
 		<form on:submit|preventDefault={currentStep === 2 ? submitForm : nextStep}>
 			{#if currentStep === 1}
 				<div class="form-step" transition:fade={{ duration: 200 }}>
-					<h3>Who you are</h3>
+					<h3>{f.who}</h3>
 
 					<div class="form-group">
-						<label for="name">Full Name *</label>
+						<label for="name">{f.name} *</label>
 						<input
 							id="name"
 							type="text"
 							bind:value={formData.name}
 							class:error={errors.name}
-							placeholder="Your full name"
+							placeholder={f.namePlaceholder}
 							aria-describedby={errors.name ? 'name-error' : undefined}
 							aria-invalid={!!errors.name}
 							required
@@ -152,13 +155,13 @@
 					</div>
 
 					<div class="form-group">
-						<label for="email">Email Address *</label>
+						<label for="email">{f.email} *</label>
 						<input
 							id="email"
 							type="email"
 							bind:value={formData.email}
 							class:error={errors.email}
-							placeholder="your.email@organization.com"
+							placeholder={f.emailPlaceholder}
 							aria-describedby={errors.email ? 'email-error' : undefined}
 							aria-invalid={!!errors.email}
 							required
@@ -174,13 +177,13 @@
 					</div>
 
 					<div class="form-group">
-						<label for="organization">Organization *</label>
+						<label for="organization">{f.org} *</label>
 						<input
 							id="organization"
 							type="text"
 							bind:value={formData.organization}
 							class:error={errors.organization}
-							placeholder="Your company or institution"
+							placeholder={f.orgPlaceholder}
 							aria-describedby={errors.organization ? 'organization-error' : undefined}
 							aria-invalid={!!errors.organization}
 							required
@@ -197,7 +200,7 @@
 
 					<div class="form-actions">
 						<button type="submit" class="btn-primary" aria-describedby="step-progress">
-							Continue
+							{f.next}
 							<svg
 								width="16"
 								height="16"
@@ -216,11 +219,11 @@
 
 			{#if currentStep === 2}
 				<div class="form-step" transition:fade={{ duration: 200 }}>
-					<h3>What would you like to talk about?</h3>
-					<p>A few lines is enough.</p>
+					<h3>{f.topic}</h3>
+					<p>{f.fewLines}</p>
 
 					<div class="form-group">
-						<label for="partnership-type">What brings you here *</label>
+						<label for="partnership-type">{f.why} *</label>
 						<select
 							id="partnership-type"
 							bind:value={formData.partnershipType}
@@ -229,7 +232,7 @@
 							aria-invalid={!!errors.partnershipType}
 							required
 						>
-							<option value="">Pick one</option>
+							<option value="">{f.pickOne}</option>
 							{#each partnershipTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -245,13 +248,13 @@
 					</div>
 
 					<div class="form-group">
-						<label for="use-case">Tell us more about your use case</label>
+						<label for="use-case">{f.more}</label>
 						<textarea
 							id="use-case"
 							bind:value={formData.useCase}
-							placeholder="Tell us about your cells, what you measure today, and what is slow about it."
+							placeholder={f.morePlaceholder}
 							rows="4"
-							aria-label="Describe your use case, project details, research goals, data types, or collaboration vision"
+							aria-label={f.moreAria}
 						></textarea>
 					</div>
 
@@ -260,7 +263,7 @@
 							type="button"
 							class="btn-secondary"
 							on:click={prevStep}
-							aria-label="Go back to previous step"
+							aria-label={f.backAria}
 						>
 							<svg
 								width="16"
@@ -273,7 +276,7 @@
 							>
 								<path d="m15 18-6-6 6-6" />
 							</svg>
-							Back
+							{f.back}
 						</button>
 						<button
 							type="submit"
@@ -283,9 +286,9 @@
 						>
 							{#if isSubmitting}
 								<div class="spinner" aria-hidden="true"></div>
-								<span id="submit-status">Sending…</span>
+								<span id="submit-status">{f.sending}</span>
 							{:else}
-								<span id="submit-status">Send</span>
+								<span id="submit-status">{f.submit}</span>
 							{/if}
 						</button>
 					</div>
@@ -307,15 +310,12 @@
 					<circle cx="12" cy="12" r="10" />
 				</svg>
 			</div>
-			<h3>Thanks, we have it.</h3>
-			<p>Eric reads every message and replies himself.</p>
-			<p class="next-steps">
-				There is no product to demo yet. What we can offer is a conversation about how you measure
-				whether your cells work, and what is slow about it.
-			</p>
+			<h3>{f.thanks}</h3>
+			<p>{f.reply}</p>
+			<p class="next-steps">{f.nextSteps}</p>
 			<div class="success-actions">
-				<button class="btn-primary" on:click={() => dispatch('close')}>Close</button>
-				<button class="btn-secondary" on:click={resetForm}>Write another</button>
+				<button class="btn-primary" on:click={() => dispatch('close')}>{f.close}</button>
+				<button class="btn-secondary" on:click={resetForm}>{f.another}</button>
 			</div>
 		</div>
 	{/if}

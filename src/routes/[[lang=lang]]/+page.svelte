@@ -7,6 +7,17 @@
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
 	import { Linkedin, Github, GraduationCap } from 'lucide-svelte';
+	import { useMessages, useLang, pathFor } from '$lib/i18n';
+
+	const m = useMessages();
+	const lang = useLang();
+
+	/** the other language: its link sets the cookie through ?lang= in hooks.server.ts */
+	const other = lang === 'ja' ? 'en' : 'ja';
+	const switchHref = `${pathFor(other)}?lang=${other}`;
+
+	/** a message may carry explicit phrase breaks as \n; each becomes a <br> */
+	const lines = (s: string): string[] => s.split('\n');
 
 	/** the write-to-us block */
 	const SHOW_CONTACT = true;
@@ -17,18 +28,13 @@
 </script>
 
 <svelte:head>
-	<title>aeon.science</title>
-	<meta
-		name="description"
-		content="An instrument that sits on a liquid-handling robot, keeps cells alive in standard plates, and images them while the robot changes their conditions, so you can see which conditions make the cells work well."
-	/>
-	<meta property="og:title" content="aeon.science" />
+	<title>{m.meta.title}</title>
+	<meta name="description" content={m.meta.description} />
+	<meta property="og:title" content={m.meta.ogTitle} />
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://aeon.science/" />
-	<meta
-		property="og:description"
-		content="An instrument that sits on a liquid-handling robot, keeps cells alive in standard plates, and images them while the robot changes their conditions."
-	/>
+	<meta property="og:url" content={lang === 'ja' ? 'https://aeon.science/ja' : 'https://aeon.science/'} />
+	<meta property="og:locale" content={m.meta.ogLocale} />
+	<meta property="og:description" content={m.meta.ogDescription} />
 	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
@@ -42,12 +48,15 @@
 	<div class="hero-grid">
 		<div class="hero-text">
 			<div class="hero-head">
-				<p class="wordmark">aeon<span>.science</span></p>
-				<p class="line">Open hardware for live-cell experiments.</p>
+				<div class="wordmark-row">
+					<p class="wordmark">aeon<span>.science</span></p>
+					<a class="lang-switch" href={switchHref} hreflang={other} lang={other}>{m.switch.label}</a>
+				</div>
+				<p class="line">{m.hero.line}</p>
 			</div>
 			<div class="hero-foot">
-				<h1 id="hero-heading">Change something. Watch.</h1>
-				<a class="cue" href="#dish-section">See how it works <span aria-hidden="true">↓</span></a>
+				<h1 id="hero-heading">{#each lines(m.hero.h1) as part, i}{#if i}<br />{/if}{part}{/each}</h1>
+				<a class="cue" href="#dish-section">{m.hero.cue} <span aria-hidden="true">↓</span></a>
 			</div>
 		</div>
 		<div class="hero-mark">
@@ -62,7 +71,8 @@
 <section id="dish-section" class="level dish" aria-labelledby="dish-heading">
 	<div class="content dish-grid">
 		<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
-			The cells never leave the plate. <em>The robot changes their conditions. We watch.</em>
+			{#each lines(m.dish.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
+			<em class="h-em">{#each lines(m.dish.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em>
 		</h2>
 		<figure class="diagram" use:reveal={{ delay: 140 }}>
 			<InstrumentSection />
@@ -74,16 +84,15 @@
 <section id="readout-section" class="level readout" aria-labelledby="readout-heading">
 	<div class="content">
 		<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
-			What comes back is a model.
-			<em>Which conditions make these cells work, with the evidence attached.</em>
+			{#each lines(m.readout.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
+			<em class="h-em">{#each lines(m.readout.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em>
 		</h2>
 		<p use:reveal={{ delay: 100 }}>
-			Every condition the robot sets is a perturbation; every frame is a measurement. From that time
-			series we fit a causal model of how the cells respond, the approach Karen Sachs introduced for
-			single-cell perturbation data in
-			<a href="https://doi.org/10.1126/science.1105809" target="_blank" rel="noopener noreferrer"
-				>Science (2005)</a
-			>.
+			{m.readout.pBefore}<a
+				href="https://doi.org/10.1126/science.1105809"
+				target="_blank"
+				rel="noopener noreferrer">{m.readout.pLink}</a
+			>{m.readout.pAfter}
 		</p>
 	</div>
 </section>
@@ -91,7 +100,7 @@
 <!-- 03 · return -->
 <section id="return-section" class="level" aria-labelledby="return-heading">
 	<div class="content">
-		<h2 id="return-heading" use:reveal={{ delay: 60 }}>Founders</h2>
+		<h2 id="return-heading" use:reveal={{ delay: 60 }}>{m.founders.h2}</h2>
 
 		<div class="people" use:reveal>
 			<div class="person">
@@ -102,52 +111,35 @@
 						height="512"
 						loading="lazy"
 						decoding="async"
-						alt="Eric Jing Mockler, smiling in glasses and a burgundy shirt"
+						alt={m.eric.alt}
 					/>
 				</div>
 				<div class="person-head">
-					<h3>Eric Jing Mockler</h3>
+					<h3>{m.eric.name}</h3>
 					<span class="links">
 						<a
 							href="https://www.linkedin.com/in/ejmockler/"
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label="Eric Jing Mockler on LinkedIn"><Linkedin size={16} strokeWidth={1.8} /></a
+							aria-label={m.eric.linkedin}><Linkedin size={16} strokeWidth={1.8} /></a
 						>
 						<a
 							href="https://github.com/ejmockler"
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label="Eric Jing Mockler on GitHub"><Github size={16} strokeWidth={1.8} /></a
+							aria-label={m.eric.github}><Github size={16} strokeWidth={1.8} /></a
 						>
 						<a
 							href="https://scholar.google.com/citations?user=ONHY9lsAAAAJ&hl=en"
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label="Eric Jing Mockler on Google Scholar"
-							><GraduationCap size={16} strokeWidth={1.8} /></a
+							aria-label={m.eric.scholar}><GraduationCap size={16} strokeWidth={1.8} /></a
 						>
 					</span>
 				</div>
-				<p class="role">Co-founder &amp; Engineer</p>
+				<p class="role">{m.eric.role}</p>
 				<p class="bio">
-					Bioengineering, cognitive science, neuroscience at UC Santa Cruz.
-					<a
-						href="https://github.com/ejmockler/case-control-genomics"
-						target="_blank"
-						rel="noopener noreferrer">Variant discovery</a
-					>
-					across 10,000+ genomes at
-					<a href="https://gladstone.org" target="_blank" rel="noopener noreferrer">Gladstone</a>
-					and
-					<a href="https://www.answerals.org" target="_blank" rel="noopener noreferrer"
-						>Answer ALS</a
-					>. With the Gyori lab,
-					<a
-						href="https://github.com/gyorilab/indra-belief-model"
-						target="_blank"
-						rel="noopener noreferrer">the belief model</a
-					>: does the paper actually say this causes that.
+					{#each m.eric.bio as s}{#if "href" in s}<a href={s.href} target="_blank" rel="noopener noreferrer">{s.t}</a>{:else}{s.t}{/if}{/each}
 				</p>
 			</div>
 			<div class="person">
@@ -158,71 +150,59 @@
 						height="512"
 						loading="lazy"
 						decoding="async"
-						alt="Karen Sachs, smiling, with sunglasses pushed up into her curly hair"
+						alt={m.karen.alt}
 					/>
 				</div>
 				<div class="person-head">
-					<h3>Karen Sachs, PhD</h3>
+					<h3>{m.karen.name}</h3>
 					<span class="links">
 						<a
 							href="https://www.linkedin.com/in/karen-sachs-b174313/"
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label="Karen Sachs on LinkedIn"><Linkedin size={16} strokeWidth={1.8} /></a
+							aria-label={m.karen.linkedin}><Linkedin size={16} strokeWidth={1.8} /></a
 						>
 						<a
 							href="https://scholar.google.com/citations?user=lS0tvhoAAAAJ&hl=en"
 							target="_blank"
 							rel="noopener noreferrer"
-							aria-label="Karen Sachs on Google Scholar"
-							><GraduationCap size={16} strokeWidth={1.8} /></a
+							aria-label={m.karen.scholar}><GraduationCap size={16} strokeWidth={1.8} /></a
 						>
 					</span>
 				</div>
-				<p class="role">Co-founder · CSO/CTO</p>
+				<p class="role">{m.karen.role}</p>
 				<p class="bio">
-					MIT PhD, biological engineering. Stanford Medicine postdoc.
-					<a
-						href="https://doi.org/10.1126/science.1105809"
-						target="_blank"
-						rel="noopener noreferrer">Causal networks from single-cell perturbation data</a
-					>; Science Breakthrough of the Year runner-up.
-					<a
-						href="https://scholar.google.com/citations?user=lS0tvhoAAAAJ&hl=en"
-						target="_blank"
-						rel="noopener noreferrer">60+ papers</a
-					>.
+					{#each m.karen.bio as s}{#if "href" in s}<a href={s.href} target="_blank" rel="noopener noreferrer">{s.t}</a>{:else}{s.t}{/if}{/each}
 				</p>
 			</div>
 		</div>
 
 		{#if SHOW_CONTACT}
 			<div class="contact" use:reveal>
-				<p>If you run a wet lab, or hold perturbation data, write.</p>
+				<p>{m.cta.line}</p>
 				<div class="cta-group left">
-					<button class="cta-primary" on:click={() => (showContact = true)}>Write to us</button>
-					<button class="cta-secondary" on:click={() => (showUpdates = true)}>Follow</button>
+					<button class="cta-primary" on:click={() => (showContact = true)}>{m.cta.write}</button>
+					<button class="cta-secondary" on:click={() => (showUpdates = true)}>{m.cta.follow}</button>
 				</div>
 			</div>
 		{/if}
 
 		<p class="colophon" use:reveal>
-			Open hardware under CERN-OHL-S-2.0 ·
-			<a
+			{m.colophon.text}<a
 				href="https://github.com/Aeon-Bio"
 				target="_blank"
 				rel="noopener noreferrer"
-				style="white-space: nowrap">Aeon-Bio on GitHub</a
+				style="white-space: nowrap">{m.colophon.link}</a
 			>
 		</p>
 	</div>
 </section>
 
-<Modal bind:isOpen={showContact} title="Write to us" maxWidth="600px">
+<Modal bind:isOpen={showContact} title={m.modal.write} maxWidth="600px">
 	<PartnershipInquiry on:close={() => (showContact = false)} />
 </Modal>
 
-<Modal bind:isOpen={showUpdates} title="Follow" maxWidth="500px">
+<Modal bind:isOpen={showUpdates} title={m.modal.follow} maxWidth="500px">
 	<EmailCapture on:close={() => (showUpdates = false)} />
 </Modal>
 
@@ -321,6 +301,31 @@
 		line-height: 1;
 		color: var(--ink-100);
 		margin: 0;
+	}
+
+	/* the wordmark row: the mark's name, and quietly to its right the other language */
+	.wordmark-row {
+		display: flex;
+		align-items: baseline;
+		gap: 1.1rem;
+	}
+
+	.lang-switch {
+		font-family: var(--font-display);
+		font-weight: 400;
+		font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+		line-height: 1;
+		color: var(--ink-70);
+		text-decoration: none;
+		/* a 44px target without moving the row */
+		padding-block: 0.9rem;
+		margin-block: -0.9rem;
+		transition: color var(--t-snap) var(--ease-out);
+	}
+
+	.lang-switch:hover,
+	.lang-switch:focus-visible {
+		color: var(--ink-100);
 	}
 
 	.wordmark span {

@@ -41,7 +41,7 @@ test('nothing under src imports a deleted module', () => {
 
 test('the ground is one gradient and nothing else', () => {
 	for (const p of GROUND) assert.ok(existsSync(p), `${p} missing`);
-	const page = readFileSync('src/routes/+page.svelte', 'utf8');
+	const page = readFileSync('src/routes/[[lang=lang]]/+page.svelte', 'utf8');
 	assert.match(page, /<div class="background-layer" aria-hidden="true">/, 'background layer div');
 	assert.match(page, /<ViewportGradient\b/, 'gradient mounted');
 	assert.doesNotMatch(page, /particle|mote|interactionState/i, 'no particle field, no dust coupling');
