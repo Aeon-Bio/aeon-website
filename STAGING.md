@@ -1,12 +1,13 @@
 # Staging deployment
 
 - Root URL: https://aeon-website-staging.pages.dev/
-- Per-deployment URL: https://e75efb79.aeon-website-staging.pages.dev
-- Deployment id: e75efb79 (supersedes 1682b382)
+- Per-deployment URL: https://18d14881.aeon-website-staging.pages.dev
+- Deployment id: 18d14881 (supersedes e75efb79)
 - Pages project: aeon-website-staging (account 019d1184e655db74b7589794a2a2a533), branch `staging`
-- Deployed at: 2026-10-11T07:56Z (hero line: "Open hardware for live-cell experiments."; F46)
-- Source commit: 33cbf28 (worktree was dirty; uploaded with `--commit-dirty=true`)
-- Deployed by: `bash scripts/deploy-staging.sh` (unmodified)
+- Deployed at: 2026-10-12 (hero mark centred on phones in WebKit; Japanese page)
+- Source commit: e7d1880 (clean worktree)
+- Deployed by: `bash scripts/deploy-staging.sh` with CLOUDFLARE_API_TOKEN, from a cloud session
+- Checked: hero mark centre = viewport centre at 390px in WebKit and Chromium; tests/th gates all pass
 
 ## Live check (2026-10-08T15:54:04Z)
 
