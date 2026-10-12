@@ -1,3 +1,2 @@
 User-agent: *
-Disallow: /insights
-Disallow: /analyze
+Allow: /
