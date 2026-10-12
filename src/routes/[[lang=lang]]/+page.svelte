@@ -407,7 +407,10 @@
 			width: 112vw;
 			max-width: none;
 			justify-self: start;
-			margin-left: calc(50% - 56vw - 16px + 16px);
+			/* centre the 112vw mark on the viewport: back out the grid's 16px gutter and the extra
+			   6vw each side. No % here: WebKit resolves a grid item's % margin differently from
+			   Blink and lands the mark ~20px right of centre. */
+			margin-left: calc(-6vw - 16px);
 			margin-top: 6vh;
 			transform: none;
 		}
