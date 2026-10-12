@@ -4,18 +4,18 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 // Dropped by the design brief: the perspective grid, random streaks, the glass chip
-// face and the old logo. The particle field and viewport gradient stay as ground.
+// face and the old logo; then (2026-10-12) the particle field, whose motes read as
+// smears on the screen. The viewport gradient alone is the ground.
 const GONE = [
 	'src/lib/components/GridSystem.svelte',
 	'src/lib/components/EnergyFlow.svelte',
 	'src/lib/components/MolecularContainer.svelte',
+	'src/lib/components/ScrollDrivenParticleField.svelte',
+	'src/lib/stores/interaction.ts',
 	'src/lib/images/AeonLogo.svelte',
 	'src/lib/images/AeonMark.svelte'
 ];
-const GROUND = [
-	'src/lib/components/ScrollDrivenParticleField.svelte',
-	'src/lib/components/ViewportGradient.svelte'
-];
+const GROUND = ['src/lib/components/ViewportGradient.svelte'];
 const NAMES = GONE.map((p) => p.split('/').pop().replace('.svelte', ''));
 
 function walk(dir, out = []) {
@@ -39,18 +39,12 @@ test('nothing under src imports a deleted module', () => {
 	}
 });
 
-test('the ground is mounted and tuned as dust, not a network', () => {
+test('the ground is one gradient and nothing else', () => {
 	for (const p of GROUND) assert.ok(existsSync(p), `${p} missing`);
 	const page = readFileSync('src/routes/+page.svelte', 'utf8');
 	assert.match(page, /<div class="background-layer" aria-hidden="true">/, 'background layer div');
-	assert.match(page, /<ScrollDrivenParticleField \/>/, 'field mounted');
 	assert.match(page, /<ViewportGradient\b/, 'gradient mounted');
-	const field = readFileSync(GROUND[0], 'utf8');
-	assert.match(field, /const DRAW_CONNECTIONS = false;/, 'connection pass off');
-	assert.match(field, /const BASE_PARTICLE_COUNT = 120;/, '120 motes at 1920');
-	assert.match(field, /const MIN_PARTICLE_COUNT = 60;/, '60 motes minimum');
-	assert.match(field, /opacity: Math\.random\(\) \* 0\.16 \+ 0\.06,/, 'mote alpha 0.06–0.22');
-	assert.match(field, /prefers-reduced-motion/, 'reduced motion honoured');
+	assert.doesNotMatch(page, /particle|mote|interactionState/i, 'no particle field, no dust coupling');
 });
 
 test('layout has no dead rules', () => {

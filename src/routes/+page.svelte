@@ -4,11 +4,7 @@
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
-	import ScrollDrivenParticleField from '$lib/components/ScrollDrivenParticleField.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
-	import { interactionState } from '$lib/stores/interaction';
-	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import { reveal } from '$lib/actions/reveal';
 	import { Linkedin, Github, GraduationCap } from 'lucide-svelte';
 
@@ -18,27 +14,6 @@
 	let showContact = false;
 	let showUpdates = false;
 
-	/* the ground: the field sizes itself once, so it is remounted after a resize settles */
-	let shouldRenderParticles = true;
-	let resizeTimer: ReturnType<typeof setTimeout>;
-	function handleResize() {
-		shouldRenderParticles = false;
-		clearTimeout(resizeTimer);
-		resizeTimer = setTimeout(() => (shouldRenderParticles = true), 500);
-	}
-
-	/* attention on the text column lifts the dust a little (the old container's coupling) */
-	function lift(el: HTMLElement) {
-		interactionState.update((s) => ({ ...s, hoveredElement: el, systemActivity: 0.8 }));
-	}
-	function settle() {
-		interactionState.update((s) => ({ ...s, hoveredElement: null, systemActivity: 0 }));
-	}
-
-	onMount(() => {
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	});
 </script>
 
 <svelte:head>
@@ -57,24 +32,15 @@
 	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
+<!-- the ground is the room's own light: one gradient and nothing scattered on it -->
 <div class="background-layer" aria-hidden="true">
-	{#if shouldRenderParticles}
-		<div transition:fade={{ duration: 320 }}>
-			<ScrollDrivenParticleField />
-		</div>
-	{/if}
 	<ViewportGradient opacity={0.9} />
 </div>
 
 <!-- 00 · the card at viewport scale: text in the mark's light, the mark owns the right -->
 <section id="hero-section" class="hero" aria-labelledby="hero-heading">
 	<div class="hero-grid">
-		<div
-			class="hero-text"
-			role="presentation"
-			on:mouseenter={(e) => lift(e.currentTarget)}
-			on:mouseleave={settle}
-		>
+		<div class="hero-text">
 			<div class="hero-head">
 				<p class="wordmark">aeon<span>.science</span></p>
 				<p class="line">Open hardware for live-cell experiments.</p>
@@ -713,12 +679,12 @@
 		border-radius: 2px;
 	}
 
+	/* the links belong to the name: they sit beside it, not at the column's far edge */
 	.person-head {
 		grid-row: 2;
 		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		gap: 1rem;
+		align-items: center;
+		gap: 0.9rem;
 	}
 
 	.person h3 {
@@ -730,7 +696,8 @@
 
 	.links {
 		display: flex;
-		gap: 0.6rem;
+		gap: 0.55rem;
+		transform: translateY(1px);
 	}
 
 	.links a {
@@ -745,11 +712,11 @@
 
 	.person .role {
 		grid-row: 3;
-		font-family: var(--font-mono);
-		font-size: 0.7rem !important;
-		letter-spacing: 0.1em;
+		font-family: var(--font-body);
+		font-size: 0.82rem !important;
+		letter-spacing: 0.01em;
 		color: var(--ink-50) !important;
-		margin: 0.2rem 0 0.7rem !important;
+		margin: 0.25rem 0 0.7rem !important;
 	}
 
 	.person p {
