@@ -515,8 +515,7 @@
 			pctx.setTransform(1, 0, 0, 1, 0, 0);
 			pctx.clearRect(0, 0, plate.width, plate.height);
 			pctx.globalCompositeOperation = 'source-over';
-			pctx.fillStyle = rgba(PRIMARY, 0.03 * (1 - 0.6 * night));
-			pctx.fillRect(0, 0, plate.width, plate.height);
+			// no tint over the whole plate: a filled square reads as a window; the wells carry the light
 			pctx.globalCompositeOperation = 'lighter';
 			const [rx, ry] = watcherAt(u);
 			if (side > 0) {

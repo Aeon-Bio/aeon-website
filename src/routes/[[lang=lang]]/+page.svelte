@@ -246,8 +246,7 @@
 		/* clip only sideways: the mark may run off the right edge without widening the
 		   page, but its wash must bleed down into the next section. Clipped at the hero's
 		   bottom it was a hard line across the seam, the one edge this page refuses. */
-		overflow-x: clip;
-		overflow-y: visible;
+		overflow: clip;
 	}
 
 	.hero-grid {
@@ -279,15 +278,17 @@
 		transform: translateX(22%);
 	}
 
+	/* the halo lives inside the hero: it reaches transparent before the section's edge,
+	   so there is nothing to clip and nothing to leak into the dish */
 	.hero-mark::before {
 		content: '';
 		position: absolute;
-		inset: -28%;
+		inset: -12%;
 		background: radial-gradient(
 			closest-side,
-			rgba(76, 201, 240, 0.15),
-			rgba(76, 201, 240, 0.05) 55%,
-			transparent
+			rgba(76, 201, 240, 0.14),
+			rgba(76, 201, 240, 0.04) 50%,
+			transparent 76%
 		);
 		pointer-events: none;
 	}
@@ -595,16 +596,6 @@
 			width: min(100%, max(18rem, calc(100svh - 14rem)));
 			margin: 0;
 		}
-	}
-
-	/* the wash never reaches the section's clipped edge: a clipped gradient is a hard
-	   line across the seam between sections, the one kind of edge this page refuses */
-	.diagram::before {
-		content: '';
-		position: absolute;
-		inset: calc(-1 * min(2.75rem, 8%));
-		background: radial-gradient(closest-side, rgba(76, 201, 240, 0.06), transparent);
-		pointer-events: none;
 	}
 
 	/* ---------- readout ---------- */
