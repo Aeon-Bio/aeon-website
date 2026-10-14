@@ -3,21 +3,21 @@
 
   One patch of a standard plate, in one world. This is about changing something
   to see what it does. The view rests over the plate, from where changes come,
-  with the watcher's lamp walking underneath. Press a well and a change forms
-  above it, from the same side of the well every time; hold and it grows; let go
-  and it falls under gravity, spreads from where it entered, and the cells answer
-  with their own kinetics, or do not. When the change lands, the view goes down
-  through the floor of that well to the watcher's own view, so the answer is
-  watched cell by cell, and comes back up when it has been seen. Nothing happens
-  on a clock the reader has to wait for and nothing moves that the reader did
-  not cause, except the robot's answer to the reader's act: on arrival it puts
-  in one change, to show that this is done here; after the reader's first change
-  it puts the same change into the next wells of the row; after the second, a
-  row at three strengths. A row is never touched. The sentences name what the
-  light has shown, whoever caused it, and only when the view can see it. Grab
-  the stage and drag, and the view turns about where it rests, settling back
-  when let go. Nothing follows the pointer by itself; the page scrolls as a page.
-
+  with the watcher's lamp walking underneath, and never moves. The hand is the
+  dispenser: rest the pointer over a well and a change forms above it, from the
+  same side of the well every time; the longer the hand rests, the stronger it
+  grows; move on and it falls, or it falls by itself once it is full. A hand
+  merely passing over a well leaves nothing. On a device without a hover, one
+  tap is one full change. No click is needed anywhere; a click only drops what
+  the hand already holds. The change spreads from where it entered and the cells
+  answer with their own kinetics, or do not, in place, beside the wells that
+  were not touched. Nothing happens on a clock the reader has to wait for and
+  nothing moves that the reader did not cause, except the robot's answer to the
+  reader's act: on arrival it puts in one change, to show that this is done
+  here; after the reader's first change it puts the same change into the next
+  wells of the row; after the second, a row at three strengths. A row is never
+  touched. The sentences name what the light has shown, whoever caused it.
+  The page scrolls as a page.
   Nothing is drawn. Every light is a field or a point; the robot is where changes
   come from, the watcher is where the light under the plate is, the plate is the
   plane the cells sit on and the body that hides the lamp. Same material as the
@@ -49,7 +49,8 @@
 	const DROP_H = 150; // the fixed height a change is released from, above the plate
 	const HOVER = 0.3; // s the robot's change waits there before it is released
 	const FALL = 0.6; // s, the fall under gravity
-	const HOLD_T = 0.7; // s of holding for the hand's change to reach full strength
+	const HOLD_T = 0.7; // s of the hand resting for its change to reach full strength
+	const PASS_T = 0.12; // s: a hand merely passing over a well leaves nothing
 	const OBS_Z = -110; // the watcher, under the plate: what the eye sees is the floor it lights, not the lamp
 	const PACE = 1.0; // s, the watcher's walk from one well to the next
 	const D2R = Math.PI / 180;
@@ -59,25 +60,9 @@
 	// HOME: over the plate from where changes come, high enough that every well is a thing to press
 	// and a change is seen to fall, low enough that the plate is a thing with a watcher underneath
 	const HOME = { tx: 420, ty: 410, az: -6 * D2R, el: 52 * D2R, dist: 2600, f: 2600 * 1.15, k: 0 };
-	// the watcher's own view of one well, from below, through the floor
-	const below = (w) => ({
-		tx: w.x,
-		ty: w.y,
-		az: 0,
-		el: -90 * D2R,
-		dist: 8000,
-		f: 8000 * 3.3,
-		k: 1
-	});
-	const THROUGH_T = 0.9; // s, the pass through the floor: a cross-fade on the well, never an edge-on swing
-	const DWELL = 4.2; // s the view stays on the answering cells after a change has landed
-	// the view turned in the hand: a drag across 40% of the stage is the full tilt
-	const TILT_X = 30 * D2R;
-	const TILT_Y = 18 * D2R;
-	const GRAB_SPAN = 0.4;
-	// the robot's answer to the reader's act, after the view has come back up: the same change again
-	// in the rest of the row, then a row at three strengths, in that order; a row is never touched
-	const ROBOT_AFTER = 0.6; // s after the view is back
+	// the robot's answer to the reader's act, once the reader's change has landed: the same change
+	// again in the rest of the row, then a row at three strengths, in that order; a row is never touched
+	const ROBOT_AFTER = 1.2; // s after the reader's change has landed
 	const STAGGER = 0.6; // s between the robot's wells
 	const STRENGTHS = [0.3, 0.55, 1];
 	// the watcher's patrol when nothing is about to change: neighbour to neighbour at a steady pace
@@ -296,9 +281,7 @@
 		const pending = []; // sentences waiting for a view they can be seen in
 		const said = {}; // each sentence is said once
 		const cam = { ...HOME };
-		let fade = null; // the pass through the floor: { from, to, k }
-		let tween = null; // the view on its way: { from, to, t0, dur, through }
-		let backAt = -1; // when the view comes back up from the well it went down to
+
 		const drops = []; // changes on their way in: forming above a well, or falling
 		const watcher = { x: NAMED.T2.x, y: NAMED.T2.y, goal: null, holdUntil: 0, next: 1 };
 		let landed = 0; // changes that have reached the floor
@@ -363,37 +346,19 @@
 			plan.push({ at, w, dose });
 			plan.sort((a, b) => a.at - b.at);
 		}
-		// the robot's steps that wait for the view to be back up: given their time when it arrives
-		function onBack(t) {
-			for (const e of plan) if (e.at === Infinity) e.at = t + ROBOT_AFTER + STAGGER * e.order;
-			plan.sort((a, b) => a.at - b.at);
-		}
 		// the wells of a row that are whole in the frame
 		const rowOf = (r) => WELLS.filter((w) => w.r === r && w.c >= 0 && w.c <= 2);
-		// the robot answers the reader's act once the view is back up: first the same change again
-		// in the rest of the row, then three strengths in a row nobody has touched
-		function answer(w, dose) {
-			const later = (o, order, d) => plan.push({ at: Infinity, order, w: o, dose: d });
+		// the robot answers the reader's act once the reader's change has landed: first the same
+		// change again in the rest of the row, then three strengths in a row nobody has touched
+		function answer(w, dose, at) {
 			if (readerN === 1) {
 				let i = 0;
-				for (const o of rowOf(w.r)) if (o !== w) later(o, i++, dose);
+				for (const o of rowOf(w.r)) if (o !== w) schedule(at + STAGGER * i++, o, dose);
 			} else if (readerN === 2) {
 				const rows = [0, 2, 1].map(rowOf).filter((row) => row.length === 3);
-				const row = rows.find((row) => row.every((o) => !o.doses.length)) || rows[0];
-				row.forEach((o, i) => later(o, i, STRENGTHS[i]));
+				const row = rows.find((row) => row.every((o) => !o.doses.length));
+				if (row) row.forEach((o, i) => schedule(at + STAGGER * i, o, STRENGTHS[i]));
 			}
-		}
-		// the view goes down through the floor of the well a change has landed in, and comes back
-		function goTo(to, t, through) {
-			tween = { from: { ...cam }, to, t0: t, dur: THROUGH_T, through };
-		}
-		function goDown(w, t) {
-			if (cam.el < 0 && cam.tx === w.x && cam.ty === w.y) {
-				backAt = t + DWELL; // already here: stay a while longer
-				return;
-			}
-			goTo(below(w), t, true);
-			backAt = t + DWELL;
 		}
 		// what the light has shown so far, by the reader's hand or the robot's
 		function rows() {
@@ -403,7 +368,6 @@
 		}
 		function noticed() {
 			if (landed > 0) say('above', 'high');
-			if (landed > 0 && cam.el < 0 && cam.f >= cam.dist * 1.5) say('below', 'near'); // the watcher's own view, once the camera is in it
 			for (const row of rows()) {
 				const done = row.filter((w) => w.doses.length);
 				if (
@@ -446,7 +410,6 @@
 			while (plan.length && t >= plan[0].at) {
 				const e = plan.shift();
 				change(e.w, e.dose, t);
-				if (e.down) drops[drops.length - 1].down = true;
 			}
 			walk(dt, t);
 			while (drops.length && !drops[0].forming && t > drops[0].t1 + 0.1) drops.shift();
@@ -454,7 +417,6 @@
 				if (!d.forming && !d.counted && t >= d.t1) {
 					d.counted = true;
 					landed++;
-					if (d.down && !quiet) goDown(d.w, t); // the change has landed: go and see what it does
 				}
 			}
 			for (const c of cells) {
@@ -501,42 +463,16 @@
 			CX = 0.5,
 			CY = 0.5;
 		let C = null; // the camera basis this frame
-		const xa = document.createElement('canvas'); // the two views of the pass through the floor
-		const xb = document.createElement('canvas');
-
-		// a vector turned about an axis (Rodrigues)
-		function rot(v, k, th) {
-			const c = Math.cos(th),
-				s = Math.sin(th),
-				kv = cross(k, v),
-				d = k[0] * v[0] + k[1] * v[1] + k[2] * v[2];
-			return [
-				v[0] * c + kv[0] * s + k[0] * d * (1 - c),
-				v[1] * c + kv[1] * s + k[1] * d * (1 - c),
-				v[2] * c + kv[2] * s + k[2] * d * (1 - c)
-			];
-		}
 		function camera(v) {
 			const ce = Math.cos(v.el),
 				se = Math.sin(v.el),
 				ca = Math.cos(v.az),
 				sa = Math.sin(v.az);
-			let eye = [v.tx + sa * ce * v.dist, v.ty - ca * ce * v.dist, se * v.dist]; // on the near side, swung by the azimuth
-			let fwd = norm([-sa * ce, ca * ce, -se]);
+			const eye = [v.tx + sa * ce * v.dist, v.ty - ca * ce * v.dist, se * v.dist]; // on the near side, swung by the azimuth
+			const fwd = norm([-sa * ce, ca * ce, -se]);
 			const hint = norm([sa * v.k, -ca * v.k, 1 - Math.abs(v.k)]);
-			let right = norm(cross(fwd, hint)),
+			const right = norm(cross(fwd, hint)),
 				up = cross(right, fwd);
-			if (look.x || look.y) {
-				// the view turned in the hand: the eye swings about the station's target on the station's
-				// own axes, so a turn from above is a tilt of the plate, never a spin of the picture
-				let e = [eye[0] - v.tx, eye[1] - v.ty, eye[2]];
-				e = rot(e, up, look.x * TILT_X);
-				e = rot(e, right, look.y * TILT_Y);
-				eye = [v.tx + e[0], v.ty + e[1], e[2]];
-				fwd = norm([-e[0], -e[1], -e[2]]);
-				right = norm(cross(fwd, hint));
-				up = cross(right, fwd);
-			}
 			C = { eye, fwd, right, up, f: v.f * S * dpr, cx: canvas.width * CX, cy: canvas.height * CY };
 		}
 		function proj(x, y, z) {
@@ -598,8 +534,8 @@
 				CX = 0.5;
 				CY = 0.6;
 			}
-			canvas.width = xa.width = xb.width = Math.round(W * dpr);
-			canvas.height = xa.height = xb.height = Math.round(H * dpr);
+			canvas.width = Math.round(W * dpr);
+			canvas.height = Math.round(H * dpr);
 			hs = canvas.width < 1100 ? 0.5 : HS; // small frames keep a finer soft plate
 			plate.width = mask.width = Math.max(1, Math.round(canvas.width * hs));
 			plate.height = mask.height = Math.max(1, Math.round(canvas.height * hs));
@@ -783,7 +719,7 @@
 			// the cultures: every footprint, faint at rest; brighter where the slow layer has settled
 			for (const c of cells) {
 				const ev = Math.min(1, c.evidence);
-				const rest = 0.07 + 0.012 * Math.sin(t * 0.5 + c.x);
+				const rest = 0.11 + 0.016 * Math.sin(t * 0.5 + c.x); // at rest: dim, but a plate before anything happens
 				ctx.fillStyle = rgba(mix(PRIMARY, BIOLUM, 0.5 * ev), rest + 0.3 * ev);
 				footprint(c, 1);
 				ctx.fill();
@@ -830,56 +766,11 @@
 			ctx.globalCompositeOperation = 'source-over';
 		}
 		function draw(t) {
-			if (fade) {
-				render(t, fade.from, xa.getContext('2d'));
-				render(t, fade.to, xb.getContext('2d'));
-				ctx0.setTransform(1, 0, 0, 1, 0, 0);
-				ctx0.clearRect(0, 0, canvas.width, canvas.height);
-				ctx0.globalAlpha = 1 - fade.k;
-				ctx0.drawImage(xa, 0, 0);
-				ctx0.globalAlpha = fade.k;
-				ctx0.drawImage(xb, 0, 0);
-				ctx0.globalAlpha = 1;
-				return;
-			}
 			render(t, cam, ctx0);
 		}
 
-		// ---- the view on its way --------------------------------------------------
-		const look = { x: 0, y: 0, tx: 0, ty: 0 }; // the view's turn in the hand, and where it is going
-		function moveView(t) {
-			if (backAt > 0 && t >= backAt && !held && !grab) {
-				backAt = -1;
-				goTo(HOME, t, true); // seen: back up through the floor
-			}
-			if (!tween) return;
-			const k = smooth((t - tween.t0) / tween.dur);
-			const a = tween.from,
-				b = tween.to;
-			if (tween.through) {
-				fade = k <= 0 || k >= 1 ? null : { from: a, to: b, k };
-				Object.assign(cam, k < 0.5 ? a : b);
-			} else {
-				fade = null;
-				cam.tx = a.tx + (b.tx - a.tx) * k;
-				cam.ty = a.ty + (b.ty - a.ty) * k;
-				cam.az = a.az + (b.az - a.az) * k;
-				cam.el = a.el + (b.el - a.el) * k;
-				cam.k = a.k + (b.k - a.k) * k;
-				cam.dist = Math.exp(Math.log(a.dist) + (Math.log(b.dist) - Math.log(a.dist)) * k);
-				cam.f = Math.exp(Math.log(a.f) + (Math.log(b.f) - Math.log(a.f)) * k);
-			}
-			if (k >= 1) {
-				tween = null;
-				fade = null;
-				Object.assign(cam, b);
-				if (b === HOME) onBack(t);
-			}
-		}
-
-		// ---- the hand -------------------------------------------------------------
-		let held = null; // { w, drop, x, y, t0 } while a pointer is down on a well
-		let grab = null; // { x, y, ox, oy, id } while a pointer drags the view
+		// ---- the hand: the dispenser ------------------------------------------------
+		let hover = null; // { w, drop } while the hand rests over a well; drop is null once it has been put in
 		let tNow = 0;
 		function wellUnder(ev) {
 			const r = stage.getBoundingClientRect();
@@ -890,81 +781,60 @@
 			if (!w || Math.hypot(pt[0] - w.x, pt[1] - w.y) > R * 0.98) return null;
 			return w;
 		}
-		function takeHold(ev) {
-			grab = { x: ev.clientX, y: ev.clientY, ox: look.tx, oy: look.ty, id: ev.pointerId };
+		// the reader's change goes in; the robot answers once it has landed
+		function put(w, dose, hoverT) {
+			release(w, dose, tNow, hoverT);
+			readerN++;
+			answer(w, dose, tNow + hoverT + FALL + ROBOT_AFTER);
 		}
-		function onDown(ev) {
-			if (still || held || grab || ev.button > 0) return;
-			const w = wellUnder(ev);
-			if (!w) {
-				takeHold(ev); // not on a well: the hand has the view
-				return;
-			}
+		// the hand comes to rest over a well: a change forms above it
+		function enter(w) {
 			const [x, y] = entryOf(w);
 			const drop = { w, x, y, t0: tNow, t1: 0, hover: 0, dose: 0.45, forming: true };
 			drops.push(drop);
-			held = { w, drop, x: ev.clientX, y: ev.clientY, id: ev.pointerId };
+			hover = { w, drop };
+			overWell = true;
 			if (clock0 < 0) clock0 = tNow; // the reader's first touch is an arrival too
 		}
-		function onMove(ev) {
-			if (held) {
-				if (held.id !== ev.pointerId) return;
-				// the hand has moved on: it was a grab, not a change
-				if (Math.hypot(ev.clientX - held.x, ev.clientY - held.y) > 10) abandon(ev);
-				return;
-			}
-			if (grab) {
-				if (grab.id !== ev.pointerId) return;
-				const r = stage.getBoundingClientRect();
-				look.tx = Math.max(
-					-1,
-					Math.min(1, grab.ox + (ev.clientX - grab.x) / (GRAB_SPAN * r.width))
-				);
-				look.ty = Math.max(
-					-1,
-					Math.min(1, grab.oy + (ev.clientY - grab.y) / (GRAB_SPAN * r.height))
-				);
-				return;
-			}
-			if (ev.pointerType === 'mouse') overWell = !!wellUnder(ev);
-		}
-		function abandon(ev) {
-			if (!held) return;
-			const i = drops.indexOf(held.drop);
-			if (i >= 0) drops.splice(i, 1);
-			held = null;
-			if (ev && ev.type === 'pointermove') takeHold(ev);
-		}
-		function letGo(ev) {
-			if (grab && grab.id === ev.pointerId) {
-				grab = null;
-				look.tx = look.ty = 0; // let go: the view settles back on the station
-			}
-		}
-		function onUp(ev) {
-			letGo(ev);
-			if (!held || held.id !== ev.pointerId) return;
-			const { w, drop } = held;
-			held = null;
+		// the hand moves on: what it held falls, unless it only passed over
+		function leave() {
+			if (!hover) return;
+			const { w, drop } = hover;
+			hover = null;
+			overWell = false;
+			if (!drop) return;
 			const i = drops.indexOf(drop);
 			if (i >= 0) drops.splice(i, 1);
-			release(w, drop.dose, tNow, 0); // held already: it falls at once
-			drops[drops.length - 1].down = true; // and the view goes to see what it does
-			readerN++;
-			answer(w, drop.dose); // the robot answers once the view is back up
+			if (tNow - drop.t0 >= PASS_T) put(w, drop.dose, 0);
 		}
-		stage.addEventListener('pointerdown', onDown);
+		function onMove(ev) {
+			if (still || ev.pointerType !== 'mouse') return;
+			const w = wellUnder(ev);
+			if (hover && w === hover.w) return;
+			leave();
+			if (w) enter(w);
+		}
+		function onDown(ev) {
+			if (still || ev.button > 0) return;
+			if (ev.pointerType === 'mouse') {
+				// no click is needed; a click only drops what the hand already holds
+				if (hover && hover.drop) {
+					const { w, drop } = hover;
+					drops.splice(drops.indexOf(drop), 1);
+					hover.drop = null;
+					put(w, drop.dose, 0);
+				}
+				return;
+			}
+			// no hover on this device: one tap is one full change
+			const w = wellUnder(ev);
+			if (!w) return;
+			if (clock0 < 0) clock0 = tNow;
+			put(w, 1, 0.15);
+		}
 		stage.addEventListener('pointermove', onMove);
-		stage.addEventListener('pointerup', onUp);
-		stage.addEventListener('pointercancel', (ev) => {
-			abandon();
-			letGo(ev);
-		});
-		stage.addEventListener('pointerleave', (ev) => {
-			if (held && held.id === ev.pointerId) abandon();
-			letGo(ev);
-			overWell = false;
-		});
+		stage.addEventListener('pointerdown', onDown);
+		stage.addEventListener('pointerleave', leave);
 
 		resize();
 		if (reduced) {
@@ -984,7 +854,6 @@
 				t = i / 60;
 				stepProcess(t, true);
 			}
-			fade = null;
 			Object.assign(cam, HOME);
 			draw(t);
 			caption = STILL;
@@ -1011,14 +880,17 @@
 					clock0 = t;
 					// the robot's one change on arrival: this is where a change is put in, and what it does
 					schedule(t + 0.8, NAMED.M0, 1);
-					plan[0].down = true;
 				}
-				// a grabbed view follows the hand closely; a let-go view settles back with the weight of a thing
-				const kl = 1 - Math.exp(-dms / (grab ? 60 : 420));
-				look.x += (look.tx - look.x) * kl;
-				look.y += (look.ty - look.y) * kl;
-				moveView(t);
-				if (held) held.drop.dose = 0.45 + 0.55 * smooth((t - held.drop.t0 - 0.1) / HOLD_T); // the longer the hold, the stronger the change
+				if (hover && hover.drop) {
+					const d = hover.drop;
+					d.dose = 0.45 + 0.55 * smooth((t - d.t0 - 0.1) / HOLD_T); // the longer the hand rests, the stronger the change
+					if (t - d.t0 >= HOLD_T + 0.25) {
+						// full: it falls by itself; the hand may stay, nothing more goes in until it leaves and returns
+						drops.splice(drops.indexOf(d), 1);
+						hover.drop = null;
+						put(hover.w, 1, 0);
+					}
+				}
 				stepProcess(t, false);
 				if (capOff === false && t > capUntil) hide();
 				speak(t);
@@ -1071,11 +943,7 @@
 	}
 
 	.stage.hand {
-		cursor: pointer;
-	}
-
-	.stage:active {
-		cursor: grabbing;
+		cursor: crosshair; /* the hand is the dispenser: aimed, not clicked */
 	}
 
 	.instrument {

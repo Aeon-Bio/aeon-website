@@ -72,8 +72,8 @@
 
 <!-- 01 · dish, 02 · readout: one plate, the sentence set over it, the readout after it -->
 <!-- The stage holds the plate, seen from over it; the dish sentence is set over the stage in the
-     words' column. Press a well and the view goes down to watch what the change does, then comes
-     back. The readout follows the plate. -->
+     words' column. Rest the pointer over a well and a change goes in; the cells answer in place.
+     The readout follows the plate. -->
 <InstrumentSection>
 	<section id="dish-section" class="level station head" aria-labelledby="dish-heading">
 		<div class="station-copy">

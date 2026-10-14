@@ -81,46 +81,27 @@ test('the process is physical and heterogeneous, not a CSS loop or a uniform wav
 	);
 });
 
-// The view: it rests over the plate where changes come from, goes down through the floor of a
-// well when a change has landed there to watch the cells answer, and comes back up when it has
-// been seen. Nothing moves the view but a change, a drag, or the end of watching.
-test('the view goes to see what a change does, and comes back', () => {
+// The view: it rests over the plate where changes come from, high enough that every well is a
+// thing to aim at and a change is seen to fall, low enough that the plate is a thing with the
+// watcher underneath. It never moves: nothing is pinned, nothing follows the scroll, the clock or
+// the pointer. The whole plate stays on the screen, so an answer is seen beside the wells not touched.
+test('the view rests over the plate and never moves', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(
 		source,
 		/const HOME = \{ tx: 420, ty: 410, az: -6 \* D2R, el: 52 \* D2R, dist: 2600, f: 2600 \* 1\.15, k: 0 \}/,
-		'rests over the plate: every well a thing to press, the watcher seen underneath'
+		'over the plate: every well a thing to aim at, the watcher seen underneath'
 	);
+	assert.match(source, /const cam = \{ \.\.\.HOME \};/, 'and that is where it stays');
 	assert.match(
 		source,
-		/const below = \(w\) => \(\{\s*tx: w\.x,\s*ty: w\.y,\s*az: 0,\s*el: -90 \* D2R,\s*dist: 8000,\s*f: 8000 \* 3\.3,\s*k: 1\s*\}\)/,
-		'the watcher’s own view of the well the change went into'
-	);
-	assert.match(
-		source,
-		/if \(d\.down && !quiet\) goDown\(d\.w, t\);/,
-		'when the change lands, the view goes down to see what it does'
-	);
-	assert.match(
-		source,
-		/goTo\(below\(w\), t, true\);/,
-		'through the floor by a cross-fade on the well, never an edge-on swing'
-	);
-	assert.match(source, /backAt = t \+ DWELL;/, 'and stays while the cells answer');
-	assert.match(
-		source,
-		/if \(backAt > 0 && t >= backAt && !held && !grab\) \{\s*backAt = -1;\s*goTo\(HOME, t, true\);/,
-		'then comes back up, unless the hand is on the plate'
-	);
-	assert.match(
-		source,
-		/1 - Math\.abs\(v\.k\)/,
-		'the from-below frame is the same plate the same way round'
+		/function draw\(t\) \{\s*render\(t, cam, ctx0\);\s*\}/,
+		'one view, no cross-fade, no dive'
 	);
 	assert.doesNotMatch(
 		source,
-		/position: sticky|DESCENT|clockP|scrollP|PROTOCOL|STEER_|-r\.top \/ run/,
-		'no pin, no scroll camera, no clock, no tour, nothing that follows the pointer by itself'
+		/position: sticky|DESCENT|clockP|scrollP|PROTOCOL|STEER_|TILT_|\bDWELL\b|goDown|\btween\b|-r\.top \/ run/,
+		'no pin, no scroll camera, no clock, no tour, no dive, no tilt, nothing that follows the pointer'
 	);
 	assert.doesNotMatch(
 		source,
@@ -136,66 +117,55 @@ test('the view goes to see what a change does, and comes back', () => {
 	);
 });
 
-// The hand on the view: grab the stage and drag, and the view turns about where it rests on its
-// own axes (a tilt, never a spin), closely while held, settling back when let go.
-test('a drag turns the view in the hand; nothing follows the pointer by itself', () => {
+// The hand is the dispenser: rest the pointer over a well and a change forms above it; the longer
+// it rests, the stronger; move on and it falls; a hand merely passing over leaves nothing; full,
+// it falls by itself. No click anywhere; on a device without a hover, one tap is one full change.
+test('the hand is the dispenser: hover puts a change in; no clicks unless the device demands it', () => {
 	const { source } = compileSvelte(FILE);
-	assert.match(source, /const TILT_X = 30 \* D2R;/, 'a turn in the hand');
-	assert.match(
-		source,
-		/e = rot\(e, up, look\.x \* TILT_X\);\s*e = rot\(e, right, look\.y \* TILT_Y\);/,
-		'about the view’s own axes: a tilt, never a spin'
-	);
-	assert.match(
-		source,
-		/takeHold\(ev\); \/\/ not on a well: the hand has the view/,
-		'a press off a well grabs the view'
-	);
-	assert.match(
-		source,
-		/> 10\) abandon\(ev\);/,
-		'a press on a well that moves on is a grab, not a change'
-	);
-	assert.match(
-		source,
-		/grab\.ox \+ \(ev\.clientX - grab\.x\) \/ \(GRAB_SPAN \* r\.width\)/,
-		'the turn is the drag, relative, never the pointer’s place'
-	);
-	assert.match(source, /look\.tx = look\.ty = 0; \/\/ let go/, 'let go and it settles back');
-	assert.match(
-		source,
-		/Math\.exp\(-dms \/ \(grab \? 60 : 420\)\)/,
-		'closely while held, with the weight of a thing when let go'
-	);
-	assert.doesNotMatch(
-		source,
-		/\(ev\.clientX - r\.left\) \/ r\.width\) \* 2 - 1/,
-		'no hover steering: the pointer’s place moves nothing'
-	);
-});
-
-// The hand: press a well and a change forms above it, from the same side of the well as the
-// robot’s; hold and it grows; let go and it falls. The watcher goes to the well about to change.
-test('the hand: press a well, a change forms above it; hold and it grows; let go and it falls', () => {
-	const { source } = compileSvelte(FILE);
-	for (const ev of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel'])
+	for (const ev of ['pointermove', 'pointerdown', 'pointerleave'])
 		assert.match(source, new RegExp(`addEventListener\\('${ev}'`), ev);
-	assert.match(
-		source,
-		/function unproj\(px, py\)/,
-		'the hand reaches through whatever view it is in'
-	);
+	assert.doesNotMatch(source, /addEventListener\('pointerup'/, 'nothing waits for a release');
+	assert.match(source, /function unproj\(px, py\)/, 'the hand reaches through the view');
 	assert.match(source, /forming: true/, 'a change forms under the hand');
 	assert.match(
 		source,
-		/0\.45 \+ 0\.55 \* smooth\(\(t - held\.drop\.t0 - 0\.1\) \/ HOLD_T\)/,
-		'the longer the hold, the stronger the change'
+		/if \(hover && w === hover\.w\) return;\s*leave\(\);\s*if \(w\) enter\(w\);/,
+		'the hand comes to rest over a well, or moves on'
 	);
-	assert.match(source, /release\(w, drop\.dose, tNow, 0\)/, 'let go and it falls at once');
+	assert.match(
+		source,
+		/d\.dose = 0\.45 \+ 0\.55 \* smooth\(\(t - d\.t0 - 0\.1\) \/ HOLD_T\);/,
+		'the longer the hand rests, the stronger the change'
+	);
+	assert.match(
+		source,
+		/if \(t - d\.t0 >= HOLD_T \+ 0\.25\) \{[\s\S]*?put\(hover\.w, 1, 0\);/,
+		'full, it falls by itself'
+	);
+	assert.match(
+		source,
+		/if \(tNow - drop\.t0 >= PASS_T\) put\(w, drop\.dose, 0\);/,
+		'move on and it falls; a hand merely passing over leaves nothing'
+	);
+	assert.match(
+		source,
+		/if \(still \|\| ev\.pointerType !== 'mouse'\) return;/,
+		'a finger does not hover'
+	);
+	assert.match(
+		source,
+		/\/\/ no hover on this device: one tap is one full change\s*const w = wellUnder\(ev\);\s*if \(!w\) return;\s*if \(clock0 < 0\) clock0 = tNow;\s*put\(w, 1, 0\.15\);/,
+		'on touch, one tap is one full change'
+	);
+	assert.match(
+		source,
+		/\/\/ no click is needed; a click only drops what the hand already holds/,
+		'a mouse click is never needed'
+	);
 	assert.match(
 		source,
 		/const d = R \* 0\.78;/,
-		'one hand: the same place in every well, every time, whoever’s hand it is'
+		'the same place in every well, whoever’s hand it is'
 	);
 	assert.match(
 		source,
@@ -204,23 +174,18 @@ test('the hand: press a well, a change forms above it; hold and it grows; let go
 	);
 	assert.match(source, /watcher\.goal = w;/, 'the watcher goes to the well about to change');
 	assert.match(source, /if \(clock0 < 0\) clock0 = tNow;/, 'a touch is an arrival too');
-	assert.match(
-		source,
-		/drops\[drops\.length - 1\]\.down = true; \/\/ and the view goes to see what it does/,
-		'the reader’s change is watched'
-	);
 	assert.match(source, /touch-action: pan-y;/, 'the page still scrolls under a finger');
 	assert.match(
 		source,
-		/\.stage\.hand \{\s*cursor: pointer;/,
-		'the only affordance drawn is the cursor, and only over a well'
+		/\.stage\.hand \{\s*cursor: crosshair;/,
+		'the only affordance drawn is the cursor, aimed, and only over a well'
 	);
 	assert.match(source, /const DROP_H = 150/, 'a change forms at a fixed height');
 	assert.match(source, /DROP_H \* \(1 - fk \* fk\)/, 'and falls under gravity');
 	assert.match(
 		source,
-		/0\.1 \+ 0\.6 \* \(1 - wide \/ 77\)/,
-		'out of focus it is a soft disc of light, never nothing'
+		/const rest = 0\.11 \+ 0\.016 \* Math\.sin/,
+		'at rest the plate is a plate before anything happens'
 	);
 });
 
@@ -232,17 +197,17 @@ test('the robot answers the reader’s act with the grammar a cause is earned in
 	const { source } = compileSvelte(FILE);
 	assert.match(
 		source,
-		/schedule\(t \+ 0\.8, NAMED\.M0, 1\);\s*plan\[0\]\.down = true;/,
-		'one change on arrival, watched: this is where a change is put in, and what it does'
+		/schedule\(t \+ 0\.8, NAMED\.M0, 1\);/,
+		'one change on arrival: this is where a change is put in, and what it does'
 	);
 	assert.match(
 		source,
-		/answer\(w, drop\.dose\); \/\/ the robot answers once the view is back up/,
-		'the robot answers once the view is back up, not before'
+		/answer\(w, dose, tNow \+ hoverT \+ FALL \+ ROBOT_AFTER\);/,
+		'the robot answers once the reader’s change has landed, not before'
 	);
 	assert.match(
 		source,
-		/if \(readerN === 1\) \{\s*let i = 0;\s*for \(const o of rowOf\(w\.r\)\)\s*if \(o !== w\) later\(o, i\+\+, dose\);/,
+		/if \(readerN === 1\) \{\s*let i = 0;\s*for \(const o of rowOf\(w\.r\)\)\s*if \(o !== w\) schedule\(at \+ STAGGER \* i\+\+, o, dose\);/,
 		'first: the same change again, in the rest of the row'
 	);
 	assert.match(
@@ -252,8 +217,8 @@ test('the robot answers the reader’s act with the grammar a cause is earned in
 	);
 	assert.match(
 		source,
-		/row\.every\(\(o\) => !o\.doses\.length\)\) \|\| rows\[0\]/,
-		'in a row nobody has touched'
+		/rows\.find\(\(row\) => row\.every\(\(o\) => !o\.doses\.length\)\);\s*if \(row\)/,
+		'in a row nobody has touched, and in no row otherwise: a control is never spent'
 	);
 	assert.doesNotMatch(
 		source,
@@ -272,7 +237,6 @@ test('the robot answers the reader’s act with the grammar a cause is earned in
 		/if \(landed > 0\) say\('above', 'high'\)/,
 		'above: after the light, not before'
 	);
-	says(source, 'below', 'We watch from below.', 'the watcher’s own view');
 	says(source, 'again', 'The same change, again.', 'replication');
 	says(source, 'strengths', 'Three strengths.', 'dose');
 	says(source, 'untouched', 'These were never touched.', 'control, there all along, named late');
