@@ -122,8 +122,7 @@ export const en = {
 		optData: 'I hold perturbation data',
 		optOther: 'Something else',
 		more: 'Tell us more about your use case',
-		morePlaceholder:
-			'Tell us about your cells, what you measure today, and what is slow about it.',
+		morePlaceholder: 'Tell us about your cells, what you measure today, and what is slow about it.',
 		moreAria:
 			'Describe your use case, project details, research goals, data types, or collaboration vision',
 		backAria: 'Go back to previous step',
@@ -163,6 +162,6 @@ export const en = {
 	a11y: {
 		mark: 'aeon mark, a Lorenz attractor photographed as a long exposure',
 		figure:
-			"Part of a standard plate as a long exposure, pinned while the page scrolls: scrolling down goes down through the instrument. From above, where changes come from, a change falls into one well. From the side, cultures of individual cells sit on the floor of every well and a watcher walks underneath, its light showing only through the well it is under. The view passes through the floor to the watcher's own: close on that well as the change spreads and the cells answer with their own timing, or not. It pulls back to the plate from below as the robot runs its protocol: the same change in the next wells of the row, a row at three strengths where more cells answer the stronger it is, a row never touched that only flickers on its own, and a day later the same cells answering again. Pressing a well puts a change into it from above; holding longer makes it stronger. What answered because of a change settles slowly into a map of cause."
+			"Part of a standard plate as a long exposure, pinned while the page scrolls. The view descends through the instrument on its own as the robot works; scrolling can only hurry it, and a mouse over it turns the view in the hand. From above, where changes come from, a change falls into one well. From the side, cultures of individual cells sit on the floor of every well and a watcher walks underneath, its light showing only through the well it is under. The view passes through the floor to the watcher's own: close on that well as the change spreads and the cells answer with their own timing, or not. It pulls back to the plate from below as the robot runs its protocol: the same change in the next wells of the row, a row at three strengths where more cells answer the stronger it is, a row never touched that only flickers on its own, and a day later the same cells answering again. Pressing a well puts a change into it from above; holding longer makes it stronger. What answered because of a change settles slowly into a map of cause."
 	}
 } as const;

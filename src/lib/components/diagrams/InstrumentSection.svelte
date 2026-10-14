@@ -2,13 +2,16 @@
   The plate, in the reader's hand.
 
   One patch of a standard plate, in one world, that lasts for the rest of the page.
-  The stage is pinned while the page scrolls, and the scroll is the camera: it
-  begins above the plate where changes come from, descends to the side where the
-  plate is a thing with a watcher walking underneath, closes on one well, passes
-  through the floor to the watcher's own view where the cells are seen one by one,
-  and pulls back to the whole plate from below where what answered has settled
-  into a map. Scrolling down is going down through the instrument. Scrolling up
-  is coming back; nothing is lost on the way.
+  The stage is pinned while the page scrolls, and the camera descends on the
+  robot's clock, going where the light is: it begins above the plate where
+  changes come from, descends to the side where the plate is a thing with a
+  watcher walking underneath, closes on one well, passes through the floor during
+  the night to the watcher's own view where the cells are seen one by one, and
+  pulls back to the whole plate from below where what answered has settled into
+  a map. Nothing has to be scrolled to see it; the scroll can only hurry it, so
+  the readout is always read from below with the map settled. A mouse over the
+  stage has the camera: it turns about each station in the hand, up to a quarter
+  turn, and settles back when the hand leaves.
 
   The hand: press a well and a change forms above it, from the same side of the
   well every time; hold and it grows; let go and it falls under gravity, spreads
@@ -67,18 +70,25 @@
 	const MACRO = { tx: 200, ty: 392, az: 0, el: -90 * D2R, dist: 8000, f: 8000 * 3.3, k: 1 };
 	const PLATE = { tx: 400, ty: 400, az: 0, el: -90 * D2R, dist: 8000, f: 8000, k: 1 };
 
-	// the descent: where the scroll puts the camera, as a fraction of the stage's travel.
-	// A move is continuous; the pass through the floor is a cross-fade on the well, never an edge-on swing.
+	// the descent: where the camera is at each second of the robot's clock, so the camera is
+	// where the light is. A move is continuous; the pass through the floor is a cross-fade on
+	// the well, never an edge-on swing. The scroll can only hurry it: the camera's place is
+	// max(clock, scroll), so the readout at the foot of the stage is always read from below.
 	const DESCENT = [
-		{ to: 0.08, cam: ABOVE }, // a hold: the sentence is read in the robot's view
-		{ to: 0.3, cam: SYSTEM }, // down to the side
-		{ to: 0.42, cam: SYSTEM_DRIFT }, // the drift
-		{ to: 0.52, cam: CLOSE }, // close on the well the first change went into
-		{ to: 0.62, cam: MACRO, fade: true }, // through the floor
-		{ to: 0.72, cam: MACRO }, // a hold: the cells one by one
-		{ to: 0.9, cam: PLATE }, // pull back
-		{ to: 1.0, cam: PLATE } // a hold: the map, with the readout
+		{ at: 8, cam: ABOVE }, // a hold: the first change, the sentence read in the robot's view
+		{ at: 13, cam: SYSTEM }, // down to the side as the same change goes in again
+		{ at: 21, cam: SYSTEM_DRIFT }, // the drift, as the row at three strengths goes in
+		{ at: 25, cam: CLOSE }, // close on the well the first change went into
+		{ at: 32, cam: MACRO, fade: true }, // through the floor, during the night
+		{ at: 37, cam: MACRO }, // a hold: the cells one by one, the day after
+		{ at: 42, cam: PLATE }, // pull back
+		{ at: 46, cam: PLATE } // a hold: the map, with the readout
 	];
+	const DESCENT_T = DESCENT[DESCENT.length - 1].at;
+	for (const seg of DESCENT) seg.to = seg.at / DESCENT_T;
+	// the hand on the camera: a mouse over the stage turns the view about the station
+	const STEER_AZ = 22 * D2R; // at the stage's edge, left or right
+	const STEER_EL = 12 * D2R; // at the stage's edge, top or bottom
 
 	// the robot's protocol, on its own clock from the reader's arrival; a sentence names what the
 	// light has shown, once the camera can see it: 'wide' is the whole plate, 'near' is one well
@@ -487,10 +497,13 @@
 		const xb = document.createElement('canvas');
 
 		function camera(v) {
-			const ce = Math.cos(v.el),
-				se = Math.sin(v.el),
-				ca = Math.cos(v.az),
-				sa = Math.sin(v.az);
+			// the station, turned in the hand
+			const az = v.az + look.x * STEER_AZ;
+			const el = Math.max(-90 * D2R, Math.min(90 * D2R, v.el - look.y * STEER_EL));
+			const ce = Math.cos(el),
+				se = Math.sin(el),
+				ca = Math.cos(az),
+				sa = Math.sin(az);
 			const eye = [v.tx + sa * ce * v.dist, v.ty - ca * ce * v.dist, se * v.dist]; // on the near side, swung by the azimuth
 			const fwd = norm([-sa * ce, ca * ce, -se]);
 			const hint = norm([sa * v.k, -ca * v.k, 1 - Math.abs(v.k)]);
@@ -805,13 +818,16 @@
 			render(t, cam, ctx0);
 		}
 
-		// ---- the descent: the scroll is the camera ----------------------------
+		// ---- the descent: the clock is the camera; the scroll can only hurry it ----
 		let pTarget = 0;
 		let p = 0;
-		function travel() {
+		const look = { x: 0, y: 0, tx: 0, ty: 0 }; // the mouse's place over the stage, and where it is going
+		function travel(t) {
 			const r = wrap.getBoundingClientRect();
 			const run = r.height - window.innerHeight;
-			pTarget = run > 1 ? Math.max(0, Math.min(1, -r.top / run)) : 0;
+			const scrollP = run > 1 ? Math.max(0, Math.min(1, -r.top / run)) : 0;
+			const clockP = clock0 >= 0 ? Math.min(1, (t - clock0) / DESCENT_T) : 0;
+			pTarget = Math.max(clockP, scrollP);
 		}
 		function placeCamera(q) {
 			let from = DESCENT[0].cam,
@@ -870,7 +886,11 @@
 				if (Math.hypot(ev.clientX - held.x, ev.clientY - held.y) > 10) abandon();
 				return;
 			}
-			if (ev.pointerType === 'mouse') overWell = !!wellUnder(ev);
+			if (ev.pointerType !== 'mouse') return;
+			overWell = !!wellUnder(ev);
+			const r = stage.getBoundingClientRect();
+			look.tx = Math.max(-1, Math.min(1, ((ev.clientX - r.left) / r.width) * 2 - 1));
+			look.ty = Math.max(-1, Math.min(1, ((ev.clientY - r.top) / r.height) * 2 - 1));
 		}
 		function abandon() {
 			if (!held) return;
@@ -893,6 +913,7 @@
 		stage.addEventListener('pointerleave', (ev) => {
 			if (held && held.id === ev.pointerId) abandon();
 			overWell = false;
+			look.tx = look.ty = 0; // the hand has left: the camera settles back on the station
 		});
 
 		resize();
@@ -914,7 +935,7 @@
 			live = true;
 			return;
 		}
-		travel();
+		travel(0);
 		placeCamera(pTarget);
 		p = pTarget;
 		draw(0);
@@ -933,10 +954,16 @@
 				lastNow = now;
 				tNow = t;
 				if (arrived && clock0 < 0) clock0 = t;
-				travel();
-				// the camera follows the hand with a little weight: no wheel steps, no lag worth the name
+				travel(t);
+				// the camera follows the clock and the hand with a little weight: no wheel steps, no lag worth the name
 				p += (pTarget - p) * (1 - Math.exp(-dms / 90));
 				if (Math.abs(pTarget - p) < 0.0005) p = pTarget;
+				// the mouse turns the view with more weight: a hand, not a twitch; it holds still while a change forms
+				if (!held) {
+					const kl = 1 - Math.exp(-dms / 160);
+					look.x += (look.tx - look.x) * kl;
+					look.y += (look.ty - look.y) * kl;
+				}
 				placeCamera(p);
 				if (held) held.drop.dose = 0.45 + 0.55 * smooth((t - held.drop.t0 - 0.1) / HOLD_T); // the longer the hold, the stronger the change
 				stepProcess(t, false);

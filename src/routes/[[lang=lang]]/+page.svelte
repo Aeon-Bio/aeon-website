@@ -584,7 +584,7 @@
 
 	/* between the sentences the words step aside and the plate has the screen */
 	.station.travel {
-		min-height: 120svh;
+		min-height: 40svh; /* the descent runs on its own clock: the travel is a pause, not the drive */
 		padding: 0;
 	}
 

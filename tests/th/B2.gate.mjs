@@ -81,10 +81,11 @@ test('the process is physical and heterogeneous, not a CSS loop or a uniform wav
 	);
 });
 
-// The descent: the stage is pinned and the scroll is the camera, from above the plate where
-// changes come from, down the side where the plate is a thing, through the floor to where we
-// watch, and back to the whole plate from below. Going down the page is going down the instrument.
-test('the scroll is the camera: a descent from where changes come from to where we watch', () => {
+// The descent: the stage is pinned and the camera descends on the robot's clock, from above the
+// plate where changes come from, down the side where the plate is a thing, through the floor to
+// where we watch, and back to the whole plate from below. Nothing has to be scrolled to see it;
+// the scroll can only hurry it. A mouse over the stage turns the view about the station.
+test('the clock is the camera, the scroll can only hurry it, the mouse turns it in the hand', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(
 		source,
@@ -123,13 +124,45 @@ test('the scroll is the camera: a descent from where changes come from to where 
 	);
 	assert.match(
 		source,
-		/-r\.top \/ run/,
-		'the camera’s place on the descent is the scroll’s place in the stage'
+		/\{ at: 32, cam: MACRO, fade: true \}/,
+		'through the floor during the night (NIGHT = [27, 32])'
+	);
+	assert.match(
+		source,
+		/const clockP = clock0 >= 0 \? Math\.min\(1, \(t - clock0\) \/ DESCENT_T\) : 0;/,
+		'the camera’s place on the descent is the robot’s clock from the reader’s arrival'
+	);
+	assert.match(source, /-r\.top \/ run/, 'and the scroll’s place in the stage');
+	assert.match(
+		source,
+		/pTarget = Math\.max\(clockP, scrollP\);/,
+		'whichever is further down: nothing has to be scrolled, scrolling can only hurry'
 	);
 	assert.match(
 		source,
 		/Math\.exp\(-dms \/ 90\)/,
-		'the camera follows the hand with a little weight and no lag worth the name'
+		'the camera follows with a little weight and no lag worth the name'
+	);
+	assert.match(source, /const STEER_AZ = 22 \* D2R;/, 'the mouse turns the view about the station');
+	assert.match(
+		source,
+		/const az = v\.az \+ look\.x \* STEER_AZ;/,
+		'in every view, the fade’s two halves included'
+	);
+	assert.match(
+		source,
+		/if \(ev\.pointerType !== 'mouse'\) return;/,
+		'a finger does not steer: it scrolls or it is a hand on a well'
+	);
+	assert.match(
+		source,
+		/look\.tx = look\.ty = 0; \/\/ the hand has left/,
+		'the view settles back when the hand leaves'
+	);
+	assert.match(
+		source,
+		/if \(!held\) \{\s*const kl = 1 - Math\.exp\(-dms \/ 160\);/,
+		'with weight, and still while a change forms'
 	);
 	assert.doesNotMatch(
 		source,
