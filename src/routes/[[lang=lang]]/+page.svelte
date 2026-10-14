@@ -242,6 +242,10 @@
 		min-height: 100vh;
 		min-height: 100svh;
 		display: grid;
+		/* minmax(0, …): the track takes the viewport's width, never the mark's. A bare 1fr
+		   is minmax(auto, 1fr), and WebKit sizes that auto from the 112vw mark on phones,
+		   so the whole hero grew 20% wider than the screen and the mark sat off-centre. */
+		grid-template-columns: minmax(0, 1fr);
 		align-items: center;
 		/* clip only sideways: the mark may run off the right edge without widening the
 		   page, but its wash must bleed down into the next section. Clipped at the hero's
@@ -397,7 +401,7 @@
 
 	@media (max-width: 719px) {
 		.hero-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr); /* see .hero: the mark overflows the track, it never widens it */
 			width: 100%;
 			padding-inline: 16px;
 			align-content: space-between; /* mark at the top, name block at the foot, like the card */
@@ -406,11 +410,7 @@
 			order: -1;
 			width: 112vw;
 			max-width: none;
-			justify-self: start;
-			/* centre the 112vw mark on the viewport: back out the grid's 16px gutter and the extra
-			   6vw each side. No % here: WebKit resolves a grid item's % margin differently from
-			   Blink and lands the mark ~20px right of centre. */
-			margin-left: calc(-6vw - 16px);
+			justify-self: center; /* overflows both sides equally: centred on the screen in every engine */
 			margin-top: 6vh;
 			transform: none;
 		}
