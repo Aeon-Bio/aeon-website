@@ -1,30 +1,32 @@
 <!--
-  The plate, the hand above it and the eye beneath it, as a long exposure.
+  The plate, in the reader's hand.
 
-  Three views of one patch of a standard plate, in one world.
-  From the side, low over the plate, drifting slowly: the plate is a grid of
-  faint cultures; a watcher walks underneath it at a steady pace, its light
-  reaching the eye through the floor of the well it is under and only faintly
-  across the body between wells, sliding against the rim as the camera
-  drifts, so the plate is known by what it hides and by parallax. The camera
-  closes on the well the watcher has stopped under; a change appears at a
-  fixed height above it, waits, falls under gravity, lands near the wall and
-  spreads. Then a cross-fade on that well to the watcher's own view: up
-  through the floor, close, where the cells are seen one by one and answer
-  with their own kinetics, or do not. Then it pulls back to the plate from
-  below and the experiment runs: the same change again, wells one after
-  another; three strengths, the answer in how many cells are recruited; a row
-  never touched, there all along; a night; a day later the same cells
-  answering again. One sentence names each beat after the light has shown it.
-  At the end the view fades back to the side with the maps settled, they
-  dissolve, and it begins again.
-  Nothing is drawn. Every light is a field or a point; the robot is where
-  changes come from, the watcher is where the light under the plate is, the
-  plate is the plane the cells sit on and the body that hides the lamp.
-  Same material as the mark: soft plates at quarter resolution, light that
-  adds, one colour ramp from deep space through primary and biolum to white.
-  Reduced motion: one exposure from above with the maps settled and one
-  sentence.
+  One patch of a standard plate, in one world, that lasts for the rest of the page.
+  The stage is pinned while the page scrolls, and the scroll is the camera: it
+  begins above the plate where changes come from, descends to the side where the
+  plate is a thing with a watcher walking underneath, closes on one well, passes
+  through the floor to the watcher's own view where the cells are seen one by one,
+  and pulls back to the whole plate from below where what answered has settled
+  into a map. Scrolling down is going down through the instrument. Scrolling up
+  is coming back; nothing is lost on the way.
+
+  The hand: press a well and a change forms above it, from the same side of the
+  well every time; hold and it grows; let go and it falls under gravity, spreads
+  from where it entered, and the cells answer with their own kinetics, or do not.
+  The watcher walks to the well that is about to change. The robot runs its own
+  protocol on its own clock once the reader has arrived: the same change again
+  in the next wells of the row, a row at three strengths, a row never touched,
+  then a night and the same cells answering a day later. The reader's changes
+  and the robot's are the same material; the sentences name what the light has
+  shown, whoever caused it, and only when the camera can see it.
+
+  Nothing is drawn. Every light is a field or a point; the robot is where changes
+  come from, the watcher is where the light under the plate is, the plate is the
+  plane the cells sit on and the body that hides the lamp. Same material as the
+  mark: soft plates at quarter resolution, light that adds, one colour ramp from
+  deep space through primary and biolum to white.
+  Reduced motion: one exposure from the side with the maps settled and one
+  sentence; the stage is not pinned and nothing follows the scroll.
 -->
 <script>
 	import { onMount } from 'svelte';
@@ -46,64 +48,70 @@
 	const FRONT_T = 3.6; // s for a change to cross a well
 	const RISE = 0.24; // s, the steep rise of an answer
 	const ENTRY_A = -1.05; // a change is put in from the same side of every well
-	const CYCLE = 50; // s, one experiment
 	const DROP_H = 150; // the fixed height a change is released from, above the plate
-	const HOVER = 0.3; // s it waits there before it is released
+	const HOVER = 0.3; // s the robot's change waits there before it is released
 	const FALL = 0.6; // s, the fall under gravity
+	const HOLD_T = 0.7; // s of holding for the hand's change to reach full strength
 	const OBS_Z = -110; // the watcher, under the plate: what the eye sees is the floor it lights, not the lamp
+	const PACE = 1.0; // s, the watcher's walk from one well to the next
 	const D2R = Math.PI / 180;
-	const NIGHT = [28.5, 34.0]; // the dark interval
+	const NIGHT = [27.0, 32.0]; // the dark interval, on the robot's clock
 
-	// the camera: target on the plate, azimuth, elevation, distance, focal length, and the up hint (0 sky-up, 1 the from-below frame)
-	const SYSTEM = { tx: 420, ty: 430, az: -5 * D2R, el: 22 * D2R, dist: 1700, f: 1700 * 0.8, k: 0 };
-	const SYSTEM_DRIFT = { ...SYSTEM, az: 5 * D2R }; // a slow sideways drift: parallax tells what is under the plate
-	const CLOSE = { tx: 200, ty: 392, az: 4 * D2R, el: 22 * D2R, dist: 1700, f: 1700 * 2.1, k: 0 };
-	const CLOSE_DRIFT = { ...CLOSE, az: 7 * D2R };
-	const PLATE = { tx: 400, ty: 400, az: 0, el: -90 * D2R, dist: 8000, f: 8000, k: 1 };
+	// the stations: target on the plate, azimuth, elevation, distance, focal length, and the up hint
+	// (0 sky-up for a view from the side; 1 the from-below frame; -1 the from-above frame, the same
+	// plate seen the same way round, so the descent never mirrors it)
+	const ABOVE = { tx: 400, ty: 400, az: 0, el: 90 * D2R, dist: 8000, f: 8000 * 0.95, k: -1 };
+	const SYSTEM = { tx: 420, ty: 430, az: -5 * D2R, el: 22 * D2R, dist: 1700, f: 1700 * 1.25, k: 0 };
+	const SYSTEM_DRIFT = { ...SYSTEM, az: 5 * D2R }; // a sideways drift in the hand: parallax tells what is under the plate
+	const CLOSE = { tx: 200, ty: 392, az: 4 * D2R, el: 22 * D2R, dist: 1700, f: 1700 * 2.4, k: 0 };
 	const MACRO = { tx: 200, ty: 392, az: 0, el: -90 * D2R, dist: 8000, f: 8000 * 3.3, k: 1 };
+	const PLATE = { tx: 400, ty: 400, az: 0, el: -90 * D2R, dist: 8000, f: 8000, k: 1 };
 
-	// the experiment, in order; a sentence names what the light has just shown
-	const SCRIPT = [
-		{ at: 0.0, cam: SYSTEM_DRIFT, dur: 6.0 },
-		{ at: 2.0, cam: CLOSE, dur: 1.5 },
-		{ at: 3.5, cam: CLOSE_DRIFT, dur: 3.0 },
-		{ at: 3.5, change: ['M0', 1] },
-		{ at: 3.8, say: m.beats.above },
-		{ at: 5.2, fade: MACRO, dur: 0.9 },
-		{ at: 6.4, say: m.beats.below },
-		{ at: 11.0, cam: PLATE, dur: 1.6 },
-		{ at: 12.8, say: m.beats.again },
-		{ at: 13.0, change: ['M1', 1] },
-		{ at: 13.6, change: ['M2', 1] },
-		{ at: 18.0, say: m.beats.strengths },
-		{ at: 18.2, change: ['T0', 0.3] },
-		{ at: 18.8, change: ['T1', 0.55] },
-		{ at: 19.4, change: ['T2', 1] },
-		{ at: 24.0, say: m.beats.untouched },
-		{ at: 28.5, say: '' },
-		{ at: 34.0, say: m.beats.later },
-		{ at: 34.2, change: ['T0', 0.3] },
-		{ at: 34.8, change: ['T1', 0.55] },
-		{ at: 35.4, change: ['T2', 1] },
-		{ at: 36.2, change: ['M0', 1] },
-		{ at: 36.8, change: ['M1', 1] },
-		{ at: 37.4, change: ['M2', 1] },
-		{ at: 42.0, say: '' },
-		{ at: 42.5, fade: SYSTEM, dur: 1.2 },
-		{ at: 43.7, cam: SYSTEM_DRIFT, dur: 6.3 },
-		{ at: 46.5, dissolve: true }
+	// the descent: where the scroll puts the camera, as a fraction of the stage's travel.
+	// A move is continuous; the pass through the floor is a cross-fade on the well, never an edge-on swing.
+	const DESCENT = [
+		{ to: 0.08, cam: ABOVE }, // a hold: the sentence is read in the robot's view
+		{ to: 0.3, cam: SYSTEM }, // down to the side
+		{ to: 0.42, cam: SYSTEM_DRIFT }, // the drift
+		{ to: 0.52, cam: CLOSE }, // close on the well the first change went into
+		{ to: 0.62, cam: MACRO, fade: true }, // through the floor
+		{ to: 0.72, cam: MACRO }, // a hold: the cells one by one
+		{ to: 0.9, cam: PLATE }, // pull back
+		{ to: 1.0, cam: PLATE } // a hold: the map, with the readout
 	];
-	// the watcher's walk: a steady pace, neighbour to neighbour, stopping under the well the change will go into
-	const WALK = [[0, 'T2'], [1.0, 'T1'], [2.0, 'T0'], [3.0, 'M0'], [7.5, 'M0'], [8.5, 'M1'], [9.5, 'M2'], [10.5, 'B2'], [11.5, 'B1'], [12.5, 'B0'], [13.5, 'M0'], [14.5, 'T0'], [15.5, 'T1'], [16.5, 'T2']];
-	const STILL = m.beats.still;
-	// (the sentence of the still exposure)
 
+	// the robot's protocol, on its own clock from the reader's arrival; a sentence names what the
+	// light has shown, once the camera can see it: 'wide' is the whole plate, 'near' is one well
+	const PROTOCOL = [
+		{ at: 0.8, change: ['M0', 1] },
+		{ at: 9.0, change: ['M1', 1] },
+		{ at: 9.6, change: ['M2', 1] },
+		{ at: 11.0, say: 'again', needs: 'wide' },
+		{ at: 16.0, change: ['T0', 0.3] },
+		{ at: 16.6, change: ['T1', 0.55] },
+		{ at: 17.2, change: ['T2', 1] },
+		{ at: 19.5, say: 'strengths', needs: 'wide' },
+		{ at: 24.0, say: 'untouched', needs: 'wide' },
+		{ at: 33.0, change: ['T0', 0.3] },
+		{ at: 33.6, change: ['T1', 0.55] },
+		{ at: 34.2, change: ['T2', 1] },
+		{ at: 35.0, change: ['M0', 1] },
+		{ at: 35.6, change: ['M1', 1] },
+		{ at: 36.2, change: ['M2', 1] },
+		{ at: 38.5, say: 'later', needs: 'wide' }
+	];
+	// the watcher's patrol when nothing is about to change: neighbour to neighbour at a steady pace
+	const PATROL = ['T2', 'T1', 'T0', 'M0', 'M1', 'M2', 'B2', 'B1', 'B0'];
+	const STILL = m.beats.still;
+
+	let wrap;
+	let stage;
 	let canvas;
-	let field;
 	let live = false;
 	let caption = '';
 	let capOff = true;
 	let still = false; // reduced motion: one frame, the sentence set beneath it
+	let overWell = false; // the pointer is over a well: the hand can act here
 
 	function mulberry(seed) {
 		return () => {
@@ -132,9 +140,14 @@
 			);
 		};
 	}
-	const noise2 = (n, x, y, s) => 0.65 * n(x / s, y / s) + 0.35 * n(x / (s * 0.45) + 17, y / (s * 0.45) + 9);
+	const noise2 = (n, x, y, s) =>
+		0.65 * n(x / s, y / s) + 0.35 * n(x / (s * 0.45) + 17, y / (s * 0.45) + 9);
 	const smooth = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
-	const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+	const cross = (a, b) => [
+		a[1] * b[2] - a[2] * b[1],
+		a[2] * b[0] - a[0] * b[2],
+		a[0] * b[1] - a[1] * b[0]
+	];
 	const norm = (a) => {
 		const l = Math.hypot(a[0], a[1], a[2]) || 1;
 		return [a[0] / l, a[1] / l, a[2] / l];
@@ -152,7 +165,18 @@
 	const NAMED = {};
 	for (let r = -1; r <= 3; r++)
 		for (let c = -1; c <= 3; c++) {
-			const w = { x: X0[0] + c * PITCH, y: Y0[0] + r * PITCH, entryA: ENTRY_A, entry: null, impactT: -100, dose: 0, cells: [] };
+			const w = {
+				x: X0[0] + c * PITCH,
+				y: Y0[0] + r * PITCH,
+				r,
+				c,
+				entryA: ENTRY_A,
+				entry: null,
+				impactT: -100,
+				dose: 0,
+				doses: [],
+				cells: []
+			};
 			WELLS.push(w);
 			if (c >= 0 && c <= 2) {
 				if (r === 0) NAMED['T' + c] = w;
@@ -193,7 +217,8 @@
 				for (let x = Math.max(0, gx - reach); x <= Math.min(gw - 1, gx + reach); x++)
 					for (const i of grid[y * gw + x]) {
 						const q = pts[i];
-						if (Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5 * (need + spacingAt(q[0], q[1]))) return false;
+						if (Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5 * (need + spacingAt(q[0], q[1])))
+							return false;
 					}
 			return true;
 		};
@@ -246,7 +271,7 @@
 	}
 
 	onMount(() => {
-		if (!canvas || !field) return;
+		if (!canvas || !stage || !wrap) return;
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const ctx0 = canvas.getContext('2d');
 		if (!ctx0) return;
@@ -283,32 +308,55 @@
 
 		// ---- the process -------------------------------------------------------
 		let lastT = 0;
-		let cycleT0 = 0;
-		let dissolving = false;
-		const fired = new Set();
+		let clock0 = -1; // the robot's clock starts when the reader arrives
+		const fired = []; // the protocol steps already taken
 		let capTimer = 0;
-		const cam = { ...SYSTEM };
-		let camFrom = { ...SYSTEM },
-			camTo = { ...SYSTEM },
-			camT0 = -10,
-			camDur = 1;
-		let fade = null; // a cross-fade between two views on the same well: { from, to, t0, dur }
-		const drops = []; // changes on their way down
-		function say(text) {
+		let capUntil = 0; // the sentence on screen holds until then
+		const pending = []; // sentences waiting for a view they can be seen in
+		const said = {}; // each sentence is said once
+		const cam = { ...ABOVE };
+		let fade = null; // the pass through the floor: { from, to, k }
+		const drops = []; // changes on their way in: forming above a well, or falling
+		const watcher = { x: NAMED.T2.x, y: NAMED.T2.y, goal: null, holdUntil: 0, next: 1 };
+		let landed = 0; // changes that have reached the floor
+		function say(key, needs) {
+			if (said[key]) return;
+			said[key] = true;
+			pending.push({ key, needs });
+		}
+		function show(text, t) {
 			capOff = true;
 			clearTimeout(capTimer);
-			if (text)
-				capTimer = setTimeout(() => {
-					caption = text;
-					capOff = false;
-				}, 320);
+			capUntil = t + 3.6;
+			capTimer = setTimeout(() => {
+				caption = text;
+				capOff = false;
+			}, 320);
 		}
-		function change(w, dose, t) {
-			const d = R * 0.78; // near the wall, where a change is put in; the same place every time
-			w.entry = [w.x + Math.cos(w.entryA) * d, w.y + Math.sin(w.entryA) * d];
-			w.impactT = t + HOVER + FALL;
+		function hide() {
+			capOff = true;
+			clearTimeout(capTimer);
+		}
+		// the change enters the well: from the same place near the wall, every time, whoever's hand it is
+		function entryOf(w) {
+			const d = R * 0.78;
+			return [w.x + Math.cos(w.entryA) * d, w.y + Math.sin(w.entryA) * d];
+		}
+		function release(w, dose, t, hover) {
+			w.entry = entryOf(w);
+			w.impactT = t + hover + FALL;
 			w.dose = dose;
-			drops.push({ x: w.entry[0], y: w.entry[1], t0: t, t1: w.impactT, dose });
+			w.doses.push(dose);
+			drops.push({
+				w,
+				x: w.entry[0],
+				y: w.entry[1],
+				t0: t,
+				t1: w.impactT,
+				hover,
+				dose,
+				forming: false
+			});
 			const reach = 0.45 + 0.55 * dose; // how far across the well a change of this strength carries
 			for (const c of w.cells) {
 				const dist = Math.hypot(c.x - w.entry[0], c.y - w.entry[1]) / (2 * R);
@@ -321,70 +369,76 @@
 				c.arriveAt = w.impactT + transit * (1 + 0.4 * (rnd() - 0.5)) + c.latency;
 				c.pending = Math.min(1.3, c.gain * 1.05);
 			}
+			// the watcher goes to the well that is about to change, and stays while it answers
+			watcher.goal = w;
+			watcher.holdUntil = w.impactT + 5;
 		}
-		function moveCam(to, dur, t) {
-			camFrom = { ...cam };
-			camTo = to;
-			camT0 = t;
-			camDur = dur;
+		function change(w, dose, t) {
+			release(w, dose, t, HOVER);
 		}
-		function fadeCam(to, dur, t) {
-			fade = { from: { ...cam }, to, t0: t, dur };
-			Object.assign(cam, to);
-			camFrom = { ...to };
-			camTo = to;
-			camT0 = t - 10;
+		// what the light has shown so far, by the reader's hand or the robot's
+		function rows() {
+			const out = [];
+			for (let r = -1; r <= 3; r++) out.push(WELLS.filter((w) => w.r === r));
+			return out;
 		}
-		// where the watcher is, on its walk
-		function watcherAt(u) {
-			const last = WALK[WALK.length - 1][0];
-			const v = u < last ? u : last - 10 + ((u - last) % 10); // after the opening it loops the plate at the same pace
-			let i = 0;
-			while (i < WALK.length - 2 && v >= WALK[i + 1][0]) i++;
-			const a = NAMED[WALK[i][1]],
-				b = NAMED[WALK[i + 1][1]];
-			const k = Math.max(0, Math.min(1, (v - WALK[i][0]) / (WALK[i + 1][0] - WALK[i][0])));
-			return [a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k];
+		function noticed() {
+			if (landed > 0) say('above', 'high');
+			if (landed > 0 && cam.el < 0 && cam.f >= cam.dist * 1.5) say('below', 'near'); // the watcher's own view, once the camera is in it
+			for (const row of rows()) {
+				const done = row.filter((w) => w.doses.length);
+				if (
+					done.length >= 2 &&
+					done.some((a) => done.some((b) => a !== b && Math.abs(a.dose - b.dose) < 0.08))
+				)
+					say('again', 'wide');
+				const ds = done.map((w) => w.dose).sort((a, b) => a - b);
+				if (ds.length >= 3 && ds[2] - ds[0] > 0.4 && ds[1] - ds[0] > 0.12 && ds[2] - ds[1] > 0.12)
+					say('strengths', 'wide');
+			}
+		}
+		// where the watcher is, on its walk: towards the next change, or on patrol
+		function walk(dt, t) {
+			let goal = watcher.goal;
+			if (goal && t > watcher.holdUntil) goal = watcher.goal = null;
+			if (!goal) {
+				const n = NAMED[PATROL[watcher.next % PATROL.length]];
+				if (Math.hypot(n.x - watcher.x, n.y - watcher.y) < 1) watcher.next++;
+				goal = NAMED[PATROL[watcher.next % PATROL.length]];
+			}
+			const dx = goal.x - watcher.x,
+				dy = goal.y - watcher.y,
+				d = Math.hypot(dx, dy),
+				step = (PITCH / PACE) * dt;
+			if (d <= step) {
+				watcher.x = goal.x;
+				watcher.y = goal.y;
+			} else {
+				watcher.x += (dx / d) * step;
+				watcher.y += (dy / d) * step;
+			}
 		}
 		function stepProcess(t, quiet) {
 			const dt = Math.min(0.05, Math.max(0, t - lastT));
 			lastT = t;
-			let u = t - cycleT0;
-			if (u >= CYCLE) {
-				cycleT0 = t;
-				u = 0;
-				fired.clear();
-				dissolving = false;
-				fade = null;
-				drops.length = 0;
-				for (const c of cells) {
-					c.events.length = 0;
-					c.evidence = 0;
-					c.arriveAt = -1;
+			if (clock0 >= 0) {
+				const u = t - clock0;
+				for (let i = 0; i < PROTOCOL.length; i++) {
+					const e = PROTOCOL[i];
+					if (fired[i] || u < e.at) continue;
+					fired[i] = true;
+					if (e.change) change(NAMED[e.change[0]], e.change[1], t);
+					if (e.say && !quiet) say(e.say, e.needs);
 				}
-				for (const w of WELLS) w.impactT = -100;
 			}
-			for (let i = 0; i < SCRIPT.length; i++) {
-				const e = SCRIPT[i];
-				if (fired.has(i) || u < e.at) continue;
-				fired.add(i);
-				if (e.say !== undefined && !quiet) say(e.say);
-				if (e.change) change(NAMED[e.change[0]], e.change[1], t);
-				if (e.cam) moveCam(e.cam, e.dur, t);
-				if (e.fade) fadeCam(e.fade, e.dur, t);
-				if (e.dissolve) dissolving = true;
+			walk(dt, t);
+			while (drops.length && !drops[0].forming && t > drops[0].t1 + 0.1) drops.shift();
+			for (const d of drops) {
+				if (!d.forming && !d.counted && t >= d.t1) {
+					d.counted = true;
+					landed++;
+				}
 			}
-			if (fade && t > fade.t0 + fade.dur) fade = null;
-			// the camera, between its views
-			const k = smooth((t - camT0) / camDur);
-			cam.tx = camFrom.tx + (camTo.tx - camFrom.tx) * k;
-			cam.ty = camFrom.ty + (camTo.ty - camFrom.ty) * k;
-			cam.az = camFrom.az + (camTo.az - camFrom.az) * k;
-			cam.el = camFrom.el + (camTo.el - camFrom.el) * k;
-			cam.k = camFrom.k + (camTo.k - camFrom.k) * k;
-			cam.dist = Math.exp(Math.log(camFrom.dist) + (Math.log(camTo.dist) - Math.log(camFrom.dist)) * k);
-			cam.f = Math.exp(Math.log(camFrom.f) + (Math.log(camTo.f) - Math.log(camFrom.f)) * k);
-			while (drops.length && t > drops[0].t1 + 0.1) drops.shift();
 			for (const c of cells) {
 				if (c.arriveAt >= 0 && t >= c.arriveAt) {
 					if (c.pending > 0.03) {
@@ -396,8 +450,23 @@
 				// spontaneous activity, uncaused: part of the picture, never part of the evidence
 				if (rnd() < dt * 0.006) c.events.push({ t, a: 0.35 + 0.4 * rnd(), caused: false });
 				if (c.events.length > 4) c.events.shift();
-				c.evidence *= dissolving ? 1 - dt / 0.9 : 1 - dt / 240; // the slow layer nearly does not forget
+				c.evidence *= 1 - dt / 240; // the slow layer nearly does not forget
 			}
+			if (!quiet) noticed();
+		}
+		// a sentence is shown only in a view it can be seen in
+		function speak(t) {
+			if (t < capUntil || !pending.length) return;
+			const v = cam;
+			const high = v.el > 0; // above or from the side: the plate as a thing, changes falling into it
+			const wide = v.f < v.dist * 1.5; // the whole plate, not one well
+			const near = v.el < 0 && !wide; // the watcher's own view
+			const i = pending.findIndex((s) =>
+				s.needs === 'high' ? high : s.needs === 'near' ? near : wide
+			);
+			if (i < 0) return;
+			const [s] = pending.splice(i, 1);
+			show(m.beats[s.key], t);
 		}
 
 		// ---- the camera and the exposure ---------------------------------------
@@ -408,9 +477,13 @@
 		const HS = 0.25;
 		let hs = HS;
 		let S = 1,
-			dpr = 1;
+			dpr = 1,
+			W = 1,
+			H = 1,
+			CX = 0.5,
+			CY = 0.5;
 		let C = null; // the camera basis this frame
-		const xa = document.createElement('canvas'); // the two views of a cross-fade
+		const xa = document.createElement('canvas'); // the two views of the pass through the floor
 		const xb = document.createElement('canvas');
 
 		function camera(v) {
@@ -420,10 +493,10 @@
 				sa = Math.sin(v.az);
 			const eye = [v.tx + sa * ce * v.dist, v.ty - ca * ce * v.dist, se * v.dist]; // on the near side, swung by the azimuth
 			const fwd = norm([-sa * ce, ca * ce, -se]);
-			const hint = norm([sa * v.k, -ca * v.k, 1 - v.k]);
+			const hint = norm([sa * v.k, -ca * v.k, 1 - Math.abs(v.k)]);
 			const right = norm(cross(fwd, hint)),
 				up = cross(right, fwd);
-			C = { eye, fwd, right, up, f: v.f * S * dpr, cx: canvas.width / 2, cy: canvas.height / 2 };
+			C = { eye, fwd, right, up, f: v.f * S * dpr, cx: canvas.width * CX, cy: canvas.height * CY };
 		}
 		function proj(x, y, z) {
 			const dx = x - C.eye[0],
@@ -437,21 +510,58 @@
 				s
 			];
 		}
+		// the point on the plate under a pixel: the hand reaches through whatever view it is in
+		function unproj(px, py) {
+			const u = (px - C.cx) / C.f,
+				v = -(py - C.cy) / C.f;
+			const D = [
+				C.fwd[0] + C.right[0] * u + C.up[0] * v,
+				C.fwd[1] + C.right[1] * u + C.up[1] * v,
+				C.fwd[2] + C.right[2] * u + C.up[2] * v
+			];
+			if (Math.abs(D[2]) < 1e-6) return null;
+			const s = -C.eye[2] / D[2];
+			if (s <= 0) return null;
+			return [C.eye[0] + D[0] * s, C.eye[1] + D[1] * s];
+		}
 		// an affine frame on the plate around (x, y) with unit = r
 		function frameAt(x, y, r) {
 			const o = proj(x, y, 0),
 				a = proj(x + r, y, 0),
 				b = proj(x, y + r, 0);
-			return { ox: o[0], oy: o[1], ux: a[0] - o[0], uy: a[1] - o[1], vx: b[0] - o[0], vy: b[1] - o[1] };
+			return {
+				ox: o[0],
+				oy: o[1],
+				ux: a[0] - o[0],
+				uy: a[1] - o[1],
+				vx: b[0] - o[0],
+				vy: b[1] - o[1]
+			};
 		}
 		function resize() {
-			const r = field.getBoundingClientRect();
+			const r = stage.getBoundingClientRect();
 			dpr = Math.min(window.devicePixelRatio || 1, 2);
-			const w = Math.max(1, Math.round(r.width));
-			S = w / FW;
-			canvas.width = canvas.height = xa.width = xa.height = xb.width = xb.height = Math.round(w * dpr);
+			W = Math.max(1, Math.round(r.width));
+			H = Math.max(1, Math.round(r.height));
+			const wide = W >= 1024 && W > H; // words on the left, the world on the right; otherwise words above
+			if (still) {
+				S = Math.min(W, H) / FW;
+				CX = 0.5;
+				CY = 0.5;
+			} else if (wide) {
+				S = Math.min(0.52 * W, 0.92 * H) / FW;
+				CX = 0.64;
+				CY = 0.5;
+			} else {
+				S = Math.min(0.96 * W, 0.62 * H) / FW;
+				CX = 0.5;
+				CY = 0.6;
+			}
+			canvas.width = xa.width = xb.width = Math.round(W * dpr);
+			canvas.height = xa.height = xb.height = Math.round(H * dpr);
 			hs = canvas.width < 1100 ? 0.5 : HS; // small frames keep a finer soft plate
-			plate.width = plate.height = mask.width = mask.height = Math.max(1, Math.round(canvas.width * hs));
+			plate.width = mask.width = Math.max(1, Math.round(canvas.width * hs));
+			plate.height = mask.height = Math.max(1, Math.round(canvas.height * hs));
 		}
 		// the medium stops where each culture stops: a feather at every wall, no ring
 		function buildMask() {
@@ -483,9 +593,9 @@
 				uy = a[1] - o[1],
 				vx = b[0] - o[0],
 				vy = b[1] - o[1];
-			const m = Math.min(Math.hypot(ux, uy), Math.hypot(vx, vy));
-			if (m < 0.7) {
-				const q = 0.7 / m;
+			const mm = Math.min(Math.hypot(ux, uy), Math.hypot(vx, vy));
+			if (mm < 0.7) {
+				const q = 0.7 / mm;
 				ux *= q;
 				uy *= q;
 				vx *= q;
@@ -506,9 +616,11 @@
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.imageSmoothingEnabled = true;
 			ctx.imageSmoothingQuality = 'high';
-			const side = Math.max(0, Math.min(1, (v.el / D2R + 70) / 50)); // how much the view is from the side: the watcher under the plate is seen only then
-			const u = t - cycleT0;
+			const side = Math.max(0, Math.min(1, (v.el / D2R + 70) / 50)); // how much the view is from the side or above: the watcher under the plate is seen only then
+			const flat = Math.abs(Math.sin(v.el)); // how much the view is along the plate's normal: a change above the floor is out of focus then
+			const u = clock0 >= 0 ? t - clock0 : -1;
 			const night = smooth((u - NIGHT[0]) / 1.5) * (1 - smooth((u - NIGHT[1] + 1.5) / 1.5)); // the interval between the day and the day after
+			const minWH = Math.min(canvas.width, canvas.height);
 
 			// the medium, on the soft plate: a dim floor in every well; the watcher's light through the floor of the well it is under;
 			// in a changed well, the change spreading from where it entered
@@ -517,11 +629,12 @@
 			pctx.globalCompositeOperation = 'source-over';
 			// no tint over the whole plate: a filled square reads as a window; the wells carry the light
 			pctx.globalCompositeOperation = 'lighter';
-			const [rx, ry] = watcherAt(u);
+			const rx = watcher.x,
+				ry = watcher.y;
 			if (side > 0) {
 				// the watcher, under the plate: its light reaches the eye through the floor of the well it is under; the mask hides it between wells
 				const o = proj(rx, ry, 0);
-				const rr = Math.max(1, Math.min(-1.2 * OBS_Z * o[2], 0.11 * canvas.width) * hs); // no bigger than a well's neighbourhood, even close to the camera
+				const rr = Math.max(1, Math.min(-1.2 * OBS_Z * o[2], 0.11 * minWH) * hs); // no bigger than a well's neighbourhood, even close to the camera
 				const g = pctx.createRadialGradient(o[0] * hs, o[1] * hs, 0, o[0] * hs, o[1] * hs, rr);
 				g.addColorStop(0, rgba(mix(PRIMARY, WHITE, 0.2), 0.55 * side));
 				g.addColorStop(0.35, rgba(PRIMARY, 0.16 * side));
@@ -589,7 +702,7 @@
 			if (side > 0) {
 				// and a little of the watcher's light scatters through the body of the plate between wells, so the walk never breaks
 				const o = proj(rx, ry, 0);
-				const rr = Math.max(1, Math.min(-OBS_Z * o[2], 0.1 * canvas.width));
+				const rr = Math.max(1, Math.min(-OBS_Z * o[2], 0.1 * minWH));
 				const g = ctx.createRadialGradient(o[0], o[1], 0, o[0], o[1], rr);
 				g.addColorStop(0, rgba(PRIMARY, 0.07 * side));
 				g.addColorStop(1, rgba(PRIMARY, 0));
@@ -599,20 +712,29 @@
 				ctx.fill();
 			}
 
-			// a change on its way in: it appears at the same fixed height above the well every time, waits, then falls under gravity.
-			// From below it is out of focus and wide, gathering to a point as it nears the floor
+			// a change on its way in: it forms at the same fixed height above the well every time, waits (or is held), then falls under gravity.
+			// Along the plate's normal it is out of focus and wide, gathering to a point as it nears the floor
 			for (const d of drops) {
 				const dt = t - d.t0;
-				if (dt < 0 || t >= d.t1) continue;
-				const fk = Math.max(0, Math.min(1, (dt - HOVER) / FALL));
-				const z = DROP_H * (1 - fk * fk);
+				if (dt < 0 || (!d.forming && t >= d.t1)) continue;
+				let z, form, dose;
+				if (d.forming) {
+					z = DROP_H;
+					dose = d.dose;
+					form = 0.35 + 0.65 * smooth(dt / 0.25); // it forms under the hand, and grows while the hand stays
+				} else {
+					const fk = Math.max(0, Math.min(1, (dt - d.hover) / FALL));
+					z = DROP_H * (1 - fk * fk);
+					dose = d.dose;
+					form = dt < d.hover ? 0.35 + 0.65 * (dt / d.hover) : 1; // the robot's forms before it is released
+				}
 				const o = proj(d.x, d.y, z);
-				const wide = 70 * (z / DROP_H) * (1 - side),
-					r = (7 + wide) * o[2];
-				const form = dt < HOVER ? 0.35 + 0.65 * (dt / HOVER) : 1; // it forms before it is released
-				const a = form * Math.min(0.7, 0.045 * (77 / (7 + wide)) ** 2 + 0.5 * side) * (0.5 + 0.5 * d.dose);
+				const wide = 70 * (z / DROP_H) * flat * flat,
+					r = (7 + wide) * o[2] * (0.6 + 0.4 * dose);
+				// out of focus it is a soft disc of light, never nothing: the hand has to see what it is holding
+				const a = form * (0.1 + 0.6 * (1 - wide / 77)) * (0.5 + 0.5 * dose);
 				const g = ctx.createRadialGradient(o[0], o[1], 0, o[0], o[1], Math.max(1, r));
-				g.addColorStop(0, rgba(mix(PRIMARY, WHITE, 0.35 * side), a));
+				g.addColorStop(0, rgba(mix(PRIMARY, WHITE, 0.35 * (1 - flat)), a));
 				g.addColorStop(1, rgba(PRIMARY, 0));
 				ctx.fillStyle = g;
 				ctx.beginPath();
@@ -637,7 +759,8 @@
 				let recent = 0;
 				for (const e of c.events) {
 					const d = t - e.t;
-					if (e.caused && d > RISE * 0.6 && d < RISE + 0.22 && e.a > 0.8) recent = Math.max(recent, e.a);
+					if (e.caused && d > RISE * 0.6 && d < RISE + 0.22 && e.a > 0.8)
+						recent = Math.max(recent, e.a);
 				}
 				if (recent) {
 					const o = proj(c.x, c.y, 0);
@@ -649,32 +772,32 @@
 			}
 			// the exposure fades at the edges of the frame: the plate goes on, the frame does not cut it
 			ctx.globalCompositeOperation = 'destination-in';
-			const W = canvas.width,
-				E = Math.round(W * 0.07);
+			const CW = canvas.width,
+				CH = canvas.height,
+				E = Math.round(minWH * 0.07);
 			for (const [x0, y0, x1, y1] of [
 				[0, 0, E, 0],
-				[W, 0, W - E, 0],
+				[CW, 0, CW - E, 0],
 				[0, 0, 0, E],
-				[0, W, 0, W - E]
+				[0, CH, 0, CH - E]
 			]) {
 				const g = ctx.createLinearGradient(x0, y0, x1, y1);
 				g.addColorStop(0, 'rgba(0,0,0,0)');
 				g.addColorStop(1, 'rgba(0,0,0,1)');
 				ctx.fillStyle = g;
-				ctx.fillRect(0, 0, W, W);
+				ctx.fillRect(0, 0, CW, CH);
 			}
 			ctx.globalCompositeOperation = 'source-over';
 		}
 		function draw(t) {
 			if (fade) {
-				const k = smooth((t - fade.t0) / fade.dur);
 				render(t, fade.from, xa.getContext('2d'));
 				render(t, fade.to, xb.getContext('2d'));
 				ctx0.setTransform(1, 0, 0, 1, 0, 0);
 				ctx0.clearRect(0, 0, canvas.width, canvas.height);
-				ctx0.globalAlpha = 1 - k;
+				ctx0.globalAlpha = 1 - fade.k;
 				ctx0.drawImage(xa, 0, 0);
-				ctx0.globalAlpha = k;
+				ctx0.globalAlpha = fade.k;
 				ctx0.drawImage(xb, 0, 0);
 				ctx0.globalAlpha = 1;
 				return;
@@ -682,9 +805,102 @@
 			render(t, cam, ctx0);
 		}
 
+		// ---- the descent: the scroll is the camera ----------------------------
+		let pTarget = 0;
+		let p = 0;
+		function travel() {
+			const r = wrap.getBoundingClientRect();
+			const run = r.height - window.innerHeight;
+			pTarget = run > 1 ? Math.max(0, Math.min(1, -r.top / run)) : 0;
+		}
+		function placeCamera(q) {
+			let from = DESCENT[0].cam,
+				p0 = 0;
+			for (const seg of DESCENT) {
+				if (q <= seg.to || seg === DESCENT[DESCENT.length - 1]) {
+					const k = smooth((q - p0) / Math.max(1e-6, seg.to - p0));
+					if (seg.fade) {
+						fade = k <= 0 || k >= 1 ? null : { from, to: seg.cam, k };
+						Object.assign(cam, k < 0.5 ? from : seg.cam);
+					} else {
+						fade = null;
+						const a = from,
+							b = seg.cam;
+						cam.tx = a.tx + (b.tx - a.tx) * k;
+						cam.ty = a.ty + (b.ty - a.ty) * k;
+						cam.az = a.az + (b.az - a.az) * k;
+						cam.el = a.el + (b.el - a.el) * k;
+						cam.k = a.k + (b.k - a.k) * k;
+						cam.dist = Math.exp(Math.log(a.dist) + (Math.log(b.dist) - Math.log(a.dist)) * k);
+						cam.f = Math.exp(Math.log(a.f) + (Math.log(b.f) - Math.log(a.f)) * k);
+					}
+					return;
+				}
+				from = seg.cam;
+				p0 = seg.to;
+			}
+		}
+
+		// ---- the hand -------------------------------------------------------------
+		let held = null; // { w, drop, x, y, t0 } while a pointer is down on a well
+		let tNow = 0;
+		function wellUnder(ev) {
+			const r = stage.getBoundingClientRect();
+			camera(cam);
+			const pt = unproj((ev.clientX - r.left) * dpr, (ev.clientY - r.top) * dpr);
+			if (!pt) return null;
+			const w = wellAt(pt[0], pt[1]);
+			if (!w || Math.hypot(pt[0] - w.x, pt[1] - w.y) > R * 0.98) return null;
+			return w;
+		}
+		function onDown(ev) {
+			if (still || held || ev.button > 0) return;
+			const w = wellUnder(ev);
+			if (!w) return;
+			const [x, y] = entryOf(w);
+			const drop = { w, x, y, t0: tNow, t1: 0, hover: 0, dose: 0.45, forming: true };
+			drops.push(drop);
+			held = { w, drop, x: ev.clientX, y: ev.clientY, id: ev.pointerId };
+			if (clock0 < 0) clock0 = tNow; // the reader's first touch is an arrival too
+		}
+		function onMove(ev) {
+			if (held) {
+				if (held.id !== ev.pointerId) return;
+				// the hand has moved on: it was a scroll, not a change
+				if (Math.hypot(ev.clientX - held.x, ev.clientY - held.y) > 10) abandon();
+				return;
+			}
+			if (ev.pointerType === 'mouse') overWell = !!wellUnder(ev);
+		}
+		function abandon() {
+			if (!held) return;
+			const i = drops.indexOf(held.drop);
+			if (i >= 0) drops.splice(i, 1);
+			held = null;
+		}
+		function onUp(ev) {
+			if (!held || held.id !== ev.pointerId) return;
+			const { w, drop } = held;
+			held = null;
+			const i = drops.indexOf(drop);
+			if (i >= 0) drops.splice(i, 1);
+			release(w, drop.dose, tNow, 0); // held already: it falls at once
+		}
+		stage.addEventListener('pointerdown', onDown);
+		stage.addEventListener('pointermove', onMove);
+		stage.addEventListener('pointerup', onUp);
+		stage.addEventListener('pointercancel', abandon);
+		stage.addEventListener('pointerleave', (ev) => {
+			if (held && held.id === ev.pointerId) abandon();
+			overWell = false;
+		});
+
 		resize();
 		if (reduced) {
-			// one exposure from above, the maps settled, with one sentence
+			// one exposure from the side, the maps settled, with one sentence
+			still = true;
+			resize();
+			clock0 = 0;
 			let t = 0;
 			for (let i = 0; i < 60 * 45.5; i++) {
 				t = i / 60;
@@ -695,32 +911,52 @@
 			draw(t);
 			caption = STILL;
 			capOff = false;
-			still = true;
 			live = true;
 			return;
 		}
+		travel();
+		placeCamera(pTarget);
+		p = pTarget;
 		draw(0);
 		live = true;
 
-		// the experiment's clock runs only while the figure is in view: it begins when the reader arrives
+		// the cells' clock runs only while the stage is in view; the robot's starts when the reader has arrived
 		let t = 0;
 		let lastNow = 0;
 		let frame = 0;
 		let visible = false;
+		let arrived = false;
 		function tick(now) {
 			if (visible) {
-				if (lastNow) t += Math.min(0.1, (now - lastNow) / 1000);
+				const dms = lastNow ? Math.min(100, now - lastNow) : 16;
+				t += dms / 1000;
 				lastNow = now;
+				tNow = t;
+				if (arrived && clock0 < 0) clock0 = t;
+				travel();
+				// the camera follows the hand with a little weight: no wheel steps, no lag worth the name
+				p += (pTarget - p) * (1 - Math.exp(-dms / 90));
+				if (Math.abs(pTarget - p) < 0.0005) p = pTarget;
+				placeCamera(p);
+				if (held) held.drop.dose = 0.45 + 0.55 * smooth((t - held.drop.t0 - 0.1) / HOLD_T); // the longer the hold, the stronger the change
 				stepProcess(t, false);
+				if (capOff === false && t > capUntil) hide();
+				speak(t);
 				draw(t);
 			} else lastNow = 0;
 			frame = requestAnimationFrame(tick);
 		}
 		frame = requestAnimationFrame(tick);
-		const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.5 });
-		io.observe(field);
+		const io = new IntersectionObserver(
+			([e]) => {
+				visible = e.isIntersecting;
+				if (e.intersectionRatio >= 0.5) arrived = true;
+			},
+			{ threshold: [0, 0.5] }
+		);
+		io.observe(stage);
 		const ro = new ResizeObserver(() => resize());
-		ro.observe(field);
+		ro.observe(stage);
 		return () => {
 			cancelAnimationFrame(frame);
 			clearTimeout(capTimer);
@@ -730,32 +966,33 @@
 	});
 </script>
 
-<div class="instrument-wrap" class:still>
-	<div
-		class="field"
-		bind:this={field}
-		role="img"
-		aria-label="Part of a standard plate as a long exposure, seen first from the side: cultures of individual cells on the floor of every well, a watcher walking underneath whose light shows only through the well it is under, and a change falling into one well from above. The view dives through the plate to the watcher's own: close on that well as the change spreads and the cells answer with their own timing, or not. It pulls back to the plate from below: the same change enters the next wells of that row one after another; a row receives it at three strengths and more cells answer the stronger it is; a row is never touched and only flickers on its own; a day later the same cells answer the same changes again. What answered because of a change settles slowly into a map of cause."
-	>
+<div class="experiment" class:still bind:this={wrap}>
+	<div class="stage" class:hand={overWell} bind:this={stage} role="img" aria-label={m.a11y.figure}>
 		<canvas class="instrument" class:shown={live} bind:this={canvas} aria-hidden="true"></canvas>
+		<p class="pass" class:off={capOff} aria-live="polite" {lang}>{caption}</p>
 	</div>
-	<p class="pass" class:off={capOff} aria-live="polite" {lang}>{caption}</p>
+	<slot />
 </div>
 
 <style>
-	/* the figure is sized by the page so the whole exposure fits in view with its sentence */
-	.instrument-wrap {
+	/* the stage is pinned for the length of the descent; the page's stations scroll over it */
+	.experiment {
 		position: relative;
-		width: 100%;
-		max-width: 880px;
-		margin-inline: auto;
-		display: grid;
 	}
 
-	.field {
-		position: relative;
-		width: 100%;
-		aspect-ratio: 1;
+	.stage {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+		overflow: clip;
+		touch-action: pan-y; /* the page still scrolls under a finger; a still finger is a hand on a well */
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-touch-callout: none;
+	}
+
+	.stage.hand {
+		cursor: pointer;
 	}
 
 	.instrument {
@@ -772,13 +1009,13 @@
 		opacity: 1;
 	}
 
-	/* the sentence of the beat: display face, set inside the exposure on its feathered
+	/* the sentence of the beat: display face, set under the plate inside the exposure's feathered
 	   lower edge, so the words are never read apart from the light they name */
 	.pass {
 		position: absolute;
-		left: 6%;
-		right: 6%;
-		bottom: 5%;
+		left: 16px;
+		right: 16px;
+		bottom: 5svh;
 		margin: 0;
 		font-family: var(--font-display);
 		font-weight: 300;
@@ -787,15 +1024,43 @@
 		max-width: 48ch;
 		color: var(--ink-100, rgba(255, 255, 255, 0.96));
 		transition: opacity var(--t-move, 320ms) var(--ease-out, ease-out);
+		pointer-events: none;
 	}
 
 	.pass.off {
 		opacity: 0;
 	}
 
-	/* the still exposure's sentence is longer; it sits beneath the frame */
+	@media (min-width: 1024px) and (orientation: landscape) {
+		.pass {
+			left: 46vw;
+			right: 4vw;
+			bottom: 7svh;
+			text-align: center;
+			max-width: none;
+		}
+	}
+
+	/* reduced motion: one square exposure, not pinned, the sentence beneath it; the stations follow */
+	.experiment.still {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.still .stage {
+		position: relative;
+		height: auto;
+		aspect-ratio: 1;
+		width: 100%;
+		max-width: 880px;
+		margin-inline: auto;
+		order: 1;
+	}
+
 	.still .pass {
 		position: static;
-		margin-top: 1rem;
+		margin: 1rem 16px 0;
+		text-align: left;
+		max-width: 48ch;
 	}
 </style>

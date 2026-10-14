@@ -24,7 +24,6 @@
 
 	let showContact = false;
 	let showUpdates = false;
-
 </script>
 
 <svelte:head>
@@ -32,7 +31,10 @@
 	<meta name="description" content={m.meta.description} />
 	<meta property="og:title" content={m.meta.ogTitle} />
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content={lang === 'ja' ? 'https://aeon.science/ja' : 'https://aeon.science/'} />
+	<meta
+		property="og:url"
+		content={lang === 'ja' ? 'https://aeon.science/ja' : 'https://aeon.science/'}
+	/>
 	<meta property="og:locale" content={m.meta.ogLocale} />
 	<meta property="og:description" content={m.meta.ogDescription} />
 	<meta name="twitter:card" content="summary" />
@@ -50,12 +52,15 @@
 			<div class="hero-head">
 				<div class="wordmark-row">
 					<p class="wordmark">aeon<span>.science</span></p>
-					<a class="lang-switch" href={switchHref} hreflang={other} lang={other}>{m.switch.label}</a>
+					<a class="lang-switch" href={switchHref} hreflang={other} lang={other}>{m.switch.label}</a
+					>
 				</div>
 				<p class="line">{m.hero.line}</p>
 			</div>
 			<div class="hero-foot">
-				<h1 id="hero-heading">{#each lines(m.hero.h1) as part, i}{#if i}<br />{/if}{part}{/each}</h1>
+				<h1 id="hero-heading">
+					{#each lines(m.hero.h1) as part, i}{#if i}<br />{/if}{part}{/each}
+				</h1>
 				<a class="cue" href="#dish-section">{m.hero.cue} <span aria-hidden="true">↓</span></a>
 			</div>
 		</div>
@@ -65,37 +70,41 @@
 	</div>
 </section>
 
-<!-- 01 · dish -->
-<!-- one screen: one sentence hung on the exposure, sized by the viewport so the words are
-     never read apart from the figure. The figure says the rest. -->
-<section id="dish-section" class="level dish" aria-labelledby="dish-heading">
-	<div class="content dish-grid">
-		<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
-			{#each lines(m.dish.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
-			<em class="h-em">{#each lines(m.dish.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em>
-		</h2>
-		<figure class="diagram" use:reveal={{ delay: 140 }}>
-			<InstrumentSection />
-		</figure>
-	</div>
-</section>
-
-<!-- 02 · readout -->
-<section id="readout-section" class="level readout" aria-labelledby="readout-heading">
-	<div class="content">
-		<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
-			{#each lines(m.readout.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
-			<em class="h-em">{#each lines(m.readout.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em>
-		</h2>
-		<p use:reveal={{ delay: 100 }}>
-			{m.readout.pBefore}<a
-				href="https://doi.org/10.1126/science.1105809"
-				target="_blank"
-				rel="noopener noreferrer">{m.readout.pLink}</a
-			>{m.readout.pAfter}
-		</p>
-	</div>
-</section>
+<!-- 01 · dish, 02 · readout: one plate, pinned, for the length of both -->
+<!-- The stage holds the plate; the scroll is the camera, going down through the instrument from
+     where changes come from to where we watch. The two sentences are stations on the way down:
+     the dish sentence is read in the robot's view, the readout sentence from below with the map
+     settled. Between them the words step aside and the plate has the screen. -->
+<InstrumentSection>
+	<section id="dish-section" class="level station head" aria-labelledby="dish-heading">
+		<div class="station-copy">
+			<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
+				{#each lines(m.dish.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
+				<em class="h-em"
+					>{#each lines(m.dish.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em
+				>
+			</h2>
+		</div>
+	</section>
+	<div class="station travel" aria-hidden="true"></div>
+	<section id="readout-section" class="level station foot" aria-labelledby="readout-heading">
+		<div class="station-copy">
+			<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
+				{#each lines(m.readout.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
+				<em class="h-em"
+					>{#each lines(m.readout.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em
+				>
+			</h2>
+			<p use:reveal={{ delay: 100 }}>
+				{m.readout.pBefore}<a
+					href="https://doi.org/10.1126/science.1105809"
+					target="_blank"
+					rel="noopener noreferrer">{m.readout.pLink}</a
+				>{m.readout.pAfter}
+			</p>
+		</div>
+	</section>
+</InstrumentSection>
 
 <!-- 03 · return -->
 <section id="return-section" class="level" aria-labelledby="return-heading">
@@ -139,7 +148,11 @@
 				</div>
 				<p class="role">{m.eric.role}</p>
 				<p class="bio">
-					{#each m.eric.bio as s}{#if "href" in s}<a href={s.href} target="_blank" rel="noopener noreferrer">{s.t}</a>{:else}{s.t}{/if}{/each}
+					{#each m.eric.bio as s}{#if 'href' in s}<a
+								href={s.href}
+								target="_blank"
+								rel="noopener noreferrer">{s.t}</a
+							>{:else}{s.t}{/if}{/each}
 				</p>
 			</div>
 			<div class="person">
@@ -172,7 +185,11 @@
 				</div>
 				<p class="role">{m.karen.role}</p>
 				<p class="bio">
-					{#each m.karen.bio as s}{#if "href" in s}<a href={s.href} target="_blank" rel="noopener noreferrer">{s.t}</a>{:else}{s.t}{/if}{/each}
+					{#each m.karen.bio as s}{#if 'href' in s}<a
+								href={s.href}
+								target="_blank"
+								rel="noopener noreferrer">{s.t}</a
+							>{:else}{s.t}{/if}{/each}
 				</p>
 			</div>
 		</div>
@@ -182,7 +199,8 @@
 				<p>{m.cta.line}</p>
 				<div class="cta-group left">
 					<button class="cta-primary" on:click={() => (showContact = true)}>{m.cta.write}</button>
-					<button class="cta-secondary" on:click={() => (showUpdates = true)}>{m.cta.follow}</button>
+					<button class="cta-secondary" on:click={() => (showUpdates = true)}>{m.cta.follow}</button
+					>
 				</div>
 			</div>
 		{/if}
@@ -401,7 +419,10 @@
 
 	@media (max-width: 719px) {
 		.hero-grid {
-			grid-template-columns: minmax(0, 1fr); /* see .hero: the mark overflows the track, it never widens it */
+			grid-template-columns: minmax(
+				0,
+				1fr
+			); /* see .hero: the mark overflows the track, it never widens it */
 			width: 100%;
 			padding-inline: 16px;
 			align-content: space-between; /* mark at the top, name block at the foot, like the card */
@@ -539,79 +560,98 @@
 		text-decoration-color: var(--aeon-biolum);
 	}
 
-	/* ---------- diagram / status ---------- */
+	/* ---------- the stations over the stage ---------- */
 
-	/* ---------- the dish screen ---------- */
-
-	/* the section is one viewport: text column left, the exposure right, sized by the
-	   viewport height so the figure, its sentence and the words around it are seen at once */
-	.dish {
+	/* each station is a screen the words step into while the plate is pinned beneath it; the
+	   pointer passes through the words to the plate, except at a link */
+	.station {
+		z-index: 1;
 		min-height: 100svh;
-		padding: 3rem 2rem;
 		display: grid;
 		align-content: center;
+		padding: 3rem 2rem;
+		pointer-events: none;
 	}
 
-	/* the sentence hangs on the figure: centred on the square, in its light */
-	.dish-grid {
-		max-width: 76rem;
+	.station a {
+		pointer-events: auto;
+	}
+
+	/* the first station overlays the stage: the sentence is read in the robot's view */
+	.station.head {
+		margin-top: -100svh;
+	}
+
+	/* between the sentences the words step aside and the plate has the screen */
+	.station.travel {
+		min-height: 120svh;
+		padding: 0;
+	}
+
+	/* words on the left, the world on the right, as in the hero */
+	.station-copy {
+		width: min(100%, 76rem);
+		margin-inline: auto;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		grid-template-areas: 'head fig';
-		column-gap: clamp(2rem, 4vw, 4rem);
-		align-items: center;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
 	}
 
-	.dish h2 {
-		grid-area: head;
+	/* every line of the station keeps to the left column; the right is the plate's */
+	.station-copy > * {
+		grid-column: 1;
+	}
+
+	.station h2 {
 		font-size: clamp(1.9rem, 3vw, 2.6rem);
 		max-width: 16ch;
 		margin: 0;
 	}
 
-	/* the drawing sits on the dark with its own faint wash: no box, no rule */
-	.diagram {
-		grid-area: fig;
-		position: relative;
-		width: min(880px, calc(100svh - 6rem), calc(100vw - 4rem));
-		margin: 0;
-		padding: 0;
+	.station.foot h2 {
+		max-width: 18ch;
+		margin: 0 0 2rem;
 	}
 
-	@media (max-width: 63.99rem) {
-		.dish {
-			padding: clamp(3rem, 8vh, 5rem) 2rem;
+	.station.foot p {
+		max-width: 40ch;
+	}
+
+	/* reduced motion: the stage is a still square and nothing is pinned, so the stations flow:
+	   the dish sentence, the exposure, the readout; no overlay, no empty travel */
+	:global(.experiment.still) .station.head {
+		margin-top: 0;
+		min-height: 0;
+		padding-bottom: 0;
+	}
+
+	:global(.experiment.still) .station.travel {
+		display: none;
+	}
+
+	:global(.experiment.still) .station.foot {
+		order: 2;
+		min-height: 0;
+	}
+
+	/* narrow or upright: the words above, the plate below them */
+	@media (max-width: 63.99rem), (orientation: portrait) {
+		.station {
+			align-content: start;
+			padding: 9svh 2rem 3rem;
 		}
 
-		.dish-grid {
+		.station-copy {
 			grid-template-columns: minmax(0, 1fr);
-			grid-template-areas:
-				'head'
-				'fig';
 		}
 
-		.dish h2 {
+		.station h2,
+		.station.foot h2 {
 			max-width: 30ch;
-			margin: 0 0 1.5rem;
 		}
 
-		.diagram {
-			width: min(100%, max(18rem, calc(100svh - 14rem)));
-			margin: 0;
+		.station.foot p {
+			max-width: 58ch;
 		}
-	}
-
-	/* ---------- readout ---------- */
-
-	/* a screen whose centre is the claim; the void around it is composed, not leftover */
-	.readout {
-		min-height: 100svh;
-		display: grid;
-		align-content: center;
-	}
-
-	.readout h2 {
-		max-width: 22ch;
 	}
 
 	/* ---------- colophon ---------- */
