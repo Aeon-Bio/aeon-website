@@ -11,8 +11,21 @@
 			type="image/webp"
 			fetchpriority="high"
 		/>
-		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
-		<link rel="alternate icon" href="%sveltekit.assets%/favicon.png" />
+		<!-- ?v= is the icon's generation: browsers hold favicons past any cache header, so a new
+		     exposure needs a new URL. Bump it whenever static/favicon.* is regenerated. -->
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg?v=2" type="image/svg+xml" />
+		<link rel="icon" href="%sveltekit.assets%/favicon-32.png?v=2" type="image/png" sizes="32x32" />
+		<link
+			rel="icon"
+			href="%sveltekit.assets%/favicon-192.png?v=2"
+			type="image/png"
+			sizes="192x192"
+		/>
+		<link
+			rel="apple-touch-icon"
+			href="%sveltekit.assets%/apple-touch-icon.png?v=2"
+			sizes="180x180"
+		/>
 		<meta name="theme-color" content="#1a1b2f" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
