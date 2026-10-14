@@ -76,106 +76,101 @@ test('the process is physical and heterogeneous, not a CSS loop or a uniform wav
 	);
 	assert.match(
 		source,
-		/if \(arrived && clock0 < 0\) clock0 = t;/,
+		/if \(arrived && clock0 < 0\) \{\s*clock0 = t;/,
 		'the robot’s clock starts when the reader has arrived'
 	);
 });
 
-// The descent: the stage is pinned and the camera descends on the robot's clock, from above the
-// plate where changes come from, down the side where the plate is a thing, through the floor to
-// where we watch, and back to the whole plate from below. Nothing has to be scrolled to see it;
-// the scroll can only hurry it. A mouse over the stage turns the view about the station.
-test('the clock is the camera, the scroll can only hurry it, the mouse turns it in the hand', () => {
+// The view: it rests over the plate where changes come from, goes down through the floor of a
+// well when a change has landed there to watch the cells answer, and comes back up when it has
+// been seen. Nothing moves the view but a change, a drag, or the end of watching.
+test('the view goes to see what a change does, and comes back', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(
 		source,
-		/const ABOVE = \{ tx: 400, ty: 400, az: 0, el: 90 \* D2R, dist: 8000, f: 8000 \* 0\.95, k: -1 \}/,
-		'opens from above: the robot’s view'
+		/const HOME = \{ tx: 420, ty: 410, az: -6 \* D2R, el: 52 \* D2R, dist: 2600, f: 2600 \* 1\.15, k: 0 \}/,
+		'rests over the plate: every well a thing to press, the watcher seen underneath'
 	);
 	assert.match(
 		source,
-		/const SYSTEM = \{ tx: 420, ty: 430, az: -5 \* D2R, el: 22 \* D2R/,
-		'the side, low over the plate'
+		/const below = \(w\) => \(\{\s*tx: w\.x,\s*ty: w\.y,\s*az: 0,\s*el: -90 \* D2R,\s*dist: 8000,\s*f: 8000 \* 3\.3,\s*k: 1\s*\}\)/,
+		'the watcher’s own view of the well the change went into'
 	);
 	assert.match(
 		source,
-		/const MACRO = \{ tx: 200, ty: 392, az: 0, el: -90 \* D2R, dist: 8000, f: 8000 \* 3\.3/,
-		'close on one well, from below'
+		/if \(d\.down && !quiet\) goDown\(d\.w, t\);/,
+		'when the change lands, the view goes down to see what it does'
 	);
 	assert.match(
 		source,
-		/const PLATE = \{ tx: 400, ty: 400, az: 0, el: -90 \* D2R, dist: 8000, f: 8000, k: 1 \}/,
-		'the whole plate from below'
-	);
-	assert.match(
-		source,
-		/const DESCENT = \[[\s\S]*cam: ABOVE \}[\s\S]*cam: SYSTEM \}[\s\S]*cam: SYSTEM_DRIFT \}[\s\S]*cam: CLOSE \}[\s\S]*cam: MACRO, fade: true \}[\s\S]*cam: MACRO \}[\s\S]*cam: PLATE \}[\s\S]*\];/,
-		'in order: above, side, drift, close, through the floor, the well, the plate'
-	);
-	assert.match(
-		source,
-		/cam: MACRO, fade: true/,
+		/goTo\(below\(w\), t, true\);/,
 		'through the floor by a cross-fade on the well, never an edge-on swing'
+	);
+	assert.match(source, /backAt = t \+ DWELL;/, 'and stays while the cells answer');
+	assert.match(
+		source,
+		/if \(backAt > 0 && t >= backAt && !held && !grab\) \{\s*backAt = -1;\s*goTo\(HOME, t, true\);/,
+		'then comes back up, unless the hand is on the plate'
 	);
 	assert.match(
 		source,
 		/1 - Math\.abs\(v\.k\)/,
-		'the from-above frame is the same plate the same way round: the descent never mirrors it'
-	);
-	assert.match(
-		source,
-		/\{ at: 32, cam: MACRO, fade: true \}/,
-		'through the floor during the night (NIGHT = [27, 32])'
-	);
-	assert.match(
-		source,
-		/const clockP = clock0 >= 0 \? Math\.min\(1, \(t - clock0\) \/ DESCENT_T\) : 0;/,
-		'the camera’s place on the descent is the robot’s clock from the reader’s arrival'
-	);
-	assert.match(source, /-r\.top \/ run/, 'and the scroll’s place in the stage');
-	assert.match(
-		source,
-		/pTarget = Math\.max\(clockP, scrollP\);/,
-		'whichever is further down: nothing has to be scrolled, scrolling can only hurry'
-	);
-	assert.match(
-		source,
-		/Math\.exp\(-dms \/ 90\)/,
-		'the camera follows with a little weight and no lag worth the name'
-	);
-	assert.match(source, /const STEER_AZ = 22 \* D2R;/, 'the mouse turns the view about the station');
-	assert.match(
-		source,
-		/const az = v\.az \+ look\.x \* STEER_AZ;/,
-		'in every view, the fade’s two halves included'
-	);
-	assert.match(
-		source,
-		/if \(ev\.pointerType !== 'mouse'\) return;/,
-		'a finger does not steer: it scrolls or it is a hand on a well'
-	);
-	assert.match(
-		source,
-		/look\.tx = look\.ty = 0; \/\/ the hand has left/,
-		'the view settles back when the hand leaves'
-	);
-	assert.match(
-		source,
-		/if \(!held\) \{\s*const kl = 1 - Math\.exp\(-dms \/ 160\);/,
-		'with weight, and still while a change forms'
+		'the from-below frame is the same plate the same way round'
 	);
 	assert.doesNotMatch(
 		source,
-		/preventDefault|scroll-snap|scrollTo\(|scrollIntoView/,
+		/position: sticky|DESCENT|clockP|scrollP|PROTOCOL|STEER_|-r\.top \/ run/,
+		'no pin, no scroll camera, no clock, no tour, nothing that follows the pointer by itself'
+	);
+	assert.doesNotMatch(
+		source,
+		/preventDefault|scroll-snap|scrollTo\(|scrollIntoView|wheel/,
 		'the page scrolls as a page: nothing is hijacked or snapped'
 	);
-	assert.match(source, /position: sticky;/, 'the stage is pinned');
-	assert.match(source, /height: 100svh;/, 'for one screen');
-	assert.match(source, /<slot \/>/, 'the page’s stations scroll over it');
+	assert.match(source, /height: 100svh;/, 'one screen for the plate');
+	assert.match(source, /<slot \/>/, 'the page’s stations are set over and after it');
 	assert.match(
 		source,
-		/Object\.assign\(cam, SYSTEM\);\s*draw\(t\);\s*caption = STILL;/,
-		'reduced motion: one exposure from the side with the maps settled and one sentence'
+		/Object\.assign\(cam, HOME\);\s*draw\(t\);\s*caption = STILL;/,
+		'reduced motion: one exposure from over the plate with the maps settled and one sentence'
+	);
+});
+
+// The hand on the view: grab the stage and drag, and the view turns about where it rests on its
+// own axes (a tilt, never a spin), closely while held, settling back when let go.
+test('a drag turns the view in the hand; nothing follows the pointer by itself', () => {
+	const { source } = compileSvelte(FILE);
+	assert.match(source, /const TILT_X = 30 \* D2R;/, 'a turn in the hand');
+	assert.match(
+		source,
+		/e = rot\(e, up, look\.x \* TILT_X\);\s*e = rot\(e, right, look\.y \* TILT_Y\);/,
+		'about the view’s own axes: a tilt, never a spin'
+	);
+	assert.match(
+		source,
+		/takeHold\(ev\); \/\/ not on a well: the hand has the view/,
+		'a press off a well grabs the view'
+	);
+	assert.match(
+		source,
+		/> 10\) abandon\(ev\);/,
+		'a press on a well that moves on is a grab, not a change'
+	);
+	assert.match(
+		source,
+		/grab\.ox \+ \(ev\.clientX - grab\.x\) \/ \(GRAB_SPAN \* r\.width\)/,
+		'the turn is the drag, relative, never the pointer’s place'
+	);
+	assert.match(source, /look\.tx = look\.ty = 0; \/\/ let go/, 'let go and it settles back');
+	assert.match(
+		source,
+		/Math\.exp\(-dms \/ \(grab \? 60 : 420\)\)/,
+		'closely while held, with the weight of a thing when let go'
+	);
+	assert.doesNotMatch(
+		source,
+		/\(ev\.clientX - r\.left\) \/ r\.width\) \* 2 - 1/,
+		'no hover steering: the pointer’s place moves nothing'
 	);
 });
 
@@ -196,7 +191,6 @@ test('the hand: press a well, a change forms above it; hold and it grows; let go
 		/0\.45 \+ 0\.55 \* smooth\(\(t - held\.drop\.t0 - 0\.1\) \/ HOLD_T\)/,
 		'the longer the hold, the stronger the change'
 	);
-	assert.match(source, /> 10\) abandon\(\)/, 'a moved finger is a scroll, not a change');
 	assert.match(source, /release\(w, drop\.dose, tNow, 0\)/, 'let go and it falls at once');
 	assert.match(
 		source,
@@ -210,6 +204,11 @@ test('the hand: press a well, a change forms above it; hold and it grows; let go
 	);
 	assert.match(source, /watcher\.goal = w;/, 'the watcher goes to the well about to change');
 	assert.match(source, /if \(clock0 < 0\) clock0 = tNow;/, 'a touch is an arrival too');
+	assert.match(
+		source,
+		/drops\[drops\.length - 1\]\.down = true; \/\/ and the view goes to see what it does/,
+		'the reader’s change is watched'
+	);
 	assert.match(source, /touch-action: pan-y;/, 'the page still scrolls under a finger');
 	assert.match(
 		source,
@@ -225,27 +224,42 @@ test('the hand: press a well, a change forms above it; hold and it grows; let go
 	);
 });
 
-// The robot: the grammar a cause is earned in, on its own clock from the reader’s arrival.
-// The sentences name what the light has shown, whoever caused it, and only in a view it can be seen in.
-test('the robot runs the grammar a cause is earned in; a sentence names what the light has shown', () => {
+// The robot: the grammar a cause is earned in, as an answer to the reader's act. One change on
+// arrival shows what is done here; after the reader's first change, the same change again in the
+// rest of the row; after the second, a row at three strengths; a row is never touched. The
+// sentences name what the light has shown, whoever caused it, and only in a view it can be seen in.
+test('the robot answers the reader’s act with the grammar a cause is earned in', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(
 		source,
-		/const PROTOCOL = \[\s*\{ at: 0\.8, change: \['M0', 1\] \}/,
-		'the first change, soon after arrival'
+		/schedule\(t \+ 0\.8, NAMED\.M0, 1\);\s*plan\[0\]\.down = true;/,
+		'one change on arrival, watched: this is where a change is put in, and what it does'
 	);
 	assert.match(
 		source,
-		/change: \['M1', 1\] \},\s*\{ at: [\d.]+, change: \['M2', 1\] \}/,
-		'the same change again in the next wells of the row'
+		/answer\(w, drop\.dose\); \/\/ the robot answers once the view is back up/,
+		'the robot answers once the view is back up, not before'
 	);
 	assert.match(
 		source,
-		/change: \['T0', 0\.3\] \}[\s\S]*change: \['T1', 0\.55\] \}[\s\S]*change: \['T2', 1\] \}/,
-		'a geometric series, in order'
+		/if \(readerN === 1\) \{\s*let i = 0;\s*for \(const o of rowOf\(w\.r\)\)\s*if \(o !== w\) later\(o, i\+\+, dose\);/,
+		'first: the same change again, in the rest of the row'
 	);
-	assert.doesNotMatch(source, /change: \['B[012]'/, 'a row is never touched by the robot');
-	assert.match(source, /const NIGHT = \[27\.0, 32\.0\]/, 'a night before the day after');
+	assert.match(
+		source,
+		/const STRENGTHS = \[0\.3, 0\.55, 1\];/,
+		'then three strengths, a geometric series'
+	);
+	assert.match(
+		source,
+		/row\.every\(\(o\) => !o\.doses\.length\)\) \|\| rows\[0\]/,
+		'in a row nobody has touched'
+	);
+	assert.doesNotMatch(
+		source,
+		/readerN === 3|readerN >= 3/,
+		'and then nothing more: the rest is the reader’s'
+	);
 	assert.match(source, /const HOVER = 0\.3/, 'the robot’s change waits before it is released');
 	says(
 		source,
@@ -262,7 +276,11 @@ test('the robot runs the grammar a cause is earned in; a sentence names what the
 	says(source, 'again', 'The same change, again.', 'replication');
 	says(source, 'strengths', 'Three strengths.', 'dose');
 	says(source, 'untouched', 'These were never touched.', 'control, there all along, named late');
-	says(source, 'later', 'A day later. The same cells.', 'time');
+	assert.match(
+		source,
+		/if \(said\.strengths && \[0, 1, 2\]\.some\(\(r\) => rowOf\(r\)\.every\(\(w\) => !w\.doses\.length\)\)\)/,
+		'untouched: once the strengths have been seen and a row still has nothing in it'
+	);
 	assert.match(
 		source,
 		/const wide = v\.f < v\.dist \* 1\.5/,
@@ -298,9 +316,14 @@ test('the robot runs the grammar a cause is earned in; a sentence names what the
 		/the exposure fades at the edges of the frame/,
 		'no straight cuts through wells'
 	);
+	assert.match(
+		source,
+		/ctx\.createRadialGradient\(0, 0, 0, 0, 0, 1\);/,
+		'the fade is an ellipse about the plate: no edge of it is straight'
+	);
 });
 
-test('the stage is full-bleed and pinned; words on the left, the world on the right; reduced motion keeps the square', () => {
+test('the stage is full-bleed; words on the left, the world on the right; reduced motion keeps the square', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(source, /CX = 0\.64;/, 'wide: the plate owns the right of the screen');
 	assert.match(source, /CX = 0\.5;\s*CY = 0\.6;/, 'narrow: the plate below the words');

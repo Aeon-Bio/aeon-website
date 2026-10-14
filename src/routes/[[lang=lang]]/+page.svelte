@@ -70,11 +70,10 @@
 	</div>
 </section>
 
-<!-- 01 · dish, 02 · readout: one plate, pinned, for the length of both -->
-<!-- The stage holds the plate; the scroll is the camera, going down through the instrument from
-     where changes come from to where we watch. The two sentences are stations on the way down:
-     the dish sentence is read in the robot's view, the readout sentence from below with the map
-     settled. Between them the words step aside and the plate has the screen. -->
+<!-- 01 · dish, 02 · readout: one plate, the sentence set over it, the readout after it -->
+<!-- The stage holds the plate, seen from over it; the dish sentence is set over the stage in the
+     words' column. Press a well and the view goes down to watch what the change does, then comes
+     back. The readout follows the plate. -->
 <InstrumentSection>
 	<section id="dish-section" class="level station head" aria-labelledby="dish-heading">
 		<div class="station-copy">
@@ -86,7 +85,6 @@
 			</h2>
 		</div>
 	</section>
-	<div class="station travel" aria-hidden="true"></div>
 	<section id="readout-section" class="level station foot" aria-labelledby="readout-heading">
 		<div class="station-copy">
 			<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
@@ -562,8 +560,8 @@
 
 	/* ---------- the stations over the stage ---------- */
 
-	/* each station is a screen the words step into while the plate is pinned beneath it; the
-	   pointer passes through the words to the plate, except at a link */
+	/* the head station is the screen of words over the plate; the pointer passes through the words
+	   to the plate, except at a link. The foot station (the readout) follows the plate. */
 	.station {
 		z-index: 1;
 		min-height: 100svh;
@@ -580,12 +578,6 @@
 	/* the first station overlays the stage: the sentence is read in the robot's view */
 	.station.head {
 		margin-top: -100svh;
-	}
-
-	/* between the sentences the words step aside and the plate has the screen */
-	.station.travel {
-		min-height: 40svh; /* the descent runs on its own clock: the travel is a pause, not the drive */
-		padding: 0;
 	}
 
 	/* words on the left, the world on the right, as in the hero */
@@ -616,16 +608,12 @@
 		max-width: 40ch;
 	}
 
-	/* reduced motion: the stage is a still square and nothing is pinned, so the stations flow:
-	   the dish sentence, the exposure, the readout; no overlay, no empty travel */
+	/* reduced motion: the stage is a still square, so the stations flow:
+	   the dish sentence, the exposure, the readout; no overlay */
 	:global(.experiment.still) .station.head {
 		margin-top: 0;
 		min-height: 0;
 		padding-bottom: 0;
-	}
-
-	:global(.experiment.still) .station.travel {
-		display: none;
 	}
 
 	:global(.experiment.still) .station.foot {
