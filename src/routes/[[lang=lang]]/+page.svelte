@@ -4,7 +4,7 @@
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
 	import Record from '$lib/components/diagrams/Record.svelte';
-	import { counts } from '$lib/components/diagrams/bench.js';
+	import { counts, stillMode } from '$lib/components/diagrams/bench.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -28,8 +28,9 @@
 	let showUpdates = false;
 
 	/** the one line that counts the record: how many changes, how many of them the instrument's */
-	$: countLine =
-		$counts.n === 0
+	$: countLine = $stillMode
+		? m.record.still
+		: $counts.n === 0
 			? m.record.none
 			: $counts.n === 1
 				? m.record.one

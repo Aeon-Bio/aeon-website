@@ -140,7 +140,7 @@
 				const r = (p.mine ? 4.2 : 3.4) * px();
 				const col = p.mine ? mix(BIOLUM, WHITE, 0.5) : mix(PRIMARY, BIOLUM, 0.35);
 				// the rise: a trail from the floor to where the point is, fading once it has settled
-				const trail = p.settled ? Math.max(0, 1 - (t - p.settledAt) / 2.5) : 1;
+				const trail = p.settled ? Math.max(0, 1 - (t - p.settledAt) / 0.9) : 1;
 				if (trail > 0.01 && y0 - y > 1) {
 					const g = ctx.createLinearGradient(0, y0, 0, y);
 					g.addColorStop(0, rgba(col, 0));

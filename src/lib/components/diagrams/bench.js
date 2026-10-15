@@ -18,6 +18,8 @@ export const bench = {
 
 /** how many changes, and how many of them the instrument's */
 export const counts = writable({ n: 0, k: 0 });
+/** reduced motion: the plate is one still exposure, and the count line says so in one sentence */
+export const stillMode = writable(false);
 
 let nextId = 1;
 /** @returns {Point} */

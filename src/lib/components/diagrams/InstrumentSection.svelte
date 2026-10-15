@@ -18,14 +18,14 @@
   its fall; an answer is the cells' own colour. Same material as the mark: soft plates at
   quarter resolution, light that adds, one ramp from deep space through primary and biolum
   to white. What every change did is written to the record (bench.js) as it happens.
-  Reduced motion: one exposure with the instrument's own three changes settled.
+  Reduced motion: one exposure with the instrument's own three changes settled; the count
+  line beside it says so in one sentence.
 -->
 <script>
 	import { onMount } from 'svelte';
-	import { useMessages, useLang } from '$lib/i18n';
-	import { bench, addPoint, resetBench, nextDose, refit } from './bench.js';
+	import { useMessages } from '$lib/i18n';
+	import { bench, addPoint, resetBench, nextDose, refit, stillMode } from './bench.js';
 	const m = useMessages();
-	const lang = useLang();
 
 	const FW = 800;
 	const PITCH = 220;
@@ -743,7 +743,9 @@
 			const w = wellUnder(ev);
 			if (!w) return;
 			ev.preventDefault();
+			pointerFocus = true;
 			stage.focus({ preventScroll: true });
+			pointerFocus = false;
 			press(w, ev.pointerType);
 			hold.x = ev.clientX;
 			hold.y = ev.clientY;
@@ -787,6 +789,15 @@
 		function onKeyUp(ev) {
 			if ((ev.key === ' ' || ev.key === 'Enter') && hold && hold.type === 'keyboard') unpress();
 		}
+		let pointerFocus = false;
+		function onFocus() {
+			if (pointerFocus) {
+				pointerFocus = false;
+				return;
+			}
+			kb = kb || NAMED.M1;
+			look = kb;
+		}
 		function onBlur() {
 			kb = null;
 			look = null;
@@ -799,12 +810,14 @@
 		stage.addEventListener('pointerleave', onLeave);
 		stage.addEventListener('keydown', onKey);
 		stage.addEventListener('keyup', onKeyUp);
+		stage.addEventListener('focus', onFocus);
 		stage.addEventListener('blur', onBlur);
 
 		resize();
 		if (reduced) {
 			// one exposure: the instrument's own three changes, chosen one from the last, settled
 			still = true;
+			stillMode.set(true);
 			clock0 = 0;
 			schedule(ARRIVAL, NAMED.T1, 0.5);
 			let t = 0;
@@ -820,14 +833,16 @@
 		render(0);
 		live = true;
 
-		// the cells' clock runs only while the stage is in view; the instrument's starts when the visitor has arrived
+		// the clock starts when the visitor arrives at the plate and runs on from there: the instrument keeps
+		// working its row while the plate is off-screen, so a reader who scrolls on finds the record with its
+		// curve. The plate is only drawn while it is in view
 		let t = 0;
 		let lastNow = 0;
 		let frame = 0;
 		let visible = false;
 		let arrived = false;
 		function tick(now) {
-			if (visible) {
+			if (visible || clock0 >= 0) {
 				const dms = lastNow ? Math.min(100, now - lastNow) : 16;
 				t += dms / 1000;
 				lastNow = now;
@@ -843,7 +858,7 @@
 					if (t - hold.t0 >= HOLD_T + 0.35) unpress(); // full: it falls by itself
 				}
 				stepProcess(t);
-				render(t);
+				if (visible) render(t);
 			} else lastNow = 0;
 			frame = requestAnimationFrame(tick);
 		}
@@ -879,9 +894,6 @@
 	aria-label={m.a11y.figure}
 >
 	<canvas class="instrument" class:shown={live} bind:this={canvas} aria-hidden="true"></canvas>
-	{#if still}
-		<p class="pass" {lang}>{m.record.still}</p>
-	{/if}
 </div>
 
 <style>
@@ -915,19 +927,4 @@
 		opacity: 1;
 	}
 
-	/* reduced motion: one sentence under the still exposure */
-	.pass {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		margin: 0;
-		font-family: var(--font-display);
-		font-weight: 300;
-		font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-		line-height: 1.3;
-		max-width: 44ch;
-		color: var(--ink-70);
-		pointer-events: none;
-	}
 </style>

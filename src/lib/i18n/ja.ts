@@ -24,8 +24,8 @@ export const ja: Messages = {
 	},
 	record: {
 		none: 'まだ、何も変えていない。',
-		one: 'プレート上の変化はひとつ。装置が入れたもの。',
-		many: 'プレート上の変化は{n}つ。うち{k}つは装置が入れたもの。',
+		one: '変化はひとつ。装置が入れたもの。',
+		many: '変化は{n}つ。うち{k}つは装置が。',
 		still: '変化をひとつ。その答えから、さらにふたつ。何も加えない列が、ひとつ。'
 	},
 	readout: {
@@ -184,7 +184,7 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'record.many',
-		note: '{n}つ / {k}つ counters: confirm つ is right for 変化 here, or whether 件 reads better.',
+		note: '変化は{n}つ。うち{k}つは装置が。: shortened to hold one line at 390; confirm the elided 入れたもの reads naturally and that つ (not 件) is right for 変化.',
 		open: true
 	},
 	{
