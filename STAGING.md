@@ -9,6 +9,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh` with CLOUDFLARE_API_TOKEN, from a cloud session
 - Checked: hero mark centre = viewport centre at 390px in WebKit and Chromium; tests/th gates all pass
 
+## Deployment a1058268 (2026-10-15)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree reset to `wip/2026-10-15-ask-the-plate`
+- Source commit: 3ce6fa3 (the bench) plus the Japanese phone heading size in `src/app.css` (uncommitted at deploy time)
+- Deployed by: `bash scripts/deploy-staging.sh`
+- Checked: `/` and `/ja` serve the bench copy ("Put something in.", 「ひとつ、入れてみる。」); no film strings remain; gates 33/33 with the build
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
