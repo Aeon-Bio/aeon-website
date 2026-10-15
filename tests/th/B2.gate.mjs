@@ -268,12 +268,55 @@ test('the robot answers the reader’s act with the grammar a cause is earned in
 		/for \(let r = -1; r <= 3; r\+\+\)/,
 		'a ring of wells runs off the frame: a patch of something larger'
 	);
-	assert.match(source, /const OBS_Z = -110/, 'the watcher under the plate');
-	assert.match(source, /the mask hides it between wells/, 'the plate known by what it hides');
+	// each kind of light is its own: the watcher a field of plain light seen only through a well's
+	// floor, a change a solid bead, an answer the cells' colour. No orb blooms through the plate
 	assert.match(
 		source,
-		/scatters through the body of the plate between wells/,
-		'and the walk never breaks'
+		/const FIELD = 0\.5 \* R;/,
+		'the watcher is a field the size of what it sees'
+	);
+	assert.match(source, /hides it between wells/, 'the plate known by what it hides');
+	assert.match(
+		source,
+		/frameAt\(watcher\.x, watcher\.y, FIELD\)[\s\S]*?addColorStop\(0, rgba\(WHITE, 0\.1\)\);\s*g\.addColorStop\(0\.86, rgba\(WHITE, 0\.1\)\);/,
+		'plain light with the hard edge a field has, not the colour of a change or an answer'
+	);
+	assert.doesNotMatch(
+		source,
+		/scatters through the body of the plate|OBS_Z/,
+		'nothing of the watcher’s light leaves the wells'
+	);
+	assert.match(
+		source,
+		/Math\.floor\(t \/ TILE_T\) % 4/,
+		'holding a well, the watcher takes it in quarters'
+	);
+	assert.match(
+		source,
+		/const seen = fd < 1 \? 0\.3 \* \(1 - fd \*\* 6\) : 0;/,
+		'in the field the cells are seen'
+	);
+	{
+		const i0 = source.indexOf('for (const d of drops) {\n\t\t\t\tconst dt = t - d.t0;');
+		const i1 = source.indexOf('// the cultures: every footprint', i0);
+		assert.ok(i0 > 0 && i1 > i0, 'the drops are drawn before the cultures');
+		const beads = source.slice(i0, i1);
+		assert.doesNotMatch(
+			beads,
+			/createRadialGradient|wide|flat/,
+			'a change is a bead, not an orb: no halo, no out-of-focus disc'
+		);
+		assert.match(
+			beads,
+			/along = rb \* \(1 \+ 1\.3 \* fk\)/,
+			'drawn out along its fall as it gathers speed'
+		);
+		assert.match(beads, /rgba\(WHITE, 0\.9 \* form\)/, 'one point of light on its shoulder');
+	}
+	assert.match(
+		source,
+		/watcher\.goal = hover\.w;\s*watcher\.holdUntil = t \+ 3;/,
+		'the watcher comes under the well the hand rests on'
 	);
 	assert.match(
 		source,

@@ -3,7 +3,7 @@
 
   One patch of a standard plate, in one world. This is about changing something
   to see what it does. The view rests over the plate, from where changes come,
-  with the watcher's lamp walking underneath, and never moves. The hand is the
+  with the watcher's field of light walking underneath, and never moves. The hand is the
   dispenser: rest the pointer over a well and a change forms above it, from the
   same side of the well every time; the longer the hand rests, the stronger it
   grows; move on and it falls, or it falls by itself once it is full. A hand
@@ -18,11 +18,14 @@
   wells of the row; after the second, a row at three strengths. A row is never
   touched. The sentences name what the light has shown, whoever caused it.
   The page scrolls as a page.
-  Nothing is drawn. Every light is a field or a point; the robot is where changes
-  come from, the watcher is where the light under the plate is, the plate is the
-  plane the cells sit on and the body that hides the lamp. Same material as the
-  mark: soft plates at quarter resolution, light that adds, one colour ramp from
-  deep space through primary and biolum to white.
+  Nothing is drawn. Every light is a field or a point, and each kind of light is
+  its own: the watcher is a field of plain light on the floor of the well it is
+  under, the size of what it sees at once, hidden by the body of the plate
+  between wells; a change is a bead of liquid, a solid body and not a light,
+  stretched by its fall; an answer is the cells' own colour. The robot is where
+  changes come from, the plate is the plane the cells sit on. Same material as
+  the mark: soft plates at quarter resolution, light that adds, one colour ramp
+  from deep space through primary and biolum to white.
   Reduced motion: one exposure from the side with the maps settled and one
   sentence; the stage is not pinned and nothing follows the scroll.
 -->
@@ -51,7 +54,8 @@
 	const FALL = 0.6; // s, the fall under gravity
 	const HOLD_T = 0.7; // s of the hand resting for its change to reach full strength
 	const PASS_T = 0.12; // s: a hand merely passing over a well leaves nothing
-	const OBS_Z = -110; // the watcher, under the plate: what the eye sees is the floor it lights, not the lamp
+	const FIELD = 0.5 * R; // the watcher's field, under the plate: what the eye sees is the floor it lights, the size of what it sees at once
+	const TILE_T = 0.9; // s the watcher spends on each quarter of a well it is holding, before it steps to the next
 	const PACE = 1.0; // s, the watcher's walk from one well to the next
 	const D2R = Math.PI / 180;
 
@@ -392,13 +396,21 @@
 				if (Math.hypot(n.x - watcher.x, n.y - watcher.y) < 1) watcher.next++;
 				goal = NAMED[PATROL[watcher.next % PATROL.length]];
 			}
-			const dx = goal.x - watcher.x,
-				dy = goal.y - watcher.y,
+			// holding a well, the watcher takes it in quarters, stepping from one to the next; on patrol it passes through the centre
+			let gx = goal.x,
+				gy = goal.y;
+			if (watcher.goal) {
+				const q = Math.floor(t / TILE_T) % 4;
+				gx += (q === 1 || q === 2 ? 1 : -1) * 0.42 * R;
+				gy += (q >= 2 ? 1 : -1) * 0.42 * R;
+			}
+			const dx = gx - watcher.x,
+				dy = gy - watcher.y,
 				d = Math.hypot(dx, dy),
 				step = (PITCH / PACE) * dt;
 			if (d <= step) {
-				watcher.x = goal.x;
-				watcher.y = goal.y;
+				watcher.x = gx;
+				watcher.y = gy;
 			} else {
 				watcher.x += (dx / d) * step;
 				watcher.y += (dy / d) * step;
@@ -593,32 +605,12 @@
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.imageSmoothingEnabled = true;
 			ctx.imageSmoothingQuality = 'high';
-			const side = Math.max(0, Math.min(1, (v.el / D2R + 70) / 50)); // how much the view is from the side or above: the watcher under the plate is seen only then
-			const flat = Math.abs(Math.sin(v.el)); // how much the view is along the plate's normal: a change above the floor is out of focus then
-			const minWH = Math.min(canvas.width, canvas.height);
-
-			// the medium, on the soft plate: a dim floor in every well; the watcher's light through the floor of the well it is under;
-			// in a changed well, the change spreading from where it entered
+			// the medium, on the soft plate: in a changed well, the change spreading from where it entered
 			pctx.setTransform(1, 0, 0, 1, 0, 0);
 			pctx.clearRect(0, 0, plate.width, plate.height);
 			pctx.globalCompositeOperation = 'source-over';
 			// no tint over the whole plate: a filled square reads as a window; the wells carry the light
 			pctx.globalCompositeOperation = 'lighter';
-			const rx = watcher.x,
-				ry = watcher.y;
-			if (side > 0) {
-				// the watcher, under the plate: its light reaches the eye through the floor of the well it is under; the mask hides it between wells
-				const o = proj(rx, ry, 0);
-				const rr = Math.max(1, Math.min(-1.2 * OBS_Z * o[2], 0.11 * minWH) * hs); // no bigger than a well's neighbourhood, even close to the camera
-				const g = pctx.createRadialGradient(o[0] * hs, o[1] * hs, 0, o[0] * hs, o[1] * hs, rr);
-				g.addColorStop(0, rgba(mix(PRIMARY, WHITE, 0.2), 0.55 * side));
-				g.addColorStop(0.35, rgba(PRIMARY, 0.16 * side));
-				g.addColorStop(1, rgba(PRIMARY, 0));
-				pctx.fillStyle = g;
-				pctx.beginPath();
-				pctx.arc(o[0] * hs, o[1] * hs, rr, 0, 6.2832);
-				pctx.fill();
-			}
 			for (const w of WELLS) {
 				if (!w.entry) continue;
 				const since = t - w.impactT;
@@ -674,53 +666,81 @@
 			pctx.globalCompositeOperation = 'source-over';
 			ctx.globalCompositeOperation = 'lighter';
 			ctx.drawImage(plate, 0, 0, canvas.width, canvas.height);
-			if (side > 0) {
-				// and a little of the watcher's light scatters through the body of the plate between wells, so the walk never breaks
-				const o = proj(rx, ry, 0);
-				const rr = Math.max(1, Math.min(-OBS_Z * o[2], 0.1 * minWH));
-				const g = ctx.createRadialGradient(o[0], o[1], 0, o[0], o[1], rr);
-				g.addColorStop(0, rgba(PRIMARY, 0.07 * side));
-				g.addColorStop(1, rgba(PRIMARY, 0));
-				ctx.fillStyle = g;
-				ctx.beginPath();
-				ctx.arc(o[0], o[1], rr, 0, 6.2832);
-				ctx.fill();
+			// the watcher, under the plate: a field of plain light on the floor of the well it is under, the size of what it
+			// sees at once, with the hard edge a field has. The wall of the well hides it between wells, so it is seen only
+			// through a floor: the body of the plate is a body because it hides it
+			{
+				const w = wellAt(watcher.x, watcher.y);
+				if (w) {
+					const Fw = frameAt(w.x, w.y, R * 0.9);
+					ctx.save();
+					ctx.setTransform(Fw.ux, Fw.uy, Fw.vx, Fw.vy, Fw.ox, Fw.oy);
+					ctx.beginPath();
+					ctx.arc(0, 0, 1, 0, 6.2832);
+					ctx.clip();
+					const F = frameAt(watcher.x, watcher.y, FIELD);
+					ctx.setTransform(F.ux, F.uy, F.vx, F.vy, F.ox, F.oy);
+					const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+					g.addColorStop(0, rgba(WHITE, 0.1));
+					g.addColorStop(0.86, rgba(WHITE, 0.1));
+					g.addColorStop(1, rgba(WHITE, 0));
+					ctx.fillStyle = g;
+					ctx.beginPath();
+					ctx.arc(0, 0, 1, 0, 6.2832);
+					ctx.fill();
+					ctx.restore();
+					ctx.setTransform(1, 0, 0, 1, 0, 0);
+				}
 			}
 
 			// a change on its way in: it forms at the same fixed height above the well every time, waits (or is held), then falls under gravity.
-			// Along the plate's normal it is out of focus and wide, gathering to a point as it nears the floor
+			// It is a bead of liquid, not a light: a solid body the size of its dose, with one point of the room's light on its
+			// shoulder, drawn out along its fall as it gathers speed. No halo: what it does is seen in the well, not around it
 			for (const d of drops) {
 				const dt = t - d.t0;
 				if (dt < 0 || (!d.forming && t >= d.t1)) continue;
-				let z, form, dose;
+				let z,
+					form,
+					fk = 0;
 				if (d.forming) {
 					z = DROP_H;
-					dose = d.dose;
-					form = 0.35 + 0.65 * smooth(dt / 0.25); // it forms under the hand, and grows while the hand stays
+					form = smooth(dt / 0.25); // it forms under the hand, and grows while the hand stays
 				} else {
-					const fk = Math.max(0, Math.min(1, (dt - d.hover) / FALL));
+					fk = Math.max(0, Math.min(1, (dt - d.hover) / FALL));
 					z = DROP_H * (1 - fk * fk);
-					dose = d.dose;
-					form = dt < d.hover ? 0.35 + 0.65 * (dt / d.hover) : 1; // the robot's forms before it is released
+					form = dt < d.hover ? smooth(dt / d.hover) : 1; // the robot's forms before it is released
 				}
-				const o = proj(d.x, d.y, z);
-				const wide = 70 * (z / DROP_H) * flat * flat,
-					r = (7 + wide) * o[2] * (0.6 + 0.4 * dose);
-				// out of focus it is a soft disc of light, never nothing: the hand has to see what it is holding
-				const a = form * (0.1 + 0.6 * (1 - wide / 77)) * (0.5 + 0.5 * dose);
-				const g = ctx.createRadialGradient(o[0], o[1], 0, o[0], o[1], Math.max(1, r));
-				g.addColorStop(0, rgba(mix(PRIMARY, WHITE, 0.35 * (1 - flat)), a));
-				g.addColorStop(1, rgba(PRIMARY, 0));
-				ctx.fillStyle = g;
+				const o = proj(d.x, d.y, z),
+					u = proj(d.x, d.y, z + 1);
+				let gx = o[0] - u[0],
+					gy = o[1] - u[1];
+				const gl = Math.hypot(gx, gy) || 1; // the direction of the fall, on the screen
+				gx /= gl;
+				gy /= gl;
+				const rb = Math.max(2.5, (3.5 + 4 * d.dose) * o[2]) * (0.6 + 0.4 * form),
+					along = rb * (1 + 1.3 * fk);
+				ctx.setTransform(-gy * rb, gx * rb, gx * along, gy * along, o[0], o[1]);
 				ctx.beginPath();
-				ctx.arc(o[0], o[1], Math.max(1, r), 0, 6.2832);
+				ctx.arc(0, 0, 1, 0, 6.2832);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.fillStyle = rgba(mix(PRIMARY, WHITE, 0.2), 0.85 * form);
+				ctx.fill();
+				ctx.fillStyle = rgba(WHITE, 0.9 * form);
+				ctx.beginPath();
+				ctx.arc(o[0] - 0.3 * rb, o[1] - 0.35 * rb, Math.max(0.6, 0.22 * rb), 0, 6.2832);
 				ctx.fill();
 			}
 			// the cultures: every footprint, faint at rest; brighter where the slow layer has settled
 			for (const c of cells) {
 				const ev = Math.min(1, c.evidence);
 				const rest = 0.11 + 0.016 * Math.sin(t * 0.5 + c.x); // at rest: dim, but a plate before anything happens
-				ctx.fillStyle = rgba(mix(PRIMARY, BIOLUM, 0.5 * ev), rest + 0.3 * ev);
+				// in the watcher's field the cells are seen: each body distinct in plain light, nothing added to what they do
+				const fd = Math.hypot(c.x - watcher.x, c.y - watcher.y) / FIELD;
+				const seen = fd < 1 ? 0.3 * (1 - fd ** 6) : 0;
+				ctx.fillStyle = rgba(
+					mix(mix(PRIMARY, BIOLUM, 0.5 * ev), WHITE, 0.5 * seen),
+					rest + 0.3 * ev + seen
+				);
 				footprint(c, 1);
 				ctx.fill();
 			}
@@ -884,6 +904,12 @@
 				if (hover && hover.drop) {
 					const d = hover.drop;
 					d.dose = 0.45 + 0.55 * smooth((t - d.t0 - 0.1) / HOLD_T); // the longer the hand rests, the stronger the change
+					if (!d.watched && t - d.t0 >= PASS_T) {
+						// the hand has come to rest: the watcher comes under that well, so the bead is seen over a lit floor
+						d.watched = true;
+						watcher.goal = hover.w;
+						watcher.holdUntil = t + 3;
+					}
 					if (t - d.t0 >= HOLD_T + 0.25) {
 						// full: it falls by itself; the hand may stay, nothing more goes in until it leaves and returns
 						drops.splice(drops.indexOf(d), 1);
