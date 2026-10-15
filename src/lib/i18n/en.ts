@@ -19,18 +19,16 @@ export const en = {
 		cue: 'See how it works'
 	},
 	dish: {
-		h2a: 'The cells never leave the plate.',
-		h2b: 'The robot changes their conditions. We watch.'
+		h2a: 'Put something in.',
+		h2b: 'The cells answer in place. The next change follows from the answer.'
 	},
-	beats: {
-		above: 'Changes come from above.',
-		below: 'We watch from below.',
-		again: 'The same change, again.',
-		strengths: 'Three strengths.',
-		untouched: 'These were never touched.',
-		later: 'A day later. The same cells.',
-		still:
-			'Changes come from above; we watch from below. Three strengths, three repeats, three never touched; a day later the same cells answer again.'
+	record: {
+		// the one line under the record: how many changes are on the plate, and how many of them the instrument put in
+		none: 'Nothing has changed yet.',
+		one: 'One change on the plate, the instrument’s.',
+		many: '{n} changes on the plate, {k} of them the instrument’s.',
+		// reduced motion: the still exposure's one sentence
+		still: 'One change, then two more chosen from its answer; a row never touched.'
 	},
 	readout: {
 		h2a: 'What comes back is a model.',
@@ -38,10 +36,14 @@ export const en = {
 		pBefore:
 			'Every condition the robot sets is a perturbation; every frame is a measurement. From that time series we fit a causal model of how the cells respond, the approach Karen Sachs introduced for single-cell perturbation data in ',
 		pLink: 'Science (2005)',
-		pAfter: '.'
+		pAfter: '.',
+		horizon:
+			'Where this points: an instrument a lab or a hospital can own, asking a person’s own cells which conditions make them work.'
 	},
 	founders: {
-		h2: 'Founders'
+		h2: 'Founders',
+		stage:
+			'The instrument is in design and has not yet held cells. Eric is in Kobe until November 2026, asking the people who run cell assays what they measure and what is slow about it.'
 	},
 	eric: {
 		name: 'Eric Jing Mockler',
@@ -162,6 +164,6 @@ export const en = {
 	a11y: {
 		mark: 'aeon mark, a Lorenz attractor photographed as a long exposure',
 		figure:
-			'Part of a standard plate as a long exposure, seen from over it where changes come from. Cultures of individual cells sit on the floor of every well, and a watcher walks underneath, its light showing only through the well it is under. Resting the pointer over a well puts a change into it from above; the longer it rests, the stronger the change, and a pointer merely passing over leaves nothing. On a touch screen, one tap is one change. The change spreads from where it entered and the cells answer with their own timing, or not, in place beside the wells that were not touched. The robot puts in one change on arrival, then answers each change made here: the same change in the next wells of the row, then a row at three strengths where more cells answer the stronger it is. A row is never touched and only flickers on its own. What answered because of a change settles slowly into a map of cause.'
+			'Part of a standard plate as a long exposure, seen from over it where changes come from. Cultures of individual cells sit on the floor of every well, and a watcher walks underneath, its light showing only through the well it is under. Press a well, with a finger, a mouse or the keyboard (arrow keys choose a well, Space held is the press), and a bead forms above it; the longer the press, the stronger the change; let go and it falls in. The change spreads from where it entered and the cells answer with their own timing, or not, in place beside the wells that were not touched. Once a well has answered, the instrument puts the next change into the next well of that row by itself, stronger if few cells answered and weaker if many. It puts in one change of its own on arrival and follows it the same way. A row nobody touches only flickers on its own. Each change is written to the record beside the plate as it happens: a point for its strength and how many answered, and one curve through them once there are three.'
 	}
 } as const;

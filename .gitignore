@@ -26,3 +26,7 @@ __pycache__/
 
 # disclosure gate terms stay local
 tests/th/_deny.local.mjs
+
+# build evidence (screenshots, capture scripts)
+.impeccable/review/
+.impeccable/mocks/

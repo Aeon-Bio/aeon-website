@@ -229,14 +229,18 @@ button:focus:not(:focus-visible) {
 	letter-spacing: 0.02em;
 }
 
-/* dish: 13 + 13 + 8 characters → three lines at 1440 (2.6rem); 16ch would be ~8 kanji wide */
+/* dish: 11 + 13 characters, each half on its own line; a touch smaller than the Latin so the
+   13-character half (次の変化は、その答えから。) holds together in the words' column at 1440 */
 :lang(ja) #dish-heading {
-	max-width: 13.5em;
+	max-width: 14em;
+	font-size: clamp(1.8rem, 2.6vw, 2.3rem);
 }
 
 @media (max-width: 63.99rem) {
 	:lang(ja) #dish-heading {
 		max-width: 100%;
+		/* the phone bench holds the heading, the plate and the record in 664px: Japanese leading is 1.3× Latin */
+		font-size: clamp(1.3rem, 4.2vw, 2rem);
 	}
 }
 

@@ -3,6 +3,8 @@
 	import PartnershipInquiry from '$lib/components/forms/PartnershipInquiry.svelte';
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
+	import Record from '$lib/components/diagrams/Record.svelte';
+	import { counts } from '$lib/components/diagrams/bench.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -24,6 +26,14 @@
 
 	let showContact = false;
 	let showUpdates = false;
+
+	/** the one line that counts the record: how many changes, how many of them the instrument's */
+	$: countLine =
+		$counts.n === 0
+			? m.record.none
+			: $counts.n === 1
+				? m.record.one
+				: m.record.many.replace('{n}', String($counts.n)).replace('{k}', String($counts.k));
 </script>
 
 <svelte:head>
@@ -70,23 +80,31 @@
 	</div>
 </section>
 
-<!-- 01 · dish, 02 · readout: one plate, the sentence set over it, the readout after it -->
-<!-- The stage holds the plate, seen from over it; the dish sentence is set over the stage in the
-     words' column. Rest the pointer over a well and a change goes in; the cells answer in place.
-     The readout follows the plate. -->
-<InstrumentSection>
-	<section id="dish-section" class="level station head" aria-labelledby="dish-heading">
-		<div class="station-copy">
+<!-- 01 · the bench: the plate on the right, the words and the record on the left, one screen -->
+<section id="dish-section" class="level bench" aria-labelledby="dish-heading">
+	<div class="bench-grid">
+		<div class="bench-words">
 			<h2 id="dish-heading" use:reveal={{ delay: 60 }}>
 				{#each lines(m.dish.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
 				<em class="h-em"
 					>{#each lines(m.dish.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em
 				>
 			</h2>
+			<div class="bench-record" use:reveal={{ delay: 120 }}>
+				<Record />
+			</div>
+			<p class="bench-count" aria-live="polite">{countLine}</p>
 		</div>
-	</section>
-	<section id="readout-section" class="level station foot" aria-labelledby="readout-heading">
-		<div class="station-copy">
+		<div class="bench-plate">
+			<InstrumentSection />
+		</div>
+	</div>
+</section>
+
+<!-- 02 · readout: the same record, large, and what it is -->
+<section id="readout-section" class="level readout" aria-labelledby="readout-heading">
+	<div class="content readout-grid">
+		<div class="readout-words">
 			<h2 id="readout-heading" use:reveal={{ delay: 60 }}>
 				{#each lines(m.readout.h2a) as part, i}{#if i}<br />{/if}{part}{/each}
 				<em class="h-em"
@@ -100,14 +118,19 @@
 					rel="noopener noreferrer">{m.readout.pLink}</a
 				>{m.readout.pAfter}
 			</p>
+			<p class="horizon" use:reveal={{ delay: 140 }}>{m.readout.horizon}</p>
 		</div>
-	</section>
-</InstrumentSection>
+		<div class="readout-record" use:reveal={{ delay: 120 }}>
+			<Record large />
+		</div>
+	</div>
+</section>
 
 <!-- 03 · return -->
 <section id="return-section" class="level" aria-labelledby="return-heading">
 	<div class="content">
 		<h2 id="return-heading" use:reveal={{ delay: 60 }}>{m.founders.h2}</h2>
+		<p class="stage-line" use:reveal={{ delay: 90 }}>{m.founders.stage}</p>
 
 		<div class="people" use:reveal>
 			<div class="person">
@@ -264,9 +287,10 @@
 		grid-template-columns: minmax(0, 1fr);
 		align-items: center;
 		/* clip only sideways: the mark may run off the right edge without widening the
-		   page, but its wash must bleed down into the next section. Clipped at the hero's
-		   bottom it was a hard line across the seam, the one edge this page refuses. */
-		overflow: clip;
+		   page, but its wash must bleed down into the next section. Clipped on both axes
+		   it was a hard line across the seam, the one edge this page refuses. */
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 
 	.hero-grid {
@@ -558,88 +582,144 @@
 		text-decoration-color: var(--aeon-biolum);
 	}
 
-	/* ---------- the stations over the stage ---------- */
+	/* ---------- the bench ---------- */
 
-	/* the head station is the screen of words over the plate; the pointer passes through the words
-	   to the plate, except at a link. The foot station (the readout) follows the plate. */
-	.station {
-		z-index: 1;
+	/* one screen: the words and the record in the left column, the plate in the right, as in the hero */
+	.bench {
 		min-height: 100svh;
 		display: grid;
 		align-content: center;
-		padding: 3rem 2rem;
-		pointer-events: none;
+		padding-block: 3rem;
 	}
 
-	.station a {
-		pointer-events: auto;
-	}
-
-	/* the first station overlays the stage: the sentence is read in the robot's view */
-	.station.head {
-		margin-top: -100svh;
-	}
-
-	/* words on the left, the world on the right, as in the hero */
-	.station-copy {
-		width: min(100%, 76rem);
+	.bench-grid {
+		width: min(92vw, 1280px);
 		margin-inline: auto;
 		display: grid;
 		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		align-items: center;
+		column-gap: 2rem;
 	}
 
-	/* every line of the station keeps to the left column; the right is the plate's */
-	.station-copy > * {
-		grid-column: 1;
+	.bench-words {
+		display: grid;
+		gap: 1.6rem;
+		align-content: center;
 	}
 
-	.station h2 {
+	.bench h2 {
 		font-size: clamp(1.9rem, 3vw, 2.6rem);
 		max-width: 16ch;
 		margin: 0;
 	}
 
-	.station.foot h2 {
+	/* the second thought starts its own line: the ink change never happens mid-line */
+	.bench h2 .h-em,
+	.readout h2 .h-em {
+		display: block;
+	}
+
+	.bench-record {
+		width: min(100%, 22rem);
+	}
+
+	.bench-count {
+		font-size: 0.92rem !important;
+		color: var(--ink-50) !important;
+		margin: 0 !important;
+		min-height: 1.5em;
+	}
+
+	/* the plate's field: square, as tall as the screen allows, its right lobe free to run off */
+	.bench-plate {
+		width: min(100%, 88svh);
+		justify-self: end;
+	}
+
+	/* ---------- the readout ---------- */
+
+	.readout-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		column-gap: 3rem;
+		align-items: center;
+	}
+
+	.readout h2 {
 		max-width: 18ch;
 		margin: 0 0 2rem;
 	}
 
-	.station.foot p {
+	.readout p {
 		max-width: 40ch;
 	}
 
-	/* reduced motion: the stage is a still square, so the stations flow:
-	   the dish sentence, the exposure, the readout; no overlay */
-	:global(.experiment.still) .station.head {
-		margin-top: 0;
-		min-height: 0;
-		padding-bottom: 0;
+	.readout .horizon {
+		color: var(--ink-50);
+		margin-top: 1.6rem;
 	}
 
-	:global(.experiment.still) .station.foot {
-		order: 2;
-		min-height: 0;
+	.readout-record {
+		width: 100%;
 	}
 
-	/* narrow or upright: the words above, the plate below them */
+	/* narrow or upright: the words above, the plate below them, the record under the plate */
 	@media (max-width: 63.99rem), (orientation: portrait) {
-		.station {
+		.bench {
 			align-content: start;
-			padding: 9svh 2rem 3rem;
+			padding-block: 5svh 2rem;
 		}
 
-		.station-copy {
+		.bench-grid {
 			grid-template-columns: minmax(0, 1fr);
+			row-gap: 0.9rem;
 		}
 
-		.station h2,
-		.station.foot h2 {
+		.bench-words {
+			display: contents;
+		}
+
+		.bench h2 {
+			font-size: clamp(1.5rem, 4.8vw, 2.2rem);
 			max-width: 30ch;
+			order: 0;
 		}
 
-		.station.foot p {
+		.bench-plate {
+			order: 1;
+			width: min(100%, 50svh);
+			justify-self: center;
+		}
+
+		/* wider than tall on a phone, so the whole bench stays on one screen (664px with the browser's bars) */
+		.bench-record {
+			order: 2;
+			width: min(100%, 17rem);
+		}
+
+		.bench-record :global(.field) {
+			aspect-ratio: 5 / 2;
+		}
+
+		.bench-count {
+			order: 3;
+		}
+
+		.readout-grid {
+			grid-template-columns: minmax(0, 1fr);
+			row-gap: 2rem;
+		}
+
+		.readout p {
 			max-width: 58ch;
 		}
+	}
+
+	/* ---------- the stage line ---------- */
+
+	.stage-line {
+		max-width: 58ch;
+		margin-bottom: 2.5rem !important;
 	}
 
 	/* ---------- colophon ---------- */

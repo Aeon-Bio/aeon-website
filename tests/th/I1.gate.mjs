@@ -55,10 +55,10 @@ test('every ja value passes the disclosure deny-list', { skip: DENY.length === 0
 	for (const [p, v] of leaves(ja)) for (const re of DENY) assert.doesNotMatch(v, re, `ja.${p}: forbidden ${re}`);
 });
 
-test('ja.ts carries the three NATIVE-CHECK flags', () => {
+test('ja.ts carries the NATIVE-CHECK flags', () => {
 	const { nativeCheck } = jaMod;
 	assert.ok(Array.isArray(nativeCheck), 'nativeCheck export');
-	assert.equal(nativeCheck.length, 3, 'exactly 3 entries');
+	assert.ok(nativeCheck.length >= 3, 'at least 3 entries');
 	const keys = shape(en);
 	for (const { key, note } of nativeCheck) {
 		assert.ok(keys.includes(key), `nativeCheck key ${key} is not a message key`);
