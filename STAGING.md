@@ -23,6 +23,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh`
 - Checked: `/` and `/ja` serve the tap copy in the figure description; no press-and-hold or curve strings remain; gates 33/33 with the build
 
+## Deployment 8d112d6c (2026-10-16)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree reset to `wip/2026-10-15-ask-the-plate`
+- Source commit: 88b381b (the plate is still at rest; a tap is answered inside half a second; a row of three in about seven seconds)
+- Deployed by: `bash scripts/deploy-staging.sh`
+- Checked: `/` and `/ja` serve the still-plate figure description; gates 33/33 with the build
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
