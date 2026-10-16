@@ -1,18 +1,18 @@
 <!--
-  The record: what every change did, as it happened.
+  The record: the wells that were changed, read in the order they were changed.
 
-  One point of light per change put into the plate, the visitor's brighter than the
-  instrument's; strength across, how many cells answered up. A point is born at nothing the
-  moment its bead is on its way and rises while the cells light, so the measurement is
-  watched, not reported; once three have settled, one curve of the mark's own light finds the
-  strength at which half answer, and moves as each new point lands. No axes, no ticks: the
-  floor is the line the points sit on, and the curve says the rest. Same material as the mark:
-  a halo on a quarter-resolution plate, a body, light that adds. Drawn small beside the plate
-  and large under the readout from the same record.
+  Each changed well is drawn as itself, from above: the same cells the plate holds, at
+  rest or answering, so the brightness of a well here is the fraction of its cells that
+  answered. Under each well sits the bead that went into it, the size of its strength. Read
+  left to right it is the whole claim: a change went in, the cells answered this much, and
+  the next bead was sized from that answer. No axes, no ticks, no curve: the wells and the
+  beads say it. Same material as the plate: light that adds, a halo plate at quarter
+  resolution for the answering cells, a change a solid bead of liquid. Drawn small beside
+  the plate and large under the readout from the same record.
 -->
 <script>
 	import { onMount } from 'svelte';
-	import { bench, hill } from './bench.js';
+	import { bench, changedWells, WELL_R } from './bench.js';
 
 	/** the large readout record has heavier light than the small one beside the plate */
 	export let large = false;
@@ -23,6 +23,7 @@
 	const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 	const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${Math.max(0, Math.min(1, a))})`;
 	const smooth = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
+	const SLOTS = 4; // the strip is laid out for this many wells; more share the width
 
 	let field;
 	let canvas;
@@ -49,132 +50,80 @@
 			halo.width = Math.max(1, Math.round(canvas.width * HS));
 			halo.height = Math.max(1, Math.round(canvas.height * HS));
 		}
-		// the drawn curve follows the fitted one with a lag, so a new point moves it rather than replaces it
-		let shown = null;
-		let shownSince = 0;
-		let curveAlpha = 0;
-		const px = () => (large ? 1.6 : 1) * dpr;
-		function place(d, f) {
-			const padX = 0.1 * W,
-				padT = 0.14 * H,
-				padB = 0.16 * H;
-			return [(padX + d * (W - 2 * padX)) * dpr, (H - padB - f * (H - padT - padB)) * dpr];
-		}
-		function draw(t, dt) {
-			const fit = bench.fit;
-			if (fit) {
-				if (!shown) shown = { ...fit };
-				else {
-					const a = 1 - Math.exp(-dt / 0.45);
-					shown.top += (fit.top - shown.top) * a;
-					shown.k += (fit.k - shown.k) * a;
-					shown.n += (fit.n - shown.n) * a;
-				}
-				curveAlpha = Math.min(1, curveAlpha + dt / 0.72);
-			} else curveAlpha = Math.max(0, curveAlpha - dt / 0.72);
+		function draw(t) {
+			const wells = changedWells();
+			const CW = canvas.width,
+				CH = canvas.height;
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.clearRect(0, 0, CW, CH);
 			hctx.setTransform(1, 0, 0, 1, 0, 0);
 			hctx.clearRect(0, 0, halo.width, halo.height);
 			ctx.globalCompositeOperation = 'lighter';
 			hctx.globalCompositeOperation = 'lighter';
-			// the floor: the line the points sit on, a field and not a rule
-			{
-				const [x0, y0] = place(0, 0),
-					[x1] = place(1, 0);
-				const g = ctx.createLinearGradient(x0, 0, x1, 0);
-				g.addColorStop(0, rgba(PRIMARY, 0));
-				g.addColorStop(0.3, rgba(PRIMARY, 0.14));
-				g.addColorStop(0.7, rgba(BIOLUM, 0.14));
-				g.addColorStop(1, rgba(BIOLUM, 0));
-				const h = 3 * px();
-				const v = ctx.createLinearGradient(0, y0 - h, 0, y0 + h);
-				v.addColorStop(0, 'rgba(0,0,0,0)');
-				v.addColorStop(0.5, 'rgba(255,255,255,1)');
-				v.addColorStop(1, 'rgba(0,0,0,0)');
-				ctx.save();
-				ctx.fillStyle = g;
-				ctx.globalAlpha = 1;
-				// a soft band: the gradient across, feathered up and down by a second pass
-				for (let i = -2; i <= 2; i++) {
-					ctx.globalAlpha = 0.22 * (1 - Math.abs(i) / 3);
-					ctx.fillRect(x0, y0 + i * h * 0.5 - h * 0.25, x1 - x0, h * 0.5);
-				}
-				ctx.restore();
-			}
-			// the curve: halo on the soft plate, then the body, hue from primary to biolum across
-			if (shown && curveAlpha > 0.002) {
-				const N = 72;
-				const pts = [];
-				for (let i = 0; i <= N; i++) {
-					const d = i / N;
-					pts.push(place(d, Math.min(1, hill(d, shown))));
-				}
-				const stroke = (c, width, alpha, scale) => {
-					c.lineCap = 'round';
-					c.lineJoin = 'round';
-					c.lineWidth = width * scale;
-					for (let i = 1; i < pts.length; i += 6) {
-						const i1 = Math.min(pts.length - 1, i + 6);
-						const hue = mix(PRIMARY, BIOLUM, (i + i1) / 2 / pts.length);
-						c.strokeStyle = rgba(hue, alpha);
-						c.beginPath();
-						c.moveTo(pts[i - 1][0] * scale, pts[i - 1][1] * scale);
-						for (let j = i; j <= i1; j++) c.lineTo(pts[j][0] * scale, pts[j][1] * scale);
-						c.stroke();
-					}
-				};
-				stroke(hctx, 14 * px(), 0.22 * curveAlpha, HS);
-				ctx.imageSmoothingEnabled = true;
-				ctx.imageSmoothingQuality = 'high';
-				ctx.drawImage(halo, 0, 0, canvas.width, canvas.height);
-				stroke(ctx, 1.4 * px(), 0.55 * curveAlpha, 1);
-			}
-			// the points: born at the floor, rising as the cells answer; the visitor's carry a white core
-			for (const p of bench.points) {
-				const age = t - p.born;
-				if (age < -1) continue;
-				const form = smooth((age + 1) / 0.72);
-				const [x, y] = place(p.dose, p.f);
-				const [, y0] = place(p.dose, 0);
-				const r = (p.mine ? 4.2 : 3.4) * px();
-				const col = p.mine ? mix(BIOLUM, WHITE, 0.5) : mix(PRIMARY, BIOLUM, 0.35);
-				// the rise: a trail from the floor to where the point is, fading once it has settled
-				const trail = p.settled ? Math.max(0, 1 - (t - p.settledAt) / 0.9) : 1;
-				if (trail > 0.01 && y0 - y > 1) {
-					const g = ctx.createLinearGradient(0, y0, 0, y);
-					g.addColorStop(0, rgba(col, 0));
-					g.addColorStop(1, rgba(col, 0.28 * trail * form));
-					ctx.fillStyle = g;
-					ctx.fillRect(x - 0.7 * px(), y, 1.4 * px(), y0 - y);
-				}
-				const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.6);
-				g.addColorStop(0, rgba(col, 0.95 * form));
-				g.addColorStop(0.3, rgba(col, 0.45 * form));
-				g.addColorStop(1, rgba(col, 0));
-				ctx.fillStyle = g;
+			const n = Math.max(SLOTS, wells.length);
+			const slot = CW / n;
+			const rd = Math.min(slot * 0.36, CH * 0.3); // a well's radius here
+			const cy = CH * 0.4; // the wells' line
+			const by = CH * 0.84; // the beads' line, under them
+			wells.forEach(({ well, point, first }, i) => {
+				const cx = slot * (i + 0.5);
+				// the slot appears as its first bead is released, a moment before it lands
+				const t0 = first.born - 0.9;
+				const form = smooth((t - t0) / 0.45);
+				if (form <= 0) return;
+				// the well: its medium, a field that stops at the wall
+				const mg = ctx.createRadialGradient(cx, cy, 0, cx, cy, rd);
+				mg.addColorStop(0, rgba(PRIMARY, 0.07 * form));
+				mg.addColorStop(0.85, rgba(PRIMARY, 0.05 * form));
+				mg.addColorStop(1, rgba(PRIMARY, 0));
+				ctx.fillStyle = mg;
 				ctx.beginPath();
-				ctx.arc(x, y, r * 2.6, 0, 6.2832);
+				ctx.arc(cx, cy, rd, 0, 6.2832);
 				ctx.fill();
-				if (p.mine) {
-					ctx.fillStyle = rgba(WHITE, 0.9 * form);
+				// its cells, the same ones the plate holds: faint at rest, bright where they answered, so the well's
+				// brightness is the fraction that did; alight where it is happening now
+				const k = rd / WELL_R;
+				for (const c of well.cells) {
+					const x = cx + (c.x - well.x) * k,
+						y = cy + (c.y - well.y) * k;
+					const on = c.answered ? 1 : 0; // the fraction answered is the brightness of the well
+					const l = Math.min(1, c.L);
+					const a = c.size * c.aspect * k,
+						b = c.size * k;
+					const mm = Math.max(0.5, Math.min(a, b));
+					const q = mm < 0.5 ? 0.5 / mm : 1;
+					ctx.setTransform(Math.cos(c.o) * a * q, Math.sin(c.o) * a * q, -Math.sin(c.o) * b * q, Math.cos(c.o) * b * q, x, y);
 					ctx.beginPath();
-					ctx.arc(x, y, r * 0.42, 0, 6.2832);
+					ctx.arc(0, 0, 1, 0, 6.2832);
+					ctx.setTransform(1, 0, 0, 1, 0, 0);
+					ctx.fillStyle = rgba(mix(PRIMARY, BIOLUM, Math.min(1, 0.7 * on + 0.5 * l)), (0.14 + 0.5 * on + 0.5 * l) * form);
 					ctx.fill();
+					if (l > 0.25) {
+						const rr = Math.max(0.6, c.size * 2.6 * k * HS);
+						const g = hctx.createRadialGradient(x * HS, y * HS, 0, x * HS, y * HS, rr);
+						g.addColorStop(0, rgba(BIOLUM, 0.18 * l * form));
+						g.addColorStop(1, rgba(BIOLUM, 0));
+						hctx.fillStyle = g;
+						hctx.beginPath();
+						hctx.arc(x * HS, y * HS, rr, 0, 6.2832);
+						hctx.fill();
+					}
 				}
-			}
-			// the exposure fades before every edge
-			ctx.globalCompositeOperation = 'destination-in';
-			ctx.save();
-			ctx.translate(canvas.width * 0.5, canvas.height * 0.5);
-			ctx.scale(canvas.width * 0.5, canvas.height * 0.5);
-			const vg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-			vg.addColorStop(0, 'rgba(0,0,0,1)');
-			vg.addColorStop(0.7, 'rgba(0,0,0,1)');
-			vg.addColorStop(1.0, 'rgba(0,0,0,0)');
-			ctx.fillStyle = vg;
-			ctx.fillRect(-1.2, -1.2, 2.4, 2.4);
-			ctx.restore();
+				// the bead that went in: a solid body the size of its strength, one point of the room's light on it
+				const bf = smooth((t - (point.born - 0.9)) / 0.3);
+				const rb = rd * (0.14 + 0.36 * point.dose) * (0.7 + 0.3 * bf);
+				ctx.fillStyle = rgba(mix(PRIMARY, WHITE, point.mine ? 0.45 : 0.2), 0.85 * bf);
+				ctx.beginPath();
+				ctx.arc(cx, by, rb, 0, 6.2832);
+				ctx.fill();
+				ctx.fillStyle = rgba(WHITE, 0.9 * bf);
+				ctx.beginPath();
+				ctx.arc(cx - 0.3 * rb, by - 0.35 * rb, Math.max(0.6, 0.22 * rb), 0, 6.2832);
+				ctx.fill();
+			});
+			ctx.imageSmoothingEnabled = true;
+			ctx.imageSmoothingQuality = 'high';
+			ctx.drawImage(halo, 0, 0, CW, CH);
 			ctx.globalCompositeOperation = 'source-over';
 		}
 		resize();
@@ -183,29 +132,21 @@
 			// the plate has already settled its still record; draw it once it is there
 			let tries = 0;
 			const once = () => {
-				if (bench.points.length || tries++ > 30) {
-					if (bench.fit) shown = { ...bench.fit };
-					curveAlpha = bench.fit ? 1 : 0;
-					draw(bench.clock + 10, 0.016);
-				} else requestAnimationFrame(once);
+				if (bench.points.length || tries++ > 30) draw(bench.clock + 10);
+				else requestAnimationFrame(once);
 			};
 			requestAnimationFrame(once);
 			const ro = new ResizeObserver(() => {
 				resize();
-				draw(bench.clock + 10, 0.016);
+				draw(bench.clock + 10);
 			});
 			ro.observe(field);
 			return () => ro.disconnect();
 		}
 		let frame = 0;
 		let visible = false;
-		let last = 0;
-		function tick(now) {
-			if (visible) {
-				const dt = last ? Math.min(0.1, (now - last) / 1000) : 0.016;
-				last = now;
-				draw(bench.clock, dt);
-			} else last = 0;
+		function tick() {
+			if (visible) draw(bench.clock);
 			frame = requestAnimationFrame(tick);
 		}
 		frame = requestAnimationFrame(tick);
@@ -229,11 +170,11 @@
 	.field {
 		position: relative;
 		width: 100%;
-		aspect-ratio: 8 / 5;
+		aspect-ratio: 3 / 1;
 	}
 
 	.field.large {
-		aspect-ratio: 16 / 9;
+		aspect-ratio: 3 / 1;
 	}
 
 	.record {

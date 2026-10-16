@@ -1,35 +1,35 @@
 <!--
-  The bench: one patch of a standard plate, in the visitor's hands.
+  The bench: one patch of a standard plate, seen from where changes come.
 
-  The view rests over the plate, from where changes come, and never moves. Press a well
-  and a bead of liquid forms above it; the longer the press, the more it holds; let go and
-  it falls. The change spreads from where it entered and the cells answer with their own
-  timing, or do not, in place, beside the wells that were not touched. Once a well has
-  answered, the instrument puts the next change into the next well of that row by itself,
-  stronger if few answered and weaker if many, looking for the strength at which half do.
-  On arrival it puts in one change of its own, so the gesture is shown before it is asked,
-  and it follows that change the same way while the visitor only watches. A row nobody has
-  touched stays untouched; the plate is the control for itself. The same press works with a
-  mouse, a finger and a keyboard; a passing pointer changes nothing, it only makes the
-  watcher under the plate look there.
+  The view rests over the plate and never moves. The instrument does the experiment by
+  itself, in the open: as the visitor arrives it puts one change into one well, the cells
+  answer in place with their own timing, or do not, beside wells never touched, and once
+  that answer has settled the instrument puts the next change into the next well of the
+  row, stronger if few answered and weaker if many, looking for the strength at which half
+  do. A reader who only scrolls sees the whole chain. A tap or a click on a well puts one
+  more change in, at the one strength every change starts at, and the instrument follows it
+  the same way; nothing is asked beyond that. A row nobody has touched stays untouched; the
+  plate is the control for itself. The keyboard has a button after the plate that puts a
+  change into the next well.
   Nothing is drawn. Every light is a field or a point, and each kind of light is its own:
   the watcher is a field of plain light on the floor of the well it is under, hidden by the
   body of the plate between wells; a change is a bead of liquid, a solid body stretched by
   its fall; an answer is the cells' own colour. Same material as the mark: soft plates at
   quarter resolution, light that adds, one ramp from deep space through primary and biolum
-  to white. What every change did is written to the record (bench.js) as it happens.
+  to white. Every change is written to the record (bench.js) as it happens, with the well it
+  went into, and the record draws those wells as themselves.
   Reduced motion: one exposure with the instrument's own three changes settled; the count
   line beside it says so in one sentence.
 -->
 <script>
 	import { onMount } from 'svelte';
 	import { useMessages } from '$lib/i18n';
-	import { bench, addPoint, resetBench, nextDose, refit, stillMode } from './bench.js';
+	import { bench, addPoint, resetBench, nextDose, stillMode, WELL_R } from './bench.js';
 	const m = useMessages();
 
 	const FW = 800;
 	const PITCH = 220;
-	const R = 79; // well to pitch as on a standard plate
+	const R = WELL_R; // well to pitch as on a standard plate
 	const X0 = [200, 420, 640]; // the three whole wells; a ring of partial wells runs off the frame
 	const Y0 = [172, 392, 612];
 
@@ -44,10 +44,9 @@
 	const DROP_H = 150; // the fixed height a change is released from, above the plate
 	const HOVER = 0.5; // s the instrument's bead waits above the well before it is released
 	const FALL = 0.6; // s, the fall under gravity
-	const HOLD_T = 1.0; // s of pressing for a change to reach full strength
-	const BASE = 0.35; // the strength of the briefest press
-	const SETTLE = 4.5; // s after landing until a well's answer is read
-	const THINK = 0.9; // s between an answer read and the instrument's next change
+	const DOSE = 0.3; // the one strength every change starts at: the visitor's, and the instrument's first
+	const SETTLE = 3.6; // s after landing until a well's answer is read
+	const THINK = 0.6; // s between an answer read and the instrument's next change
 	const ARRIVAL = 0.8; // s after the visitor arrives until the instrument's first change
 	const FIELD = 0.5 * R; // the watcher's field: the floor it lights, the size of what it sees at once
 	const TILE_T = 0.9; // s the watcher spends on each quarter of a well it is holding
@@ -62,7 +61,8 @@
 	let canvas;
 	let live = false;
 	let still = false; // reduced motion: one frame, the sentence set beneath it
-	let overWell = false; // the pointer is over a well: the hand can act here
+	/** the keyboard's way in: a change into the next well, wired in onMount */
+	let putNext = () => {};
 
 	function mulberry(seed) {
 		return () => {
@@ -265,7 +265,6 @@
 		const plan = []; // the instrument's changes still to put in: { at, w, dose }, by time
 		const drops = []; // beads on their way in: forming above a well, or falling
 		const watcher = { x: NAMED.T1.x, y: NAMED.T1.y, goal: null, holdUntil: 0, next: 1 };
-		let look = null; // the well the pointer (or the keyboard) is over: the watcher looks there
 
 		// the change enters the well from the same place near the wall, every time, whoever's hand it is
 		function entryOf(w) {
@@ -292,7 +291,7 @@
 				c.pending = Math.min(1.3, c.gain * 1.05);
 			}
 			// the record gets a point the moment the change is on its way; it rises as the cells answer
-			w.point = addPoint(dose, mine, w.r, w.impactT, w.impactT + SETTLE);
+			w.point = addPoint(dose, mine, w, w.impactT, w.impactT + SETTLE);
 			// the watcher goes to the well that is about to change, and stays while it answers
 			watcher.goal = w;
 			watcher.holdUntil = w.impactT + SETTLE;
@@ -314,13 +313,10 @@
 			for (const c of w.cells) if (c.answered) n++;
 			return w.cells.length ? n / w.cells.length : 0;
 		}
-		// where the watcher is, on its walk: under the pointer, under the well answering, or on patrol
+		// where the watcher is, on its walk: under the well answering, or on patrol
 		function walk(dt, t) {
-			let goal = look;
-			if (!goal) {
-				goal = watcher.goal;
-				if (goal && t > watcher.holdUntil) goal = watcher.goal = null;
-			}
+			let goal = watcher.goal;
+			if (goal && t > watcher.holdUntil) goal = watcher.goal = null;
 			if (!goal) {
 				const n = NAMED[PATROL[watcher.next % PATROL.length]];
 				if (Math.hypot(n.x - watcher.x, n.y - watcher.y) < 1) watcher.next++;
@@ -329,7 +325,7 @@
 			// holding a well, the watcher takes it in quarters; on patrol it passes through the centre
 			let gx = goal.x,
 				gy = goal.y;
-			if (goal === look || goal === watcher.goal) {
+			if (goal === watcher.goal) {
 				const q = Math.floor(t / TILE_T) % 4;
 				gx += (q === 1 || q === 2 ? 1 : -1) * 0.42 * R;
 				gy += (q >= 2 ? 1 : -1) * 0.42 * R;
@@ -371,24 +367,15 @@
 				c.evidence *= 1 - dt / 240; // the slow layer nearly does not forget
 			}
 			// the record: each live point rises with its well; a settled one is read and answered
-			let changed = false;
 			for (const w of WELLS) {
 				const p = w.point;
 				if (!p || p.settled) continue;
-				if (t >= p.born) {
-					const f = fractionOf(w);
-					if (f !== p.f) {
-						p.f = f;
-						changed = true;
-					}
-				}
+				if (t >= p.born) p.f = fractionOf(w);
 				if (t >= p.settledAt) {
 					p.settled = true;
-					changed = true;
 					follow(w, t);
 				}
 			}
-			if (changed) refit(t);
 		}
 
 		// ---- the camera and the exposure ---------------------------------------
@@ -686,8 +673,7 @@
 			ctx.globalCompositeOperation = 'source-over';
 		}
 
-		// ---- the hand: press a well ----------------------------------------------
-		let hold = null; // { w, drop, t0, x, y, type } while a well is pressed
+		// ---- the hand: tap a well -----------------------------------------------
 		let tNow = 0;
 		function wellUnder(ev) {
 			const r = stage.getBoundingClientRect();
@@ -698,120 +684,27 @@
 			if (!w || !w.whole || Math.hypot(pt[0] - w.x, pt[1] - w.y) > R * 1.02) return null;
 			return w;
 		}
-		function press(w, type) {
-			if (hold) return;
-			const [x, y] = entryOf(w);
-			const drop = { w, x, y, t0: tNow, t1: 0, hover: 0, dose: BASE, forming: true };
-			drops.push(drop);
-			hold = { w, drop, t0: tNow, type };
-			watcher.goal = w;
-			watcher.holdUntil = tNow + 4;
+		// one tap, one change, at the one strength; the instrument answers it once the well has
+		function put(w) {
 			if (clock0 < 0) clock0 = tNow;
+			release(w, DOSE, tNow, 0.25, true);
 		}
-		// let go: the bead falls with what it holds; the instrument answers once the well has
-		function unpress() {
-			if (!hold) return;
-			const { w, drop } = hold;
-			hold = null;
-			const i = drops.indexOf(drop);
-			if (i >= 0) drops.splice(i, 1);
-			release(w, drop.dose, tNow, 0, true);
-		}
-		// the press was a scroll after all: nothing goes in
-		function cancel() {
-			if (!hold) return;
-			const i = drops.indexOf(hold.drop);
-			if (i >= 0) drops.splice(i, 1);
-			hold = null;
-		}
-		function onMove(ev) {
+		// a click is a tap on every device, and never a scroll
+		function onClick(ev) {
 			if (still) return;
-			if (hold) {
-				if (hold.type === 'touch' && !hold.moved) {
-					hold.moved = Math.hypot(ev.clientX - hold.x, ev.clientY - hold.y) > 12;
-					if (hold.moved && tNow - hold.t0 < 0.3) cancel();
-				}
-				return;
-			}
-			if (ev.pointerType !== 'mouse') return;
 			const w = wellUnder(ev);
-			look = w;
-			overWell = !!w;
+			if (w) put(w);
 		}
-		function onDown(ev) {
-			if (still || ev.button > 0) return;
-			const w = wellUnder(ev);
-			if (!w) return;
-			ev.preventDefault();
-			pointerFocus = true;
-			stage.focus({ preventScroll: true });
-			pointerFocus = false;
-			press(w, ev.pointerType);
-			hold.x = ev.clientX;
-			hold.y = ev.clientY;
-			try {
-				stage.setPointerCapture(ev.pointerId);
-			} catch {
-				/* a pointer that cannot be captured still releases on pointerup */
-			}
-		}
-		function onUp(ev) {
-			if (!hold) return;
-			if (ev.type === 'pointercancel') cancel();
-			else unpress();
-		}
-		function onLeave() {
-			look = null;
-			overWell = false;
-		}
-		// the keyboard: arrows choose a well, Space or Enter held is the press
-		let kb = null;
-		const KEYS = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
-		function onKey(ev) {
+		// the keyboard: the button after the plate puts a change into the next untouched well, from the centre out
+		const FROM_CENTRE = ['M1', 'M0', 'M2', 'T1', 'B1', 'T0', 'T2', 'B0', 'B2'];
+		putNext = () => {
 			if (still) return;
-			if (KEYS[ev.key]) {
-				ev.preventDefault();
-				const [dr, dc] = KEYS[ev.key];
-				const cur = kb || NAMED.M1;
-				const r = Math.max(0, Math.min(2, cur.r + dr)),
-					c = Math.max(0, Math.min(2, cur.c + dc));
-				kb = NAMED[(r === 0 ? 'T' : r === 1 ? 'M' : 'B') + c];
-				look = kb;
-			} else if ((ev.key === ' ' || ev.key === 'Enter') && !ev.repeat) {
-				ev.preventDefault();
-				if (!kb) {
-					kb = NAMED.M1;
-					look = kb;
-				}
-				press(kb, 'keyboard');
-			}
-		}
-		function onKeyUp(ev) {
-			if ((ev.key === ' ' || ev.key === 'Enter') && hold && hold.type === 'keyboard') unpress();
-		}
-		let pointerFocus = false;
-		function onFocus() {
-			if (pointerFocus) {
-				pointerFocus = false;
-				return;
-			}
-			kb = kb || NAMED.M1;
-			look = kb;
-		}
-		function onBlur() {
-			kb = null;
-			look = null;
-			if (hold && hold.type === 'keyboard') cancel();
-		}
-		stage.addEventListener('pointermove', onMove);
-		stage.addEventListener('pointerdown', onDown);
-		stage.addEventListener('pointerup', onUp);
-		stage.addEventListener('pointercancel', onUp);
-		stage.addEventListener('pointerleave', onLeave);
-		stage.addEventListener('keydown', onKey);
-		stage.addEventListener('keyup', onKeyUp);
-		stage.addEventListener('focus', onFocus);
-		stage.addEventListener('blur', onBlur);
+			const w =
+				FROM_CENTRE.map((k) => NAMED[k]).find((o) => !o.doses.length && !plan.some((e) => e.w === o)) ||
+				NAMED.M1;
+			put(w);
+		};
+		stage.addEventListener('click', onClick);
 
 		resize();
 		if (reduced) {
@@ -819,7 +712,7 @@
 			still = true;
 			stillMode.set(true);
 			clock0 = 0;
-			schedule(ARRIVAL, NAMED.T1, 0.5);
+			schedule(ARRIVAL, NAMED.T1, DOSE);
 			let t = 0;
 			for (let i = 0; i < 60 * 24; i++) {
 				t = i / 60;
@@ -850,12 +743,7 @@
 				if (arrived && clock0 < 0) {
 					clock0 = t;
 					// the instrument's one change on arrival: this is where a change goes in, and what it does
-					schedule(t + ARRIVAL, NAMED.T1, 0.5);
-				}
-				if (hold) {
-					const d = hold.drop;
-					d.dose = BASE + (1 - BASE) * smooth((t - hold.t0 - 0.08) / HOLD_T);
-					if (t - hold.t0 >= HOLD_T + 0.35) unpress(); // full: it falls by itself
+					schedule(t + ARRIVAL, NAMED.T1, DOSE);
 				}
 				stepProcess(t);
 				if (visible) render(t);
@@ -881,20 +769,14 @@
 	});
 </script>
 
-<!-- the plate is a widget with its own keyboard (arrows choose a well, Space held is the press),
-     wired in the script where the compiler cannot see it -->
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<div
-	class="stage"
-	class:hand={overWell}
-	class:still
-	bind:this={stage}
-	role="application"
-	tabindex="0"
-	aria-label={m.a11y.figure}
->
+<!-- the plate is a picture to the page; the one thing a hand can do to it is wired on the stage in the
+     script, and the keyboard gets the same thing as a button after it -->
+<div class="stage" class:still bind:this={stage} role="img" aria-label={m.a11y.figure}>
 	<canvas class="instrument" class:shown={live} bind:this={canvas} aria-hidden="true"></canvas>
 </div>
+{#if !still}
+	<button class="put" type="button" on:click={() => putNext()}>{m.a11y.put}</button>
+{/if}
 
 <style>
 	/* the plate's own box, square: the exposure fades to nothing before any edge of it */
@@ -902,15 +784,38 @@
 		position: relative;
 		width: 100%;
 		aspect-ratio: 1;
-		touch-action: pan-y; /* the page still scrolls under a finger; a still finger on a well is a press */
+		cursor: pointer;
 		user-select: none;
 		-webkit-user-select: none;
 		-webkit-touch-callout: none;
-		outline: none; /* the keyboard's place is shown by the watcher's light under that well */
 	}
 
-	.stage.hand {
-		cursor: crosshair; /* aimed, then pressed */
+	/* the keyboard's button: out of sight until it is reached, then a plain line of the body face */
+	.put {
+		position: absolute;
+		left: 50%;
+		bottom: 0.5rem;
+		transform: translateX(-50%);
+		clip-path: inset(50%);
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		white-space: nowrap;
+		font: inherit;
+		font-size: 0.85rem;
+		color: var(--ink-70, inherit);
+		background: none;
+		border: 0;
+		padding: 0.4rem 0.8rem;
+		cursor: pointer;
+	}
+
+	.put:focus-visible {
+		clip-path: none;
+		width: auto;
+		height: auto;
+		outline: 1px solid currentColor;
+		outline-offset: 2px;
 	}
 
 	.instrument {

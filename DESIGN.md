@@ -41,7 +41,7 @@ Three timing tokens only: `--t-snap 120ms`, `--t-move 320ms`, `--t-settle 720ms`
 
 ## Interaction grammar
 
-Hover = look (the instrument attends where the pointer is). Press = act. A passing pointer never changes anything. Touch and mouse do the same thing with the same gesture. Keyboard reaches every act. A click is never required where a press will do.
+One gesture, the one everyone already has: tap or click. Nothing is held, hovered or learned; a passing pointer changes nothing, and the cursor over the plate is the plain pointer. Touch, mouse and pen do the same thing with the same gesture; the keyboard reaches the same act through a button. The thing the page shows must be seen in full by a reader who never touches it: interaction adds a question, it never carries the meaning.
 
 ## Controls
 

@@ -102,7 +102,7 @@
 	</div>
 </section>
 
-<!-- 02 · readout: the same record, large, and what it is -->
+<!-- 02 · readout: the same wells, large, and what comes back -->
 <section id="readout-section" class="level readout" aria-labelledby="readout-heading">
 	<div class="content readout-grid">
 		<div class="readout-words">
@@ -621,7 +621,7 @@
 	}
 
 	.bench-record {
-		width: min(100%, 22rem);
+		width: min(100%, 24rem);
 	}
 
 	.bench-count {
@@ -692,14 +692,14 @@
 			justify-self: center;
 		}
 
-		/* wider than tall on a phone, so the whole bench stays on one screen (664px with the browser's bars) */
+		/* a strip on a phone, so the whole bench stays on one screen (664px with the browser's bars) */
 		.bench-record {
 			order: 2;
-			width: min(100%, 17rem);
+			width: min(100%, 18rem);
 		}
 
 		.bench-record :global(.field) {
-			aspect-ratio: 5 / 2;
+			aspect-ratio: 3 / 1;
 		}
 
 		.bench-count {
