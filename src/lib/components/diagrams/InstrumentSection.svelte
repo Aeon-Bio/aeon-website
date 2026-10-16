@@ -1,69 +1,52 @@
 <!--
-  The bench: one patch of a standard plate, seen from where changes come.
+  One cell, kept.
 
-  The view rests over the plate and never moves. The instrument does the experiment by
-  itself, in the open: as the visitor arrives it puts one change into one well, the cells
-  answer in place with their own timing, or do not, beside wells never touched, and once
-  that answer has settled the instrument puts the next change into the next well of the
-  row, stronger if few answered and weaker if many, looking for the strength at which half
-  do. The three changes of a row take under ten seconds. A reader who only scrolls sees the
-  whole chain. A tap or a click on a well puts one more change in, strong enough that about
-  half the well answers within a second, and the instrument follows it the same way; nothing
-  is asked beyond that. At rest the plate is still: nothing flickers, nothing patrols; the
-  only motion is a change and its answer. A row nobody has touched stays untouched; the
-  plate is the control for itself. The keyboard has a button after the plate that puts a
-  change into the next well.
-  Nothing is drawn. Every light is a field or a point, and each kind of light is its own:
-  the watcher is a field of plain light on the floor of the well being changed, and nowhere
-  else, hidden by the body of the plate between wells; a change is a bead of liquid, a solid body stretched by
-  its fall; an answer is the cells' own colour. Same material as the mark: soft plates at
-  quarter resolution, light that adds, one ramp from deep space through primary and biolum
-  to white. Every change is written to the record (bench.js) as it happens, with the well it
-  went into, and the record draws those wells as themselves.
-  Reduced motion: one exposure with the instrument's own three changes settled; the count
-  line beside it says so in one sentence.
+  One living cell, at the scale of a face, in the room's dark. It breathes. Something arrives:
+  a drop from outside the frame, travelling to the cell's edge, taken in at the membrane with
+  a ripple. The cell answers in light, a wave from where the drop touched, the whole body
+  brightening by how much it was given, then settling, a little brighter than before: it
+  keeps what it was asked. The next question comes to the same cell. It is never thrown away
+  to be read. The instrument asks three times on arrival (a little, too much, between) and
+  then keeps asking at a slower pace for as long as the page is open. A tap or a click on the
+  cell asks it too: the drop comes from the side you touched. Nothing else moves. There is no
+  plate, no chart, no bead to decode: a body, a drop, light.
+  Material as the mark's: fields and points of light that add, no outlines; the cell is a
+  body known by its lit edge, the drop a solid bead with one point of the room's light on it,
+  the answer the cells' own colour. The count beside the figure is written to cell.js.
+  Reduced motion: one still, the cell lit by its third answer; the count line says so.
 -->
 <script>
 	import { onMount } from 'svelte';
 	import { useMessages } from '$lib/i18n';
-	import { bench, addPoint, resetBench, nextDose, readRows, stillMode, WELL_R } from './bench.js';
+	import { asked, resetCell, stillMode } from './cell.js';
 	const m = useMessages();
-
-	const FW = 800;
-	const PITCH = 220;
-	const R = WELL_R; // well to pitch as on a standard plate
-	const X0 = [200, 420, 640]; // the three whole wells; a ring of partial wells runs off the frame
-	const Y0 = [172, 392, 612];
 
 	const PRIMARY = [76, 201, 240];
 	const BIOLUM = [128, 255, 219];
 	const WHITE = [255, 255, 255];
+	const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+	const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${Math.max(0, Math.min(1, a))})`;
+	const smooth = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
+	const TAU = Math.PI * 2;
 
-	// the process
-	const FRONT_T = 1.0; // s for a change to cross a well: the answer is seen while the cause is still in mind
-	const RISE = 0.24; // s, the steep rise of an answer
-	const ENTRY_A = -1.05; // a change is put in from the same side of every well
-	const DROP_H = 150; // the fixed height a change is released from, above the plate
-	const HOVER = 0.2; // s the instrument's bead waits above the well before it is released
-	const FALL = 0.3; // s, the fall under gravity
-	const DOSE_FIRST = 0.4; // the instrument's first change: weak, a few cells answer
-	const DOSE_HAND = 0.7; // a tap: strong enough that about half the well answers, at once
-	const SETTLE = 1.6; // s after landing until a well's answer is read
-	const THINK = 0.15; // s between an answer read and the instrument's next change
-	const ARRIVAL = 0.25; // s after the visitor arrives until the instrument's first change
-	const FIELD = 0.5 * R; // the watcher's field: the floor it lights, the size of what it sees at once
-	const PACE = 0.6; // s, the watcher's move from one well to the next
-	const D2R = Math.PI / 180;
-	// over the plate from where changes come, high enough that every well is a thing to press and a
-	// bead is seen to fall, low enough that the plate is a body with a watcher underneath
-	const HOME = { tx: 420, ty: 392, az: -6 * D2R, el: 52 * D2R, dist: 2600, f: 2600 * 1.15, k: 0 };
+	// the ask
+	const ARRIVAL = 0.3; // s after the visitor arrives until the first question
+	const AGAIN = 2.6; // s after a question lands until the instrument asks the next, for the first three
+	const REST = 5.0; // s between questions once the first three have been asked
+	const FIRST = [0.35, 1.0, 0.6]; // the first three strengths: a little, too much, between
+	const FROM = [-TAU / 4 - 0.55, -TAU / 4, -TAU / 4 + 0.55]; // where the first three come from: over the top
+	const TAP = 0.75; // the strength of a visitor's question
+	const TRAVEL = 0.5; // s a drop takes to reach the cell
+	const RISE = 0.35; // s for the answer to light
+	const FADE = 2.4; // s for the answer to settle, leaving a trace
+	const BREATH = 0.045; // how much the body moves at rest, of its radius
 
 	let stage;
 	let canvas;
 	let live = false;
-	let still = false; // reduced motion: one frame, the sentence set beneath it
-	/** the keyboard's way in: a change into the next well, wired in onMount */
-	let putNext = () => {};
+	let still = false;
+	/** the keyboard's way in, wired in onMount */
+	let askNext = () => {};
 
 	function mulberry(seed) {
 		return () => {
@@ -74,634 +57,280 @@
 			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 		};
 	}
-	function valueNoise(seed) {
-		const r = mulberry(seed);
-		const G = 64;
-		const g = new Float32Array(G * G);
-		for (let i = 0; i < g.length; i++) g[i] = r();
-		const sm = (t) => t * t * (3 - 2 * t);
-		return (x, y) => {
-			const x0 = Math.floor(x),
-				y0 = Math.floor(y),
-				fx = sm(x - x0),
-				fy = sm(y - y0);
-			const v = (i, j) => g[(((j % G) + G) % G) * G + (((i % G) + G) % G)];
-			return (
-				(v(x0, y0) * (1 - fx) + v(x0 + 1, y0) * fx) * (1 - fy) +
-				(v(x0, y0 + 1) * (1 - fx) + v(x0 + 1, y0 + 1) * fx) * fy
-			);
-		};
-	}
-	const noise2 = (n, x, y, s) =>
-		0.65 * n(x / s, y / s) + 0.35 * n(x / (s * 0.45) + 17, y / (s * 0.45) + 9);
-	const smooth = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
-	const cross = (a, b) => [
-		a[1] * b[2] - a[2] * b[1],
-		a[2] * b[0] - a[0] * b[2],
-		a[0] * b[1] - a[1] * b[0]
-	];
-	const norm = (a) => {
-		const l = Math.hypot(a[0], a[1], a[2]) || 1;
-		return [a[0] / l, a[1] / l, a[2] / l];
-	};
-	function mix(a, b, t) {
-		return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-	}
-	function rgba(c, a) {
-		return `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${Math.max(0, Math.min(1, a))})`;
-	}
-
-	// the wells: three by three whole, and the ring around them cut by the frame
-	const WELLS = [];
-	const NAMED = {};
-	for (let r = -1; r <= 3; r++)
-		for (let c = -1; c <= 3; c++) {
-			const w = {
-				x: X0[0] + c * PITCH,
-				y: Y0[0] + r * PITCH,
-				r,
-				c,
-				whole: r >= 0 && r <= 2 && c >= 0 && c <= 2,
-				entryA: ENTRY_A,
-				entry: null,
-				impactT: -100,
-				dose: 0,
-				doses: [],
-				cells: [],
-				point: null
-			};
-			WELLS.push(w);
-			if (w.whole) NAMED[(r === 0 ? 'T' : r === 1 ? 'M' : 'B') + c] = w;
-		}
-	function wellAt(x, y) {
-		const c = Math.round((x - X0[0]) / PITCH),
-			r = Math.round((y - Y0[0]) / PITCH);
-		if (c < -1 || c > 3 || r < -1 || r > 3) return null;
-		return WELLS[(r + 1) * 5 + (c + 1)];
-	}
-	const rowOf = (r) => WELLS.filter((w) => w.r === r && w.whole);
-
-	/** the cultures: one Poisson-disc population per well, spacing on a slow field, thinner at the wall */
-	function culture(rnd, nDensity) {
-		const cell = 8 / Math.SQRT2;
-		const gw = Math.ceil(FW / cell);
-		const grid = [];
-		for (let i = 0; i < gw * gw; i++) grid.push([]);
-		const pts = [];
-		const active = [];
-		const spacingAt = (x, y) => 8 + 14 * Math.pow(noise2(nDensity, x, y, 70), 1.6);
-		const inWell = (x, y) => {
-			const w = wellAt(x, y);
-			if (!w) return false;
-			const d = Math.hypot(x - w.x, y - w.y) / R;
-			if (d >= 0.975) return false;
-			if (d > 0.86) return rnd() < 1 - ((d - 0.86) / 0.115) * 0.85;
-			return true;
-		};
-		const ok = (p) => {
-			const gx = (p[0] / cell) | 0,
-				gy = (p[1] / cell) | 0,
-				need = spacingAt(p[0], p[1]);
-			const reach = Math.ceil(need / cell);
-			for (let y = Math.max(0, gy - reach); y <= Math.min(gw - 1, gy + reach); y++)
-				for (let x = Math.max(0, gx - reach); x <= Math.min(gw - 1, gx + reach); x++)
-					for (const i of grid[y * gw + x]) {
-						const q = pts[i];
-						if (Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.5 * (need + spacingAt(q[0], q[1])))
-							return false;
-					}
-			return true;
-		};
-		const add = (p) => {
-			pts.push(p);
-			active.push(pts.length - 1);
-			grid[((p[1] / cell) | 0) * gw + ((p[0] / cell) | 0)].push(pts.length - 1);
-		};
-		for (const w of WELLS) {
-			const sx = Math.max(6, Math.min(FW - 6, w.x + 8)),
-				sy = Math.max(6, Math.min(FW - 6, w.y - 5));
-			if (inWell(sx, sy)) add([sx, sy]);
-		}
-		while (active.length) {
-			const ai = (rnd() * active.length) | 0,
-				p = pts[active[ai]];
-			let found = false;
-			for (let k = 0; k < 24; k++) {
-				const a = rnd() * 6.2832,
-					d = spacingAt(p[0], p[1]) * (1 + rnd());
-				const q = [p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d];
-				if (q[0] < 2 || q[1] < 2 || q[0] > FW - 2 || q[1] > FW - 2) continue;
-				if (!inWell(q[0], q[1])) continue;
-				if (ok(q)) {
-					add(q);
-					found = true;
-					break;
-				}
-			}
-			if (!found) active.splice(ai, 1);
-		}
-		return pts;
-	}
-
-	// the light of one answer: a steep rise, then a fast and a slow clearance
-	function kernel(dt) {
-		if (dt < 0) return 0;
-		if (dt < RISE) {
-			const u = dt / RISE;
-			return u * u * u;
-		}
-		const s = dt - RISE;
-		return 0.4 * Math.exp(-s / 1.2) + 0.6 * Math.exp(-s / 14);
-	}
 
 	onMount(() => {
 		if (!canvas || !stage) return;
-		resetBench();
+		resetCell();
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const ctx0 = canvas.getContext('2d');
-		if (!ctx0) return;
-
-		const rnd = mulberry(11);
-		const nDensity = valueNoise(3),
-			nOrient = valueNoise(5),
-			nSens = valueNoise(7);
-		const logn = (mu, sig) => Math.exp(mu + sig * (rnd() + rnd() + rnd() + rnd() - 2) * 0.9);
-		for (const w of WELLS) w.entryA = ENTRY_A + (rnd() - 0.5) * 0.16;
-		// each cell is an individual: footprint, orientation, kinetics, and the strength it needs before it
-		// answers. Thresholds are drawn per cell, never from a field across the plate: heterogeneity lives
-		// inside a well, not between wells
-		const cells = culture(rnd, nDensity).map(([x, y]) => {
-			const w = wellAt(x, y);
-			const c = {
-				x,
-				y,
-				w,
-				o: noise2(nOrient, x, y, 120) * 6.2832 * 1.5 + (rnd() - 0.5) * 0.5,
-				size: 2.6 * logn(0, 0.3),
-				aspect: 1.25 + rnd() * 0.75,
-				gain: logn(-0.35, 0.6),
-				latency: 0.18 + rnd() * 0.17,
-				quiet: rnd() < 0.18, // some never answer; a uniform response would be a lie
-				thr: Math.pow(rnd(), 0.635) * (0.88 + 0.24 * noise2(nSens, x, y, 45)),
-				arriveAt: -1,
-				pending: 0,
-				answered: false,
-				events: [],
-				evidence: 0,
-				L: 0
-			};
-			w.cells.push(c);
-			return c;
-		});
-
-		// ---- the process -------------------------------------------------------
-		let lastT = 0;
-		let clock0 = -1; // the instrument's clock starts when the visitor arrives
-		const plan = []; // the instrument's changes still to put in: { at, w, dose }, by time
-		const drops = []; // beads on their way in: forming above a well, or falling
-		const watcher = { x: NAMED.T1.x, y: NAMED.T1.y, goal: null, holdUntil: 0, a: 0 }; // a: its light, 0 when nothing is changing
-
-		// the change enters the well from the same place near the wall, every time, whoever's hand it is
-		function entryOf(w) {
-			const d = R * 0.78;
-			return [w.x + Math.cos(w.entryA) * d, w.y + Math.sin(w.entryA) * d];
-		}
-		function release(w, dose, t, hover, mine) {
-			w.entry = entryOf(w);
-			w.impactT = t + hover + FALL;
-			w.dose = dose;
-			w.doses.push(dose);
-			drops.push({ w, x: w.entry[0], y: w.entry[1], t0: t, t1: w.impactT, hover, dose, forming: false });
-			const reach = 0.45 + 0.55 * dose; // how far across the well a change of this strength carries
-			for (const c of w.cells) {
-				c.answered = false;
-				const dist = Math.hypot(c.x - w.entry[0], c.y - w.entry[1]) / (2 * R);
-				if (c.quiet || dose < c.thr || dist > reach) {
-					c.arriveAt = -1;
-					c.pending = 0;
-					continue;
-				}
-				const transit = FRONT_T * dist * dist;
-				c.arriveAt = w.impactT + transit * (1 + 0.4 * (rnd() - 0.5)) + c.latency;
-				c.pending = Math.min(1.3, c.gain * 1.05);
-			}
-			// the record gets a point the moment the change is on its way; it rises as the cells answer
-			w.point = addPoint(dose, mine, w, w.impactT, w.impactT + SETTLE);
-			// the watcher goes to the well that is about to change, and stays while it answers
-			watcher.goal = w;
-			watcher.holdUntil = w.impactT + SETTLE + 0.8;
-		}
-		function schedule(at, w, dose) {
-			plan.push({ at, w, dose });
-			plan.sort((a, b) => a.at - b.at);
-		}
-		// the instrument's next change, once a well has answered: the next untouched well of that row,
-		// stronger if few answered and weaker if many
-		function follow(w, t) {
-			const row = rowOf(w.r).filter((o) => !o.doses.length && !plan.some((e) => e.w === o));
-			if (!row.length) return;
-			row.sort((a, b) => Math.abs(a.c - w.c) - Math.abs(b.c - w.c));
-			schedule(t + THINK, row[0], nextDose(w.dose, w.point.f));
-		}
-		function fractionOf(w) {
-			let n = 0;
-			for (const c of w.cells) if (c.answered) n++;
-			return w.cells.length ? n / w.cells.length : 0;
-		}
-		// the watcher: under the well that is changing, and nowhere when nothing is. At rest the plate is still
-		function walk(dt, t) {
-			let goal = watcher.goal;
-			if (goal && t > watcher.holdUntil) goal = watcher.goal = null;
-			watcher.a += ((goal ? 1 : 0) - watcher.a) * (1 - Math.exp(-dt / 0.3));
-			if (!goal) return;
-			const dx = goal.x - watcher.x,
-				dy = goal.y - watcher.y,
-				d = Math.hypot(dx, dy),
-				step = (PITCH / PACE) * dt;
-			if (d <= step || watcher.a < 0.05) {
-				watcher.x = goal.x;
-				watcher.y = goal.y;
-			} else {
-				watcher.x += (dx / d) * step;
-				watcher.y += (dy / d) * step;
-			}
-		}
-		function stepProcess(t) {
-			const dt = Math.min(0.05, Math.max(0, t - lastT));
-			lastT = t;
-			bench.clock = t;
-			while (plan.length && t >= plan[0].at) {
-				const e = plan.shift();
-				release(e.w, e.dose, t, HOVER, false);
-			}
-			walk(dt, t);
-			while (drops.length && !drops[0].forming && t > drops[0].t1 + 0.1) drops.shift();
-			for (const c of cells) {
-				if (c.arriveAt >= 0 && t >= c.arriveAt) {
-					if (c.pending > 0.03) {
-						c.events.push({ t: c.arriveAt, a: c.pending, caused: true });
-						c.evidence += 0.22 * c.pending; // the slow layer: what answered because of the change
-						c.answered = true;
-					}
-					c.arriveAt = -1;
-				}
-				if (c.events.length > 4) c.events.shift();
-				c.evidence *= 1 - dt / 240; // the slow layer nearly does not forget
-			}
-			// the record: each live point rises with its well; a settled one is read and answered
-			for (const w of WELLS) {
-				const p = w.point;
-				if (!p || p.settled) continue;
-				if (t >= p.born) p.f = fractionOf(w);
-				if (t >= p.settledAt) {
-					p.settled = true;
-					readRows();
-					follow(w, t);
-				}
-			}
-		}
-
-		// ---- the camera and the exposure ---------------------------------------
-		const plate = document.createElement('canvas');
-		const pctx = plate.getContext('2d');
-		const mask = document.createElement('canvas');
-		const mctx = mask.getContext('2d');
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+		const rnd = mulberry(7);
+		// the halo plate: the body's light drawn soft at quarter resolution, as the mark's is
+		const halo = document.createElement('canvas');
+		const hctx = halo.getContext('2d');
 		const HS = 0.25;
-		let hs = HS;
-		let S = 1,
+
+		// ---- the body ------------------------------------------------------------
+		// the interior: a few soft bodies at fixed places in the cell, that move with it
+		const spots = Array.from({ length: 6 }, () => ({
+			rho: 0.25 + 0.5 * rnd(),
+			phi: rnd() * TAU,
+			size: 0.1 + 0.12 * rnd(),
+			a: 0.5 + 0.5 * rnd()
+		}));
+		const ripples = []; // { t0, th, A }: the membrane taking a drop in
+		const answers = []; // { t0, th, dose }: light from where a drop touched
+		const drops = []; // { t0, th, dose, ox, oy }: on their way in
+		let trace = 0; // what the cell keeps of every answer: a little brighter each time
+		const wrap = (d) => Math.atan2(Math.sin(d), Math.cos(d));
+		// the radius of the body at angle th, in units of R: breath, and ripples where drops landed
+		function shape(th, t) {
+			let d =
+				0.5 * BREATH * Math.sin(2 * th + 0.55 * t) +
+				0.35 * BREATH * Math.sin(3 * th - 0.4 * t + 1.3) +
+				0.22 * BREATH * Math.sin(5 * th + 0.7 * t + 2.1);
+			for (const r of ripples) {
+				const tau = t - r.t0;
+				if (tau < 0 || tau > 2) continue;
+				const dth = wrap(th - r.th) / 0.5;
+				d += r.A * Math.exp(-dth * dth) * Math.cos(11 * tau) * Math.exp(-tau / 0.55);
+			}
+			return 1 + d;
+		}
+
+		// ---- the frame -----------------------------------------------------------
+		let W = 1,
+			H = 1,
 			dpr = 1,
-			W = 1,
-			H = 1;
-		let C = null; // the camera basis this frame
-		function camera(v) {
-			const ce = Math.cos(v.el),
-				se = Math.sin(v.el),
-				ca = Math.cos(v.az),
-				sa = Math.sin(v.az);
-			const eye = [v.tx + sa * ce * v.dist, v.ty - ca * ce * v.dist, se * v.dist];
-			const fwd = norm([-sa * ce, ca * ce, -se]);
-			const hint = norm([sa * v.k, -ca * v.k, 1 - Math.abs(v.k)]);
-			const right = norm(cross(fwd, hint)),
-				up = cross(right, fwd);
-			C = { eye, fwd, right, up, f: v.f * S * dpr, cx: canvas.width * 0.5, cy: canvas.height * 0.52 };
-		}
-		function proj(x, y, z) {
-			const dx = x - C.eye[0],
-				dy = y - C.eye[1],
-				dz = z - C.eye[2];
-			const pz = dx * C.fwd[0] + dy * C.fwd[1] + dz * C.fwd[2];
-			const s = C.f / Math.max(1, pz);
-			return [
-				C.cx + (dx * C.right[0] + dy * C.right[1] + dz * C.right[2]) * s,
-				C.cy - (dx * C.up[0] + dy * C.up[1] + dz * C.up[2]) * s,
-				s
-			];
-		}
-		// the point on the plate under a pixel: the hand reaches through the view
-		function unproj(px, py) {
-			const u = (px - C.cx) / C.f,
-				v = -(py - C.cy) / C.f;
-			const D = [
-				C.fwd[0] + C.right[0] * u + C.up[0] * v,
-				C.fwd[1] + C.right[1] * u + C.up[1] * v,
-				C.fwd[2] + C.right[2] * u + C.up[2] * v
-			];
-			if (Math.abs(D[2]) < 1e-6) return null;
-			const s = -C.eye[2] / D[2];
-			if (s <= 0) return null;
-			return [C.eye[0] + D[0] * s, C.eye[1] + D[1] * s];
-		}
-		// an affine frame on the plate around (x, y) with unit = r
-		function frameAt(x, y, r) {
-			const o = proj(x, y, 0),
-				a = proj(x + r, y, 0),
-				b = proj(x, y + r, 0);
-			return { ox: o[0], oy: o[1], ux: a[0] - o[0], uy: a[1] - o[1], vx: b[0] - o[0], vy: b[1] - o[1] };
-		}
+			S = 1,
+			cx = 0,
+			cy = 0,
+			R = 1;
 		function resize() {
 			const r = stage.getBoundingClientRect();
 			dpr = Math.min(window.devicePixelRatio || 1, 2);
 			W = Math.max(1, Math.round(r.width));
 			H = Math.max(1, Math.round(r.height));
-			S = Math.min(W, H) / FW;
 			canvas.width = Math.round(W * dpr);
 			canvas.height = Math.round(H * dpr);
-			hs = canvas.width < 1100 ? 0.5 : HS; // small frames keep a finer soft plate
-			plate.width = mask.width = Math.max(1, Math.round(canvas.width * hs));
-			plate.height = mask.height = Math.max(1, Math.round(canvas.height * hs));
+			S = Math.min(canvas.width, canvas.height);
+			cx = canvas.width * 0.5;
+			cy = canvas.height * 0.5;
+			R = 0.3 * S;
+			halo.width = Math.max(1, Math.round(canvas.width * HS));
+			halo.height = Math.max(1, Math.round(canvas.height * HS));
 		}
-		// the medium stops where each culture stops: a feather at every wall, no ring
-		function buildMask() {
-			mctx.setTransform(1, 0, 0, 1, 0, 0);
-			mctx.clearRect(0, 0, mask.width, mask.height);
-			for (const w of WELLS) {
-				const F = frameAt(w.x, w.y, R);
-				mctx.setTransform(F.ux * hs, F.uy * hs, F.vx * hs, F.vy * hs, F.ox * hs, F.oy * hs);
-				const g = mctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-				g.addColorStop(0, 'rgba(0,0,0,1)');
-				g.addColorStop(0.82, 'rgba(0,0,0,1)');
-				g.addColorStop(1, 'rgba(0,0,0,0)');
-				mctx.fillStyle = g;
-				mctx.beginPath();
-				mctx.arc(0, 0, 1, 0, 6.2832);
-				mctx.fill();
+		const N = 180;
+		function body(t, c = ctx, k = 1) {
+			c.beginPath();
+			for (let i = 0; i < N; i++) {
+				const th = (i / N) * TAU;
+				const rr = R * shape(th, t);
+				const x = (cx + Math.cos(th) * rr) * k,
+					y = (cy + Math.sin(th) * rr) * k;
+				if (i) c.lineTo(x, y);
+				else c.moveTo(x, y);
 			}
-			mctx.setTransform(1, 0, 0, 1, 0, 0);
+			c.closePath();
 		}
-		let ctx = ctx0;
-		function footprint(c, scale) {
-			const o = proj(c.x, c.y, 0),
-				ca = Math.cos(c.o),
-				sa = Math.sin(c.o),
-				A = c.size * c.aspect * scale,
-				B = c.size * scale;
-			const a = proj(c.x + ca * A, c.y + sa * A, 0),
-				b = proj(c.x - sa * B, c.y + ca * B, 0);
-			let ux = a[0] - o[0],
-				uy = a[1] - o[1],
-				vx = b[0] - o[0],
-				vy = b[1] - o[1];
-			const mm = Math.min(Math.hypot(ux, uy), Math.hypot(vx, vy));
-			if (mm < 0.7) {
-				const q = 0.7 / mm;
-				ux *= q;
-				uy *= q;
-				vx *= q;
-				vy *= q;
+		const rim = (th, t) => [cx + Math.cos(th) * R * shape(th, t), cy + Math.sin(th) * R * shape(th, t)];
+
+		// ---- the ask -------------------------------------------------------------
+		let tNow = 0;
+		let clock0 = -1;
+		let nextAt = -1; // when the instrument asks next
+		let count = 0;
+		function ask(th, dose, t) {
+			// the drop sets out near the edge of the frame, in the direction it came from, and fades in there
+			const far = 0.46 * S;
+			drops.push({ t0: t, th, dose, ox: cx + Math.cos(th) * far, oy: cy + Math.sin(th) * far, landed: false });
+		}
+		function land(d, t) {
+			d.landed = true;
+			d.t1 = t;
+			ripples.push({ t0: t, th: d.th, A: 0.05 * (0.5 + d.dose) });
+			answers.push({ t0: t + 0.12, th: d.th, dose: d.dose });
+			count++;
+			asked.set(count);
+			nextAt = t + (count < 3 ? AGAIN : REST);
+		}
+		function step(t) {
+			tNow = t;
+			if (clock0 >= 0 && nextAt >= 0 && t >= nextAt) {
+				nextAt = -1;
+				const i = count;
+				if (i < 3) ask(FROM[i], FIRST[i], t);
+				else ask(-TAU / 4 + (rnd() - 0.5) * 1.6, 0.4 + 0.5 * rnd(), t);
 			}
-			ctx.setTransform(ux, uy, vx, vy, o[0], o[1]);
-			ctx.beginPath();
-			ctx.arc(0, 0, 1, 0, 6.2832);
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			for (const d of drops) if (!d.landed && t - d.t0 >= TRAVEL) land(d, t);
+			while (drops.length && drops[0].landed && t - drops[0].t1 > 0.4) drops.shift();
+			while (ripples.length && t - ripples[0].t0 > 2) ripples.shift();
+			while (answers.length > 6) answers.shift();
 		}
 
+		// ---- the exposure --------------------------------------------------------
 		function render(t) {
-			camera(HOME);
-			buildMask();
 			ctx.setTransform(1, 0, 0, 1, 0, 0);
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.globalCompositeOperation = 'lighter';
+			// the answers now: how lit the body is, and from where
+			let lit = 0;
+			for (const a of answers) {
+				const tau = t - a.t0;
+				if (tau < 0) continue;
+				const env = smooth(tau / RISE) * (0.2 + 0.8 * Math.exp(-Math.max(0, tau - RISE) / FADE));
+				lit = Math.max(lit, a.dose * env);
+			}
+			const rest = mix(PRIMARY, BIOLUM, trace);
+			// the room's light on the cell: a halo beyond the membrane, warmer as it answers
+			{
+				const g = ctx.createRadialGradient(cx, cy, R * 0.85, cx, cy, R * 1.6);
+				const c = mix(rest, BIOLUM, lit);
+				g.addColorStop(0, rgba(c, 0.1 + 0.12 * lit));
+				g.addColorStop(0.45, rgba(c, 0.03 + 0.05 * lit));
+				g.addColorStop(1, rgba(c, 0));
+				ctx.fillStyle = g;
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+			}
+			// the body's soft light, on the halo plate: a bloom at the membrane that grows with the answer
+			hctx.setTransform(1, 0, 0, 1, 0, 0);
+			hctx.clearRect(0, 0, halo.width, halo.height);
+			hctx.globalCompositeOperation = 'lighter';
+			body(t, hctx, HS);
+			hctx.fillStyle = rgba(mix(rest, BIOLUM, lit), 0.08 + 0.09 * lit);
+			hctx.fill();
 			ctx.imageSmoothingEnabled = true;
 			ctx.imageSmoothingQuality = 'high';
-			// the medium, on the soft plate: in a changed well, the change spreading from where it entered
-			pctx.setTransform(1, 0, 0, 1, 0, 0);
-			pctx.clearRect(0, 0, plate.width, plate.height);
-			pctx.globalCompositeOperation = 'lighter';
-			for (const w of WELLS) {
-				if (!w.entry) continue;
-				const since = t - w.impactT;
-				if (since <= 0) continue;
-				const F = frameAt(w.x, w.y, R);
-				pctx.setTransform(F.ux * hs, F.uy * hs, F.vx * hs, F.vy * hs, F.ox * hs, F.oy * hs);
-				pctx.save();
-				pctx.beginPath();
-				pctx.arc(0, 0, 1, 0, 6.2832);
-				pctx.clip();
-				const ex = (w.entry[0] - w.x) / R,
-					ey = (w.entry[1] - w.y) / R;
-				const reach = 0.45 + 0.55 * w.dose,
-					rad = 2 * reach * Math.sqrt(Math.min(1, since / FRONT_T));
-				const held = (0.3 + 0.7 * Math.exp(-since / 6)) * (0.35 + 0.65 * w.dose);
-				const fg = pctx.createRadialGradient(ex, ey, 0, ex, ey, Math.max(0.01, rad * 1.25));
-				fg.addColorStop(0, rgba(PRIMARY, 0.13 * held));
-				fg.addColorStop(0.5, rgba(PRIMARY, 0.07 * held));
-				fg.addColorStop(0.8, rgba(PRIMARY, 0.025 * held));
-				fg.addColorStop(1, rgba(PRIMARY, 0));
-				pctx.fillStyle = fg;
-				pctx.fillRect(-1.2, -1.2, 2.4, 2.4);
-				if (since < 0.4) {
-					// the landing: a point where the change entered, then nothing
-					const g = pctx.createRadialGradient(ex, ey, 0, ex, ey, 6 / R);
-					g.addColorStop(0, rgba(PRIMARY, 0.5 * (1 - since / 0.4) * (0.5 + 0.5 * w.dose)));
-					g.addColorStop(1, rgba(PRIMARY, 0));
-					pctx.fillStyle = g;
-					pctx.fillRect(-1.2, -1.2, 2.4, 2.4);
-				}
-				pctx.restore();
-			}
-			pctx.setTransform(1, 0, 0, 1, 0, 0);
-			// the halo of answering cells, on the same plate: small, few, never stacked into a wash
-			for (const c of cells) {
-				let l = 0;
-				for (const e of c.events) l += e.a * kernel(t - e.t);
-				c.L = l;
-				if (l > 0.25) {
-					const o = proj(c.x, c.y, 0),
-						rr = Math.max(0.5, c.size * 2.6 * o[2] * hs);
-					const g = pctx.createRadialGradient(o[0] * hs, o[1] * hs, 0, o[0] * hs, o[1] * hs, rr);
-					g.addColorStop(0, rgba(BIOLUM, 0.16 * Math.min(1, l)));
-					g.addColorStop(1, rgba(BIOLUM, 0));
-					pctx.fillStyle = g;
-					pctx.beginPath();
-					pctx.arc(o[0] * hs, o[1] * hs, rr, 0, 6.2832);
-					pctx.fill();
-				}
-			}
-			pctx.globalCompositeOperation = 'destination-in';
-			pctx.drawImage(mask, 0, 0);
-			pctx.globalCompositeOperation = 'source-over';
-			ctx.globalCompositeOperation = 'lighter';
-			ctx.drawImage(plate, 0, 0, canvas.width, canvas.height);
-			// the watcher, under the plate: a field of plain light on the floor of the well it is under,
-			// the size of what it sees at once, with the hard edge a field has. The wall of the well hides it
-			// between wells, so it is seen only through a floor: the body of the plate is a body because it hides it
-			{
-				const w = watcher.a > 0.01 ? wellAt(watcher.x, watcher.y) : null;
-				if (w) {
-					const Fw = frameAt(w.x, w.y, R * 0.9);
-					ctx.save();
-					ctx.setTransform(Fw.ux, Fw.uy, Fw.vx, Fw.vy, Fw.ox, Fw.oy);
-					ctx.beginPath();
-					ctx.arc(0, 0, 1, 0, 6.2832);
-					ctx.clip();
-					const F = frameAt(watcher.x, watcher.y, FIELD);
-					ctx.setTransform(F.ux, F.uy, F.vx, F.vy, F.ox, F.oy);
-					const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-					g.addColorStop(0, rgba(WHITE, 0.1 * watcher.a));
-					g.addColorStop(0.86, rgba(WHITE, 0.1 * watcher.a));
-					g.addColorStop(1, rgba(WHITE, 0));
-					ctx.fillStyle = g;
-					ctx.beginPath();
-					ctx.arc(0, 0, 1, 0, 6.2832);
-					ctx.fill();
-					ctx.restore();
-					ctx.setTransform(1, 0, 0, 1, 0, 0);
-				}
-			}
-			// a change on its way in: it forms at the same fixed height above the well every time, waits
-			// (or is held), then falls under gravity. A bead of liquid, not a light: a solid body the size of
-			// its dose, with one point of the room's light on its shoulder, drawn out along its fall
-			for (const d of drops) {
-				const dt = t - d.t0;
-				if (dt < 0 || (!d.forming && t >= d.t1)) continue;
-				let z,
-					form,
-					fk = 0;
-				if (d.forming) {
-					z = DROP_H;
-					form = smooth(dt / 0.25); // it forms under the press, and grows while the press stays
-				} else {
-					fk = Math.max(0, Math.min(1, (dt - d.hover) / FALL));
-					z = DROP_H * (1 - fk * fk);
-					form = dt < d.hover ? smooth(dt / d.hover) : 1; // the instrument's forms before it is released
-				}
-				const o = proj(d.x, d.y, z),
-					u = proj(d.x, d.y, z + 1);
-				let gx = o[0] - u[0],
-					gy = o[1] - u[1];
-				const gl = Math.hypot(gx, gy) || 1;
-				gx /= gl;
-				gy /= gl;
-				const rb = Math.max(2.5, (3.5 + 4 * d.dose) * o[2]) * (0.6 + 0.4 * form),
-					along = rb * (1 + 1.3 * fk);
-				ctx.setTransform(-gy * rb, gx * rb, gx * along, gy * along, o[0], o[1]);
-				ctx.beginPath();
-				ctx.arc(0, 0, 1, 0, 6.2832);
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
-				ctx.fillStyle = rgba(mix(PRIMARY, WHITE, 0.2), 0.85 * form);
-				ctx.fill();
-				ctx.fillStyle = rgba(WHITE, 0.9 * form);
-				ctx.beginPath();
-				ctx.arc(o[0] - 0.3 * rb, o[1] - 0.35 * rb, Math.max(0.6, 0.22 * rb), 0, 6.2832);
-				ctx.fill();
-			}
-			// the cultures: every footprint, faint and still at rest; a cell that answered stays bright, so the
-			// plate itself keeps the result
-			for (const c of cells) {
-				const on = c.answered ? 1 : 0;
-				const rest = 0.11;
-				// in the watcher's field the cells are seen: each body distinct in plain light
-				const fd = Math.hypot(c.x - watcher.x, c.y - watcher.y) / FIELD;
-				const seen = fd < 1 ? 0.3 * (1 - fd ** 6) * watcher.a : 0;
-				ctx.fillStyle = rgba(
-					mix(mix(PRIMARY, BIOLUM, 0.7 * on), WHITE, 0.5 * seen),
-					rest + 0.3 * on + seen
-				);
-				footprint(c, 1);
-				ctx.fill();
-			}
-			// the answer, now: biolum body; a white core only at the top of the steepest answers, for an instant
-			for (const c of cells) {
-				if (c.L < 0.03) continue;
-				const l = Math.min(1, c.L);
-				ctx.fillStyle = rgba(mix(BIOLUM, WHITE, 0.35 * l * l), 0.75 * l);
-				footprint(c, 1 + 0.25 * l);
-				ctx.fill();
-				let recent = 0;
-				for (const e of c.events) {
-					const d = t - e.t;
-					if (e.caused && d > RISE * 0.6 && d < RISE + 0.22 && e.a > 0.8) recent = Math.max(recent, e.a);
-				}
-				if (recent) {
-					const o = proj(c.x, c.y, 0);
-					ctx.fillStyle = rgba(WHITE, Math.min(1, recent));
-					ctx.beginPath();
-					ctx.arc(o[0], o[1], Math.max(0.8, 1.2 * o[2]), 0, 6.2832);
-					ctx.fill();
-				}
-			}
-			// the exposure fades at the edges of the frame: the plate goes on, the frame does not cut it.
-			// An ellipse about the plate's centre, like the mark's exposure: no edge of it is straight
-			ctx.globalCompositeOperation = 'destination-in';
-			const CW = canvas.width,
-				CH = canvas.height;
+			ctx.drawImage(halo, 0, 0, canvas.width, canvas.height);
+			// the body: an interior that is almost dark, a membrane that holds the light
+			body(t);
 			ctx.save();
-			ctx.translate(CW * 0.5, CH * 0.52);
-			ctx.scale(CW * 0.5, CH * 0.5);
-			const vg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-			vg.addColorStop(0, 'rgba(0,0,0,1)');
-			vg.addColorStop(0.58, 'rgba(0,0,0,1)');
-			vg.addColorStop(0.98, 'rgba(0,0,0,0)');
-			ctx.fillStyle = vg;
-			ctx.fillRect(-1, -1.1, 2, 2.2);
+			ctx.clip();
+			{
+				const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * (1 + BREATH));
+				const edge = mix(rest, BIOLUM, lit);
+				g.addColorStop(0, rgba(rest, 0.04));
+				g.addColorStop(0.72, rgba(rest, 0.06));
+				g.addColorStop(0.9, rgba(edge, 0.16 + 0.1 * lit));
+				g.addColorStop(1, rgba(edge, 0.42 + 0.25 * lit));
+				ctx.fillStyle = g;
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+			}
+			for (const s of spots) {
+				const rr = R * shape(s.phi, t) * s.rho;
+				const x = cx + Math.cos(s.phi) * rr,
+					y = cy + Math.sin(s.phi) * rr,
+					sr = R * s.size;
+				const g = ctx.createRadialGradient(x, y, 0, x, y, sr);
+				g.addColorStop(0, rgba(mix(rest, BIOLUM, 0.5 * lit), 0.035 * s.a * (1 + 1.5 * lit)));
+				g.addColorStop(1, rgba(rest, 0));
+				ctx.fillStyle = g;
+				ctx.beginPath();
+				ctx.arc(x, y, sr, 0, TAU);
+				ctx.fill();
+			}
+			// the answers: a wave from where each drop touched, and the body lit behind it
+			for (const a of answers) {
+				const tau = t - a.t0;
+				if (tau < 0) continue;
+				const [px, py] = rim(a.th, t);
+				const env = smooth(tau / RISE) * (0.2 + 0.8 * Math.exp(-Math.max(0, tau - RISE) / FADE));
+				const L = a.dose * env;
+				const g = ctx.createRadialGradient(px, py, 0, px, py, R * 2.2);
+				g.addColorStop(0, rgba(BIOLUM, 0.34 * L));
+				g.addColorStop(0.35, rgba(BIOLUM, 0.14 * L));
+				g.addColorStop(1, rgba(BIOLUM, 0.03 * L));
+				ctx.fillStyle = g;
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				const wr = R * 2.4 * (tau / 0.7);
+				if (wr < R * 2.6) {
+					const w = ctx.createRadialGradient(px, py, Math.max(0, wr - 0.22 * R), px, py, wr + 0.22 * R);
+					const wa = 0.55 * a.dose * Math.exp(-tau / 0.9);
+					w.addColorStop(0, rgba(BIOLUM, 0));
+					w.addColorStop(0.5, rgba(mix(BIOLUM, WHITE, 0.4), wa));
+					w.addColorStop(1, rgba(BIOLUM, 0));
+					ctx.fillStyle = w;
+					ctx.fillRect(0, 0, canvas.width, canvas.height);
+				}
+			}
 			ctx.restore();
+			// the drops: a solid bead from outside the frame to the membrane, taken in on arrival
+			for (const d of drops) {
+				const tau = t - d.t0;
+				if (tau < 0) continue;
+				const [px, py] = rim(d.th, t);
+				let x, y, sx = 1, sy = 1, alpha = 1;
+				if (!d.landed) {
+					const u = Math.min(1, tau / TRAVEL);
+					const e = u * u; // it falls: slow to leave, fast to arrive
+					x = d.ox + (px - d.ox) * e;
+					y = d.oy + (py - d.oy) * e;
+					alpha = smooth(u / 0.3);
+				} else {
+					const v = Math.min(1, (t - d.t1) / 0.3);
+					x = px;
+					y = py;
+					sx = 1 + 0.5 * v;
+					sy = 1 - 0.7 * v;
+					alpha = 1 - smooth(v);
+				}
+				const rb = 0.042 * S * (0.6 + 0.5 * d.dose);
+				const c = Math.cos(d.th),
+					s = Math.sin(d.th);
+				ctx.globalCompositeOperation = 'source-over';
+				ctx.setTransform(-s * rb * sx, c * rb * sx, c * rb * sy, s * rb * sy, x, y);
+				ctx.beginPath();
+				ctx.arc(0, 0, 1, 0, TAU);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+				ctx.fillStyle = rgba(mix(PRIMARY, WHITE, 0.25), 0.92 * alpha);
+				ctx.fill();
+				ctx.fillStyle = rgba(WHITE, 0.95 * alpha);
+				ctx.beginPath();
+				ctx.arc(x - 0.3 * rb, y - 0.32 * rb, Math.max(0.8, 0.2 * rb), 0, TAU);
+				ctx.fill();
+				ctx.globalCompositeOperation = 'lighter';
+			}
 			ctx.globalCompositeOperation = 'source-over';
 		}
+		// a settled answer leaves a trace: the cell keeps what it was asked
+		let traced = 0;
+		function keep() {
+			while (traced < count) {
+				traced++;
+				trace = Math.min(0.35, trace + 0.05);
+			}
+		}
 
-		// ---- the hand: tap a well -----------------------------------------------
-		let tNow = 0;
-		function wellUnder(ev) {
-			const r = stage.getBoundingClientRect();
-			camera(HOME);
-			const pt = unproj((ev.clientX - r.left) * dpr, (ev.clientY - r.top) * dpr);
-			if (!pt) return null;
-			const w = wellAt(pt[0], pt[1]);
-			if (!w || !w.whole || Math.hypot(pt[0] - w.x, pt[1] - w.y) > R * 1.02) return null;
-			return w;
-		}
-		// one tap, one change, strong enough to be answered at once; the instrument follows it once the well has
-		function put(w) {
-			if (clock0 < 0) clock0 = tNow;
-			release(w, DOSE_HAND, tNow, 0, true);
-		}
-		// a click is a tap on every device, and never a scroll
+		// ---- the hand: a tap asks, from the side it came --------------------------
 		function onClick(ev) {
 			if (still) return;
-			const w = wellUnder(ev);
-			if (w) put(w);
+			const r = stage.getBoundingClientRect();
+			const x = (ev.clientX - r.left) * dpr - cx,
+				y = (ev.clientY - r.top) * dpr - cy;
+			const th = Math.atan2(y, x);
+			if (clock0 < 0) clock0 = tNow;
+			ask(th, TAP, tNow);
+			nextAt = -1; // the instrument waits for this answer, then follows
 		}
-		// the keyboard: the button after the plate puts a change into the next untouched well, from the centre out
-		const FROM_CENTRE = ['M1', 'M0', 'M2', 'T1', 'B1', 'T0', 'T2', 'B0', 'B2'];
-		putNext = () => {
+		askNext = () => {
 			if (still) return;
-			const w =
-				FROM_CENTRE.map((k) => NAMED[k]).find((o) => !o.doses.length && !plan.some((e) => e.w === o)) ||
-				NAMED.M1;
-			put(w);
+			if (clock0 < 0) clock0 = tNow;
+			ask(-TAU / 4 + (rnd() - 0.5) * 1.6, TAP, tNow);
+			nextAt = -1;
 		};
 		stage.addEventListener('click', onClick);
 
 		resize();
 		if (reduced) {
-			// one exposure: the instrument's own three changes, chosen one from the last, settled
 			still = true;
 			stillMode.set(true);
 			clock0 = 0;
-			schedule(ARRIVAL, NAMED.T1, DOSE_FIRST);
+			nextAt = ARRIVAL;
 			let t = 0;
-			for (let i = 0; i < 60 * 24; i++) {
+			for (let i = 0; i < 60 * 9; i++) {
 				t = i / 60;
-				tNow = t;
-				stepProcess(t);
+				step(t);
+				keep();
 			}
 			render(t);
 			live = true;
@@ -710,26 +339,22 @@
 		render(0);
 		live = true;
 
-		// the clock starts when the visitor arrives at the plate and runs on from there: the instrument keeps
-		// working its row while the plate is off-screen, so a reader who scrolls on finds the record with its
-		// curve. The plate is only drawn while it is in view
-		let t = 0;
-		let lastNow = 0;
-		let frame = 0;
-		let visible = false;
-		let arrived = false;
+		let t = 0,
+			lastNow = 0,
+			frame = 0,
+			visible = false,
+			arrived = false;
 		function tick(now) {
 			if (visible || clock0 >= 0) {
 				const dms = lastNow ? Math.min(100, now - lastNow) : 16;
 				t += dms / 1000;
 				lastNow = now;
-				tNow = t;
 				if (arrived && clock0 < 0) {
 					clock0 = t;
-					// the instrument's one change on arrival: this is where a change goes in, and what it does
-					schedule(t + ARRIVAL, NAMED.T1, DOSE_FIRST);
+					nextAt = t + ARRIVAL;
 				}
-				stepProcess(t);
+				step(t);
+				keep();
 				if (visible) render(t);
 			} else lastNow = 0;
 			frame = requestAnimationFrame(tick);
@@ -753,17 +378,16 @@
 	});
 </script>
 
-<!-- the plate is a picture to the page; the one thing a hand can do to it is wired on the stage in the
-     script, and the keyboard gets the same thing as a button after it -->
+<!-- the cell is a picture to the page; a click on it asks, wired on the stage in the script, and the
+     keyboard gets the same thing as a button after it -->
 <div class="stage" class:still bind:this={stage} role="img" aria-label={m.a11y.figure}>
 	<canvas class="instrument" class:shown={live} bind:this={canvas} aria-hidden="true"></canvas>
 </div>
 {#if !still}
-	<button class="put" type="button" on:click={() => putNext()}>{m.a11y.put}</button>
+	<button class="put" type="button" on:click={() => askNext()}>{m.a11y.put}</button>
 {/if}
 
 <style>
-	/* the plate's own box, square: the exposure fades to nothing before any edge of it */
 	.stage {
 		position: relative;
 		width: 100%;
@@ -815,5 +439,4 @@
 	.instrument.shown {
 		opacity: 1;
 	}
-
 </style>

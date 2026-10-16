@@ -3,8 +3,7 @@
 	import PartnershipInquiry from '$lib/components/forms/PartnershipInquiry.svelte';
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
-	import Record from '$lib/components/diagrams/Record.svelte';
-	import { counts, stillMode, result } from '$lib/components/diagrams/bench.js';
+	import { asked, stillMode } from '$lib/components/diagrams/cell.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -27,21 +26,16 @@
 	let showContact = false;
 	let showUpdates = false;
 
-	/** the one line that counts the record: how many changes, how many of them the instrument's */
+	/** the one line under the figure: how many times the cell has been asked */
 	$: countLine = $stillMode
 		? m.record.still
-		: $counts.n === 0
+		: $asked === 0
 			? m.record.none
-			: $counts.n === 1
+			: $asked === 1
 				? m.record.one
-				: m.record.many.replace('{n}', String($counts.n)).replace('{k}', String($counts.k));
-
-	/** the answer of the latest row with three answers, in words, under the large record */
-	$: resultLine = $result
-		? m.readout.result
-				.replace('{n}', String($result.n))
-				.replace('{k}', m.readout.ordinals[$result.k - 1] ?? String($result.k))
-		: m.readout.resultNone;
+				: $asked === 2
+					? m.record.two
+					: m.record.many.replace('{n}', String($asked));
 </script>
 
 <svelte:head>
@@ -88,7 +82,7 @@
 	</div>
 </section>
 
-<!-- 01 · the bench: the plate on the right, the words and the record on the left, one screen -->
+<!-- 01 · one cell, kept: the cell on the right, the words on the left, one screen -->
 <section id="dish-section" class="level bench" aria-labelledby="dish-heading">
 	<div class="bench-grid">
 		<div class="bench-words">
@@ -99,9 +93,6 @@
 				>
 			</h2>
 			<p class="bench-lede" use:reveal={{ delay: 90 }}>{m.dish.lede}</p>
-			<div class="bench-record" use:reveal={{ delay: 120 }}>
-				<Record />
-			</div>
 			<p class="bench-count" aria-live="polite">{countLine}</p>
 			<p class="horizon bench-horizon" use:reveal={{ delay: 150 }}>{m.dish.horizon}</p>
 		</div>
@@ -111,7 +102,7 @@
 	</div>
 </section>
 
-<!-- 02 · readout: the same wells, large, and what comes back -->
+<!-- 02 · readout: what comes back -->
 <section id="readout-section" class="level readout" aria-labelledby="readout-heading">
 	<div class="content readout-grid">
 		<div class="readout-words">
@@ -128,10 +119,6 @@
 					rel="noopener noreferrer">{m.readout.pLink}</a
 				>{m.readout.pAfter}
 			</p>
-		</div>
-		<div class="readout-record" use:reveal={{ delay: 120 }}>
-			<Record large />
-			<p class="readout-result" aria-live="polite">{resultLine}</p>
 		</div>
 	</div>
 </section>
@@ -629,10 +616,6 @@
 		display: block;
 	}
 
-	.bench-record {
-		width: min(100%, 24rem);
-	}
-
 	.bench-lede {
 		max-width: 40ch;
 		margin: 0 !important;
@@ -650,9 +633,9 @@
 		margin: 0 !important;
 	}
 
-	/* the plate's field: square, as tall as the screen allows, its right lobe free to run off */
+	/* the cell's field: square, as tall as the screen allows */
 	.bench-plate {
-		width: min(100%, 88svh);
+		width: min(100%, 86svh);
 		justify-self: end;
 	}
 
@@ -660,9 +643,7 @@
 
 	.readout-grid {
 		display: grid;
-		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-		column-gap: 3rem;
-		align-items: center;
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.readout h2 {
@@ -678,17 +659,8 @@
 		color: var(--ink-50);
 	}
 
-	.readout-result {
-		max-width: 52ch;
-		margin: 1.2rem auto 0 !important;
-		text-align: center;
-	}
 
-	.readout-record {
-		width: 100%;
-	}
-
-	/* narrow or upright: the words above, the plate below them, the record under the plate */
+	/* narrow or upright: the words above, the cell below them, the count under it */
 	@media (max-width: 63.99rem), (orientation: portrait) {
 		.bench {
 			align-content: start;
@@ -712,18 +684,8 @@
 
 		.bench-plate {
 			order: 1;
-			width: min(100%, 36svh);
+			width: min(100%, 46svh);
 			justify-self: center;
-		}
-
-		/* a strip on a phone, so the whole bench stays on one screen (664px with the browser's bars) */
-		.bench-record {
-			order: 2;
-			width: min(100%, 15rem);
-		}
-
-		.bench-record :global(.field) {
-			aspect-ratio: 3 / 1;
 		}
 
 		.bench-lede {
@@ -744,10 +706,6 @@
 			line-height: 1.5 !important;
 		}
 
-		.readout-result {
-			text-align: left;
-			margin-inline: 0 !important;
-		}
 
 		.readout-grid {
 			grid-template-columns: minmax(0, 1fr);

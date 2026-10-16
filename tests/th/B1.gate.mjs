@@ -8,7 +8,7 @@ const DENY = existsSync(new URL('./_deny.local.mjs', import.meta.url))
 	? (await import('./_deny.local.mjs')).B1
 	: [];
 
-test('one well, one gesture: a canvas exposure with no props, no labels, no equipment', () => {
+test('one cell, one gesture: a canvas exposure with no props, no labels, no equipment', () => {
 	const { source, warnings } = compileSvelte(FILE);
 	assert.equal(warnings.length, 0, `warnings: ${warnings.map((w) => w.code).join(', ')}`);
 	assert.doesNotMatch(source, /export let/, 'no props');
@@ -17,7 +17,7 @@ test('one well, one gesture: a canvas exposure with no props, no labels, no equi
 	assert.match(source, /<button class="put"[\s\S]*?\{m\.a11y\.put\}/, 'the keyboard gets the one gesture as a button');
 	assert.doesNotMatch(source, /role="application"|tabindex=/, 'no widget grammar for the plate itself');
 	assert.doesNotMatch(source, /<svg|<li |class="label/, 'no SVG ink, no caption rows');
-	assert.doesNotMatch(source, /lens|cone|gantry|pipette/i, 'no equipment drawn or named');
+	assert.doesNotMatch(source, /lens|cone|gantry|pipette|nucleus|membrane diagram/i, 'no equipment drawn or named, no diagram of a cell');
 	assert.doesNotMatch(source, /\.stroke\(\)|strokeStyle|lineWidth/, 'nothing outlined: every light is a field or a point');
 });
 

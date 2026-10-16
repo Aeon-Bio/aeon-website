@@ -19,23 +19,21 @@ export const ja: Messages = {
 		cue: 'しくみを見る'
 	},
 	dish: {
-		h2a: 'ひとりの人の、細胞。',
-		h2b: '一滴が、ひとつの問い。\n光が、その答え。',
-		lede: 'ひとりの人から採った数千の細胞が、鉛筆の先ほどのウェルに入っている。一滴は、薬であり、量であり、条件。細胞が答えたら、次の問いはその答えから決まる。',
+		h2a: 'ひとりの人の、細胞がひとつ。',
+		h2b: 'たずねて、手放さない。',
+		lede: '何かが届く。細胞は、光で答える。次の問いは、同じ細胞に。生きたまま。測るために壊されることは、ない。',
 		horizon: 'この先にあるのは、治療の前に、その人自身の細胞にたずねる病院。'
 	},
 	record: {
-		none: 'まだ、問いはない。',
-		one: '問いはひとつ。装置がたずねたもの。',
-		many: '問いは{n}つ。うち{k}つは装置が。',
-		still: '問いをひとつ。その答えから、さらにふたつ。たずねない列が、ひとつ。'
+		none: 'まだ、たずねていない。',
+		one: '一度、たずねた。同じ細胞。',
+		two: '二度、たずねた。同じ細胞が、生きたまま。',
+		many: '{n}回、たずねた。同じ細胞が、生きたまま。',
+		still: '三度、たずねた。同じ細胞が、生きたまま。'
 	},
 	readout: {
 		h2a: '返ってくるのは、答え。',
 		h2b: 'この細胞には、\nどの条件を、どの強さで。',
-		result: 'ひとつの列に、{n}つの強さ。半分が応えたのにいちばん近いのは、{k}。この細胞には、これ。',
-		resultNone: '最初の列を、まだたずねている。',
-		ordinals: ['ひとつめ', 'ふたつめ', 'みっつめ', 'よっつめ', 'いつつめ'],
 		pBefore:
 			'ロボットが設定する条件の一つひとつが摂動であり、撮影する一コマ一コマが測定です。その時系列から、細胞がどう応答するかの因果モデルを推定します。カレン・サックスが単一細胞の摂動データに対して ',
 		pLink: 'Science（2005）',
@@ -163,8 +161,8 @@ export const ja: Messages = {
 	a11y: {
 		mark: 'aeon のマーク。長時間露光で撮影したローレンツ・アトラクター',
 		figure:
-			'標準プレートの一部を長時間露光で写したもの。変化が来る側、上から見ている。どのウェルの底にも一つひとつの細胞の培養があり、変化が入るウェルの下に、観察者の光が見える。来たときに、装置がひとつのウェルに変化をひとつ入れる。液滴が落ち、変化は入った場所から広がり、細胞はそれぞれのタイミングで応える、あるいは応えない。触れていないウェルのすぐ隣で。そのウェルが応え終わると、装置が同じ列の次のウェルに次の変化を自分で入れる。応えた細胞が少なければ強く、多ければ弱く。ウェルをタップ、またはクリックすると、変化がもうひとつ入り、装置は同じように続ける。誰も触れない列は、そのまま。プレートの横の記録には、変化したウェルが順に並び、それぞれの下に入れた液滴がある。',
-		put: '次のウェルに、変化をひとつ入れる。'
+			'生きた細胞がひとつ、暗がりに大きく、ゆっくり呼吸している。画面の外から一滴が届き、細胞のふちに波を立てて取り込まれる。細胞は光で答える。触れたところから波が広がり、与えられた分だけ全体が明るくなって、やがて落ち着く。前より少し、明るいまま。次の一滴も、同じ細胞に。来たときに装置が三度たずねる。少し、多すぎ、そのあいだ。それからは、ゆっくりたずね続ける。細胞をタップ、またはクリックすると、触れた側から一滴が届く。細胞が取り除かれることは、ない。',
+		put: '細胞にたずねる。'
 	}
 };
 
@@ -178,17 +176,17 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'dish.h2a',
-		note: 'ひとりの人の、細胞。: the plate named in one phrase (体言止め); check the comma pause reads as the card does.',
+		note: 'ひとりの人の、細胞がひとつ。: one person, one cell (体言止め); confirm 細胞がひとつ reads as "a single cell" and not as a count.',
 		open: true
 	},
 	{
 		key: 'dish.h2b',
-		note: '一滴が、ひとつの問い。光が、その答え。: a bead is a question, the light the answer; confirm 一滴 for a dispensed drop and 問い for a condition put to cells.',
+		note: 'たずねて、手放さない。: asked and kept; confirm 手放さない carries "never discarded" for a living sample.',
 		open: true
 	},
 	{
 		key: 'dish.lede',
-		note: 'The naming sentence: 採った数千の細胞 / 鉛筆の先ほどのウェル / 薬であり、量であり、条件; confirm 量 reads as dose here and that 問い carries through.',
+		note: '何かが届く / 光で答える / 生きたまま / 測るために壊されることは、ない: confirm the last clause reads as a plain fact about destructive assays, not as a boast.',
 		open: true
 	},
 	{
@@ -198,22 +196,17 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'record.many',
-		note: '問いは{n}つ。うち{k}つは装置が。: one line at 390; confirm つ (not 件) is right for 問い.',
-		open: true
-	},
-	{
-		key: 'readout.result',
-		note: 'Live sentence: {n} strengths, {k} = ひとつめ/ふたつめ/みっつめ; confirm 半分が応えたのにいちばん近い reads naturally.',
+		note: '{n}回、たずねた。同じ細胞が、生きたまま。: one line at 390; confirm 回 and the 体言止め close.',
 		open: true
 	},
 	{
 		key: 'a11y.figure',
-		note: 'The figure description, rewritten for the tap: confirm 入れる/応える and タップ、またはクリック read naturally.',
+		note: 'The figure description, rewritten for the cell: confirm 取り込まれる for a drop taken in at the membrane and 少し、多すぎ、そのあいだ for the three strengths.',
 		open: true
 	},
 	{
 		key: 'a11y.put',
-		note: '次のウェルに、変化をひとつ入れる。: the keyboard button; 体言止め would be 変化をひとつ。 but a button names an action.',
+		note: '細胞にたずねる。: the keyboard button names an action.',
 		open: true
 	},
 	{

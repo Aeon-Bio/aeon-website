@@ -19,28 +19,25 @@ export const en = {
 		cue: 'See how it works'
 	},
 	dish: {
-		h2a: 'One person’s cells.',
-		h2b: 'Each bead is a question. The light is their answer.',
-		// the sentence that names what is on the plate, beside it
-		lede: 'A few thousand cells from one person, in a well the size of a pencil’s end. A bead is a drug, a dose, a condition. Once the cells have answered, the next question follows from the answer.',
-		// where this points, within one scroll of the plate
+		h2a: 'One person’s cell.',
+		h2b: 'Asked, and kept.',
+		// the sentence that names what is on the screen, beside it
+		lede: 'Something arrives. The cell answers in light. The next question comes to the same cell, alive. It is never thrown away to be read.',
+		// where this points, within one scroll of the figure
 		horizon: 'Where this points: a hospital asking a person’s own cells before it treats them.'
 	},
 	record: {
-		// the one line under the record: how many questions are on the plate, and how many of them the instrument asked
-		none: 'No question asked yet.',
-		one: 'One question on the plate, the instrument’s.',
-		many: '{n} questions on the plate, {k} of them the instrument’s.',
+		// the one line under the figure: how many times the cell has been asked
+		none: 'Not yet asked.',
+		one: 'Asked once. The same cell.',
+		two: 'Asked twice. The same cell, alive.',
+		many: 'Asked {n} times. The same cell, alive.',
 		// reduced motion: the still exposure's one sentence
-		still: 'One question, then two more chosen from its answer; a row never asked.'
+		still: 'Asked three times. The same cell, alive.'
 	},
 	readout: {
 		h2a: 'What comes back is an answer.',
 		h2b: 'Which condition, at which strength, for these cells.',
-		// the result of the latest row with three answers, under the large record; {n} strengths, {k} an ordinal word
-		result: 'Of {n} strengths in one row, the {k} came closest to half the cells answering. That is what comes back: for these cells, this one.',
-		resultNone: 'The first row is still being asked.',
-		ordinals: ['first', 'second', 'third', 'fourth', 'fifth'],
 		pBefore:
 			'Every condition the robot sets is a perturbation; every frame is a measurement. From that time series we fit a causal model of how the cells respond, the approach Karen Sachs introduced for single-cell perturbation data in ',
 		pLink: 'Science (2005)',
@@ -170,7 +167,7 @@ export const en = {
 	a11y: {
 		mark: 'aeon mark, a Lorenz attractor photographed as a long exposure',
 		figure:
-			'Part of a standard plate as a long exposure, seen from over it where changes come from. Cultures of individual cells sit on the floor of every well, and a watcher’s light shows under the well that is being changed. As you arrive the instrument puts one change into one well: a bead falls in, the change spreads from where it entered, and the cells answer with their own timing, or not, in place beside the wells that were not touched. Once that well has answered, the instrument puts the next change into the next well of the row by itself, stronger if few cells answered and weaker if many. Tap or click a well and one more change goes in; the instrument follows it the same way. A row nobody touches stays as it is. Beside the plate, the record shows the changed wells in order with the bead that went into each one under it.',
-		put: 'Put a change into the next well.'
+			'One living cell, large, in the dark, breathing slowly. A drop arrives from outside the frame and is taken in at the cell’s edge with a ripple. The cell answers in light, a wave from where the drop touched, the whole body brightening by how much it was given, then settling a little brighter than before. The next drop comes to the same cell. The instrument asks three times as you arrive, a little, too much, then between, and keeps asking at a slower pace. Tap or click the cell and a drop comes from the side you touched. The cell is never removed.',
+		put: 'Ask the cell.'
 	}
 } as const;
