@@ -19,26 +19,32 @@ export const en = {
 		cue: 'See how it works'
 	},
 	dish: {
-		h2a: 'Put something in.',
-		h2b: 'The cells answer in place. The next change follows from the answer.'
+		h2a: 'One person’s cells.',
+		h2b: 'Each bead is a question. The light is their answer.',
+		// the sentence that names what is on the plate, beside it
+		lede: 'A few thousand cells from one person, in a well the size of a pencil’s end. A bead is a drug, a dose, a condition. Once the cells have answered, the next question follows from the answer.',
+		// where this points, within one scroll of the plate
+		horizon: 'Where this points: a hospital asking a person’s own cells before it treats them.'
 	},
 	record: {
-		// the one line under the record: how many changes are on the plate, and how many of them the instrument put in
-		none: 'Nothing has changed yet.',
-		one: 'One change on the plate, the instrument’s.',
-		many: '{n} changes on the plate, {k} of them the instrument’s.',
+		// the one line under the record: how many questions are on the plate, and how many of them the instrument asked
+		none: 'No question asked yet.',
+		one: 'One question on the plate, the instrument’s.',
+		many: '{n} questions on the plate, {k} of them the instrument’s.',
 		// reduced motion: the still exposure's one sentence
-		still: 'One change, then two more chosen from its answer; a row never touched.'
+		still: 'One question, then two more chosen from its answer; a row never asked.'
 	},
 	readout: {
-		h2a: 'What comes back is a model.',
-		h2b: 'Which conditions make these cells work, with the evidence attached.',
+		h2a: 'What comes back is an answer.',
+		h2b: 'Which condition, at which strength, for these cells.',
+		// the result of the latest row with three answers, under the large record; {n} strengths, {k} an ordinal word
+		result: 'Of {n} strengths in one row, the {k} came closest to half the cells answering. That is what comes back: for these cells, this one.',
+		resultNone: 'The first row is still being asked.',
+		ordinals: ['first', 'second', 'third', 'fourth', 'fifth'],
 		pBefore:
 			'Every condition the robot sets is a perturbation; every frame is a measurement. From that time series we fit a causal model of how the cells respond, the approach Karen Sachs introduced for single-cell perturbation data in ',
 		pLink: 'Science (2005)',
-		pAfter: '.',
-		horizon:
-			'Where this points: an instrument a lab or a hospital can own, asking a person’s own cells which conditions make them work.'
+		pAfter: '.'
 	},
 	founders: {
 		h2: 'Founders',

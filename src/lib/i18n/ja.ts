@@ -19,24 +19,27 @@ export const ja: Messages = {
 		cue: 'しくみを見る'
 	},
 	dish: {
-		h2a: 'ひとつ、入れてみる。',
-		h2b: '細胞はその場で応える。\n次の変化は、その答えから。'
+		h2a: 'ひとりの人の、細胞。',
+		h2b: '一滴が、ひとつの問い。\n光が、その答え。',
+		lede: 'ひとりの人から採った数千の細胞が、鉛筆の先ほどのウェルに入っている。一滴は、薬であり、量であり、条件。細胞が答えたら、次の問いはその答えから決まる。',
+		horizon: 'この先にあるのは、治療の前に、その人自身の細胞にたずねる病院。'
 	},
 	record: {
-		none: 'まだ、何も変えていない。',
-		one: '変化はひとつ。装置が入れたもの。',
-		many: '変化は{n}つ。うち{k}つは装置が。',
-		still: '変化をひとつ。その答えから、さらにふたつ。何も加えない列が、ひとつ。'
+		none: 'まだ、問いはない。',
+		one: '問いはひとつ。装置がたずねたもの。',
+		many: '問いは{n}つ。うち{k}つは装置が。',
+		still: '問いをひとつ。その答えから、さらにふたつ。たずねない列が、ひとつ。'
 	},
 	readout: {
-		h2a: '返ってくるのは、モデル。',
-		h2b: 'どの条件で、この細胞が\nよく機能するのか。根拠つきで。',
+		h2a: '返ってくるのは、答え。',
+		h2b: 'この細胞には、\nどの条件を、どの強さで。',
+		result: 'ひとつの列に、{n}つの強さ。半分が応えたのにいちばん近いのは、{k}。この細胞には、これ。',
+		resultNone: '最初の列を、まだたずねている。',
+		ordinals: ['ひとつめ', 'ふたつめ', 'みっつめ', 'よっつめ', 'いつつめ'],
 		pBefore:
 			'ロボットが設定する条件の一つひとつが摂動であり、撮影する一コマ一コマが測定です。その時系列から、細胞がどう応答するかの因果モデルを推定します。カレン・サックスが単一細胞の摂動データに対して ',
 		pLink: 'Science（2005）',
-		pAfter: ' で示した手法です。',
-		horizon:
-			'この先にあるのは、研究室や病院が自分で持てる装置。その人自身の細胞に、どの条件でよく働くのかを直接たずねる。'
+		pAfter: ' で示した手法です。'
 	},
 	founders: {
 		h2: '創業者',
@@ -175,17 +178,32 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'dish.h2a',
-		note: 'ひとつ、入れてみる。: an invitation without an imperative; check 入れてみる against the card register.',
+		note: 'ひとりの人の、細胞。: the plate named in one phrase (体言止め); check the comma pause reads as the card does.',
 		open: true
 	},
 	{
 		key: 'dish.h2b',
-		note: '次の変化は、その答えから。: the loop in one phrase; check that 答えから reads as "decided from the answer".',
+		note: '一滴が、ひとつの問い。光が、その答え。: a bead is a question, the light the answer; confirm 一滴 for a dispensed drop and 問い for a condition put to cells.',
+		open: true
+	},
+	{
+		key: 'dish.lede',
+		note: 'The naming sentence: 採った数千の細胞 / 鉛筆の先ほどのウェル / 薬であり、量であり、条件; confirm 量 reads as dose here and that 問い carries through.',
+		open: true
+	},
+	{
+		key: 'dish.horizon',
+		note: '治療の前に、その人自身の細胞にたずねる病院。: the horizon; confirm it does not read as a clinic selling unproven therapy (再生医療等安全性確保法 context).',
 		open: true
 	},
 	{
 		key: 'record.many',
-		note: '変化は{n}つ。うち{k}つは装置が。: shortened to hold one line at 390; confirm the elided 入れたもの reads naturally and that つ (not 件) is right for 変化.',
+		note: '問いは{n}つ。うち{k}つは装置が。: one line at 390; confirm つ (not 件) is right for 問い.',
+		open: true
+	},
+	{
+		key: 'readout.result',
+		note: 'Live sentence: {n} strengths, {k} = ひとつめ/ふたつめ/みっつめ; confirm 半分が応えたのにいちばん近い reads naturally.',
 		open: true
 	},
 	{
@@ -196,11 +214,6 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	{
 		key: 'a11y.put',
 		note: '次のウェルに、変化をひとつ入れる。: the keyboard button; 体言止め would be 変化をひとつ。 but a button names an action.',
-		open: true
-	},
-	{
-		key: 'readout.horizon',
-		note: 'その人自身の細胞に…直接たずねる: the horizon line; confirm the register stays with the card.',
 		open: true
 	},
 	{

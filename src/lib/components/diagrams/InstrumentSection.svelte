@@ -26,7 +26,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { useMessages } from '$lib/i18n';
-	import { bench, addPoint, resetBench, nextDose, stillMode, WELL_R } from './bench.js';
+	import { bench, addPoint, resetBench, nextDose, readRows, stillMode, WELL_R } from './bench.js';
 	const m = useMessages();
 
 	const FW = 800;
@@ -355,6 +355,7 @@
 				if (t >= p.born) p.f = fractionOf(w);
 				if (t >= p.settledAt) {
 					p.settled = true;
+					readRows();
 					follow(w, t);
 				}
 			}

@@ -20,6 +20,10 @@ export const bench = {
 export const counts = writable({ n: 0, k: 0 });
 /** reduced motion: the plate is one still exposure, and the count line says so in one sentence */
 export const stillMode = writable(false);
+/** the answer a row gave, once three of its questions have been answered: how many strengths were
+ *  tried in that row, and which of them (1-based, in the order asked) came closest to half the cells
+ *  answering. null until a row has three answers */
+export const result = writable(/** @type {null | { n: number, k: number }} */ (null));
 
 let nextId = 1;
 /** @returns {Point} */
@@ -33,6 +37,30 @@ export function addPoint(dose, mine, well, born, settledAt) {
 export function resetBench() {
 	bench.points.length = 0;
 	counts.set({ n: 0, k: 0 });
+	result.set(null);
+}
+
+/** read every row: the latest row with three settled answers names the strength nearest the half-answer */
+export function readRows() {
+	const rows = new Map();
+	for (const p of bench.points) {
+		if (!p.settled) continue;
+		const r = p.well.r;
+		if (!rows.has(r)) rows.set(r, []);
+		rows.get(r).push(p);
+	}
+	let best = null;
+	for (const pts of rows.values()) {
+		if (pts.length < 3) continue;
+		const last = Math.max(...pts.map((p) => p.settledAt));
+		if (best && last < best.last) continue;
+		let k = 0;
+		pts.forEach((p, i) => {
+			if (Math.abs(p.f - 0.5) < Math.abs(pts[k].f - 0.5)) k = i;
+		});
+		best = { n: pts.length, k: k + 1, last };
+	}
+	result.set(best ? { n: best.n, k: best.k } : null);
 }
 
 /** the wells that have been changed, in the order they first were, each with its latest change */

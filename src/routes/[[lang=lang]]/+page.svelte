@@ -4,7 +4,7 @@
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
 	import Record from '$lib/components/diagrams/Record.svelte';
-	import { counts, stillMode } from '$lib/components/diagrams/bench.js';
+	import { counts, stillMode, result } from '$lib/components/diagrams/bench.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -35,6 +35,13 @@
 			: $counts.n === 1
 				? m.record.one
 				: m.record.many.replace('{n}', String($counts.n)).replace('{k}', String($counts.k));
+
+	/** the answer of the latest row with three answers, in words, under the large record */
+	$: resultLine = $result
+		? m.readout.result
+				.replace('{n}', String($result.n))
+				.replace('{k}', m.readout.ordinals[$result.k - 1] ?? String($result.k))
+		: m.readout.resultNone;
 </script>
 
 <svelte:head>
@@ -91,10 +98,12 @@
 					>{#each lines(m.dish.h2b) as part, i}{#if i}<br />{/if}{part}{/each}</em
 				>
 			</h2>
+			<p class="bench-lede" use:reveal={{ delay: 90 }}>{m.dish.lede}</p>
 			<div class="bench-record" use:reveal={{ delay: 120 }}>
 				<Record />
 			</div>
 			<p class="bench-count" aria-live="polite">{countLine}</p>
+			<p class="horizon bench-horizon" use:reveal={{ delay: 150 }}>{m.dish.horizon}</p>
 		</div>
 		<div class="bench-plate">
 			<InstrumentSection />
@@ -119,10 +128,10 @@
 					rel="noopener noreferrer">{m.readout.pLink}</a
 				>{m.readout.pAfter}
 			</p>
-			<p class="horizon" use:reveal={{ delay: 140 }}>{m.readout.horizon}</p>
 		</div>
 		<div class="readout-record" use:reveal={{ delay: 120 }}>
 			<Record large />
+			<p class="readout-result" aria-live="polite">{resultLine}</p>
 		</div>
 	</div>
 </section>
@@ -624,11 +633,21 @@
 		width: min(100%, 24rem);
 	}
 
+	.bench-lede {
+		max-width: 40ch;
+		margin: 0 !important;
+	}
+
 	.bench-count {
 		font-size: 0.92rem !important;
 		color: var(--ink-50) !important;
 		margin: 0 !important;
 		min-height: 1.5em;
+	}
+
+	.bench-horizon {
+		max-width: 40ch;
+		margin: 0 !important;
 	}
 
 	/* the plate's field: square, as tall as the screen allows, its right lobe free to run off */
@@ -655,9 +674,14 @@
 		max-width: 40ch;
 	}
 
-	.readout .horizon {
+	.horizon {
 		color: var(--ink-50);
-		margin-top: 1.6rem;
+	}
+
+	.readout-result {
+		max-width: 52ch;
+		margin: 1.2rem auto 0 !important;
+		text-align: center;
 	}
 
 	.readout-record {
@@ -668,12 +692,12 @@
 	@media (max-width: 63.99rem), (orientation: portrait) {
 		.bench {
 			align-content: start;
-			padding-block: 5svh 2rem;
+			padding-block: 3svh 2rem;
 		}
 
 		.bench-grid {
 			grid-template-columns: minmax(0, 1fr);
-			row-gap: 0.9rem;
+			row-gap: 0.7rem;
 		}
 
 		.bench-words {
@@ -681,29 +705,48 @@
 		}
 
 		.bench h2 {
-			font-size: clamp(1.5rem, 4.8vw, 2.2rem);
+			font-size: clamp(1.4rem, 4.4vw, 2.2rem);
 			max-width: 30ch;
 			order: 0;
 		}
 
 		.bench-plate {
 			order: 1;
-			width: min(100%, 50svh);
+			width: min(100%, 36svh);
 			justify-self: center;
 		}
 
 		/* a strip on a phone, so the whole bench stays on one screen (664px with the browser's bars) */
 		.bench-record {
 			order: 2;
-			width: min(100%, 18rem);
+			width: min(100%, 15rem);
 		}
 
 		.bench-record :global(.field) {
 			aspect-ratio: 3 / 1;
 		}
 
+		.bench-lede {
+			order: 0;
+			max-width: 58ch;
+			font-size: 0.95rem !important;
+			line-height: 1.5 !important;
+		}
+
 		.bench-count {
 			order: 3;
+		}
+
+		.bench-horizon {
+			order: 4;
+			max-width: 58ch;
+			font-size: 0.95rem !important;
+			line-height: 1.5 !important;
+		}
+
+		.readout-result {
+			text-align: left;
+			margin-inline: 0 !important;
 		}
 
 		.readout-grid {

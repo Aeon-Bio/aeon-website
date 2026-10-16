@@ -67,8 +67,12 @@ test('the record: the changed wells drawn as themselves, the bead that went in u
 });
 
 test('the words name the bench: two halves, one count line, no beats', () => {
-	assert.equal(en.dish.h2a, 'Put something in.');
-	assert.match(en.dish.h2b, /next change follows from the answer/);
+	assert.equal(en.dish.h2a, 'One person’s cells.');
+	assert.match(en.dish.h2b, /bead is a question/);
+	assert.match(en.dish.lede, /next question follows from the answer/, 'the lede names cells, question, answer and the loop');
+	assert.match(en.dish.horizon, /hospital/, 'the horizon sits beside the plate');
+	assert.match(en.readout.result, /\{n\}.*\{k\}/, 'the readout says the row\'s answer in words');
+	assert.equal(typeof benchMod.readRows, 'function');
 	assert.ok(!('beats' in en), 'beats are gone');
 	assert.match(en.record.many, /\{n\}.*\{k\}/, 'the count line carries both numbers');
 	assert.match(en.a11y.figure, /Tap or click a well/, 'the figure description says how to act');
