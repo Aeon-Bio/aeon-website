@@ -30,6 +30,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh`
 - Checked: `/` and `/ja` serve the still-plate figure description; gates 33/33 with the build
 
+## Deployment b61b4324 (2026-10-16)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree reset to `wip/2026-10-15-ask-the-plate`
+- Source commit: ed2ad3f (the words beside the plate name it: one person's cells, a bead is a question, the light is their answer; horizon beside the plate; the readout says the row's answer in words)
+- Deployed by: `bash scripts/deploy-staging.sh`
+- Checked: `/` and `/ja` serve the new heading and horizon; gates 33/33 with the build; phone count line inside 664 px (en 615, ja 610)
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
