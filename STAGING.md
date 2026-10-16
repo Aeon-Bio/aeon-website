@@ -44,6 +44,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh`
 - Checked: `/` and `/ja` serve the one-cell copy; gates 32/32 with the build; phone count line inside 664 px (en 543, ja 540)
 
+## Deployment 19a1bcfd (2026-10-16)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree reset to `wip/2026-10-15-ask-the-plate`
+- Source commit: 4660dcd (copy distilled: no count line in motion; lede one idea per sentence; horizon tightened)
+- Deployed by: `bash scripts/deploy-staging.sh`
+- Checked: `/` and `/ja` serve the distilled copy and no count line; gates 32/32 with the build
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
