@@ -47,7 +47,7 @@ test('the instrument asks three times on arrival, a little, too much, between, a
 
 test('the words name it once: one person, one cell, asked and kept; no count line in motion; the horizon sits beside the figure', () => {
 	assert.equal(en.dish.h2a, 'One person’s cell.');
-	assert.equal(en.dish.h2b, 'Asked, and kept.');
+	assert.equal(en.dish.h2b, 'Asked, and asked again.');
 	assert.match(en.dish.lede, /Nothing is destroyed to be read/, 'the lede says what the difference is, once');
 	assert.match(en.dish.horizon, /hospital/, 'the horizon sits beside the figure');
 	assert.deepEqual(Object.keys(en.record), ['still'], 'no count line: the figure shows the asking; one sentence only under reduced motion');

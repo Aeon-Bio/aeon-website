@@ -20,9 +20,9 @@ export const en = {
 	},
 	dish: {
 		h2a: 'One person’s cell.',
-		h2b: 'Asked, and kept.',
+		h2b: 'Asked, and asked again.',
 		// the sentence that names what is on the screen, beside it
-		lede: 'Something arrives. The cell answers in light. The next question goes to the same cell. Nothing is destroyed to be read.',
+		lede: 'Something arrives. The cell answers in light. Nothing is destroyed to be read.',
 		// where this points, within one scroll of the figure
 		horizon: 'Where this points: a hospital that asks a person’s own cells before it treats them.'
 	},

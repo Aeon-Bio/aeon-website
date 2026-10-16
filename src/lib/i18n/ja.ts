@@ -20,8 +20,8 @@ export const ja: Messages = {
 	},
 	dish: {
 		h2a: 'ひとりの人の、細胞がひとつ。',
-		h2b: 'たずねて、手放さない。',
-		lede: '何かが届く。細胞は、光で答える。次の問いも、同じ細胞に。測るために壊すことは、ない。',
+		h2b: 'たずねて、またたずねる。',
+		lede: '何かが届く。細胞は、光で答える。測るために壊すことは、ない。',
 		horizon: 'この先にあるのは、治療の前に、その人自身の細胞にたずねる病院。'
 	},
 	record: {
@@ -177,12 +177,12 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'dish.h2b',
-		note: 'たずねて、手放さない。: asked and kept; confirm 手放さない carries "never discarded" for a living sample.',
+		note: 'たずねて、またたずねる。: asked, and asked again; confirm the repetition reads as the point (the same cell, again) and not as clumsy.',
 		open: true
 	},
 	{
 		key: 'dish.lede',
-		note: '何かが届く / 光で答える / 次の問いも、同じ細胞に / 測るために壊すことは、ない: confirm the last clause reads as a plain fact about endpoint assays, not as a boast.',
+		note: '何かが届く / 光で答える / 測るために壊すことは、ない: confirm the last clause reads as a plain fact about endpoint assays, not as a boast.',
 		open: true
 	},
 	{
