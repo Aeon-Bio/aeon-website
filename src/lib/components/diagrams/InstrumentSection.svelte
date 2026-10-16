@@ -6,14 +6,16 @@
   answer in place with their own timing, or do not, beside wells never touched, and once
   that answer has settled the instrument puts the next change into the next well of the
   row, stronger if few answered and weaker if many, looking for the strength at which half
-  do. A reader who only scrolls sees the whole chain. A tap or a click on a well puts one
-  more change in, at the one strength every change starts at, and the instrument follows it
-  the same way; nothing is asked beyond that. A row nobody has touched stays untouched; the
+  do. The three changes of a row take under ten seconds. A reader who only scrolls sees the
+  whole chain. A tap or a click on a well puts one more change in, strong enough that about
+  half the well answers within a second, and the instrument follows it the same way; nothing
+  is asked beyond that. At rest the plate is still: nothing flickers, nothing patrols; the
+  only motion is a change and its answer. A row nobody has touched stays untouched; the
   plate is the control for itself. The keyboard has a button after the plate that puts a
   change into the next well.
   Nothing is drawn. Every light is a field or a point, and each kind of light is its own:
-  the watcher is a field of plain light on the floor of the well it is under, hidden by the
-  body of the plate between wells; a change is a bead of liquid, a solid body stretched by
+  the watcher is a field of plain light on the floor of the well being changed, and nowhere
+  else, hidden by the body of the plate between wells; a change is a bead of liquid, a solid body stretched by
   its fall; an answer is the cells' own colour. Same material as the mark: soft plates at
   quarter resolution, light that adds, one ramp from deep space through primary and biolum
   to white. Every change is written to the record (bench.js) as it happens, with the well it
@@ -38,24 +40,23 @@
 	const WHITE = [255, 255, 255];
 
 	// the process
-	const FRONT_T = 3.6; // s for a change to cross a well
+	const FRONT_T = 1.0; // s for a change to cross a well: the answer is seen while the cause is still in mind
 	const RISE = 0.24; // s, the steep rise of an answer
 	const ENTRY_A = -1.05; // a change is put in from the same side of every well
 	const DROP_H = 150; // the fixed height a change is released from, above the plate
-	const HOVER = 0.5; // s the instrument's bead waits above the well before it is released
-	const FALL = 0.6; // s, the fall under gravity
-	const DOSE = 0.3; // the one strength every change starts at: the visitor's, and the instrument's first
-	const SETTLE = 3.6; // s after landing until a well's answer is read
-	const THINK = 0.6; // s between an answer read and the instrument's next change
-	const ARRIVAL = 0.8; // s after the visitor arrives until the instrument's first change
+	const HOVER = 0.2; // s the instrument's bead waits above the well before it is released
+	const FALL = 0.3; // s, the fall under gravity
+	const DOSE_FIRST = 0.4; // the instrument's first change: weak, a few cells answer
+	const DOSE_HAND = 0.7; // a tap: strong enough that about half the well answers, at once
+	const SETTLE = 1.6; // s after landing until a well's answer is read
+	const THINK = 0.15; // s between an answer read and the instrument's next change
+	const ARRIVAL = 0.25; // s after the visitor arrives until the instrument's first change
 	const FIELD = 0.5 * R; // the watcher's field: the floor it lights, the size of what it sees at once
-	const TILE_T = 0.9; // s the watcher spends on each quarter of a well it is holding
-	const PACE = 1.0; // s, the watcher's walk from one well to the next
+	const PACE = 0.6; // s, the watcher's move from one well to the next
 	const D2R = Math.PI / 180;
 	// over the plate from where changes come, high enough that every well is a thing to press and a
 	// bead is seen to fall, low enough that the plate is a body with a watcher underneath
 	const HOME = { tx: 420, ty: 392, az: -6 * D2R, el: 52 * D2R, dist: 2600, f: 2600 * 1.15, k: 0 };
-	const PATROL = ['T2', 'T1', 'T0', 'M0', 'M1', 'M2', 'B2', 'B1', 'B0'];
 
 	let stage;
 	let canvas;
@@ -212,12 +213,6 @@
 		const s = dt - RISE;
 		return 0.4 * Math.exp(-s / 1.2) + 0.6 * Math.exp(-s / 14);
 	}
-	// a spontaneous flash: brief, and leaves nothing
-	function flash(dt) {
-		if (dt < 0) return 0;
-		if (dt < 0.12) return dt / 0.12;
-		return Math.exp(-(dt - 0.12) / 0.5);
-	}
 
 	onMount(() => {
 		if (!canvas || !stage) return;
@@ -264,7 +259,7 @@
 		let clock0 = -1; // the instrument's clock starts when the visitor arrives
 		const plan = []; // the instrument's changes still to put in: { at, w, dose }, by time
 		const drops = []; // beads on their way in: forming above a well, or falling
-		const watcher = { x: NAMED.T1.x, y: NAMED.T1.y, goal: null, holdUntil: 0, next: 1 };
+		const watcher = { x: NAMED.T1.x, y: NAMED.T1.y, goal: null, holdUntil: 0, a: 0 }; // a: its light, 0 when nothing is changing
 
 		// the change enters the well from the same place near the wall, every time, whoever's hand it is
 		function entryOf(w) {
@@ -294,7 +289,7 @@
 			w.point = addPoint(dose, mine, w, w.impactT, w.impactT + SETTLE);
 			// the watcher goes to the well that is about to change, and stays while it answers
 			watcher.goal = w;
-			watcher.holdUntil = w.impactT + SETTLE;
+			watcher.holdUntil = w.impactT + SETTLE + 0.8;
 		}
 		function schedule(at, w, dose) {
 			plan.push({ at, w, dose });
@@ -313,30 +308,19 @@
 			for (const c of w.cells) if (c.answered) n++;
 			return w.cells.length ? n / w.cells.length : 0;
 		}
-		// where the watcher is, on its walk: under the well answering, or on patrol
+		// the watcher: under the well that is changing, and nowhere when nothing is. At rest the plate is still
 		function walk(dt, t) {
 			let goal = watcher.goal;
 			if (goal && t > watcher.holdUntil) goal = watcher.goal = null;
-			if (!goal) {
-				const n = NAMED[PATROL[watcher.next % PATROL.length]];
-				if (Math.hypot(n.x - watcher.x, n.y - watcher.y) < 1) watcher.next++;
-				goal = NAMED[PATROL[watcher.next % PATROL.length]];
-			}
-			// holding a well, the watcher takes it in quarters; on patrol it passes through the centre
-			let gx = goal.x,
-				gy = goal.y;
-			if (goal === watcher.goal) {
-				const q = Math.floor(t / TILE_T) % 4;
-				gx += (q === 1 || q === 2 ? 1 : -1) * 0.42 * R;
-				gy += (q >= 2 ? 1 : -1) * 0.42 * R;
-			}
-			const dx = gx - watcher.x,
-				dy = gy - watcher.y,
+			watcher.a += ((goal ? 1 : 0) - watcher.a) * (1 - Math.exp(-dt / 0.3));
+			if (!goal) return;
+			const dx = goal.x - watcher.x,
+				dy = goal.y - watcher.y,
 				d = Math.hypot(dx, dy),
 				step = (PITCH / PACE) * dt;
-			if (d <= step) {
-				watcher.x = gx;
-				watcher.y = gy;
+			if (d <= step || watcher.a < 0.05) {
+				watcher.x = goal.x;
+				watcher.y = goal.y;
 			} else {
 				watcher.x += (dx / d) * step;
 				watcher.y += (dy / d) * step;
@@ -361,8 +345,6 @@
 					}
 					c.arriveAt = -1;
 				}
-				// spontaneous activity, uncaused: part of the picture, never part of the evidence
-				if (rnd() < dt * 0.006) c.events.push({ t, a: 0.35 + 0.4 * rnd(), caused: false });
 				if (c.events.length > 4) c.events.shift();
 				c.evidence *= 1 - dt / 240; // the slow layer nearly does not forget
 			}
@@ -539,7 +521,7 @@
 			// the halo of answering cells, on the same plate: small, few, never stacked into a wash
 			for (const c of cells) {
 				let l = 0;
-				for (const e of c.events) l += e.a * (e.caused ? kernel(t - e.t) : flash(t - e.t));
+				for (const e of c.events) l += e.a * kernel(t - e.t);
 				c.L = l;
 				if (l > 0.25) {
 					const o = proj(c.x, c.y, 0),
@@ -562,7 +544,7 @@
 			// the size of what it sees at once, with the hard edge a field has. The wall of the well hides it
 			// between wells, so it is seen only through a floor: the body of the plate is a body because it hides it
 			{
-				const w = wellAt(watcher.x, watcher.y);
+				const w = watcher.a > 0.01 ? wellAt(watcher.x, watcher.y) : null;
 				if (w) {
 					const Fw = frameAt(w.x, w.y, R * 0.9);
 					ctx.save();
@@ -573,8 +555,8 @@
 					const F = frameAt(watcher.x, watcher.y, FIELD);
 					ctx.setTransform(F.ux, F.uy, F.vx, F.vy, F.ox, F.oy);
 					const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-					g.addColorStop(0, rgba(WHITE, 0.1));
-					g.addColorStop(0.86, rgba(WHITE, 0.1));
+					g.addColorStop(0, rgba(WHITE, 0.1 * watcher.a));
+					g.addColorStop(0.86, rgba(WHITE, 0.1 * watcher.a));
 					g.addColorStop(1, rgba(WHITE, 0));
 					ctx.fillStyle = g;
 					ctx.beginPath();
@@ -621,16 +603,17 @@
 				ctx.arc(o[0] - 0.3 * rb, o[1] - 0.35 * rb, Math.max(0.6, 0.22 * rb), 0, 6.2832);
 				ctx.fill();
 			}
-			// the cultures: every footprint, faint at rest; brighter where the slow layer has settled
+			// the cultures: every footprint, faint and still at rest; a cell that answered stays bright, so the
+			// plate itself keeps the result
 			for (const c of cells) {
-				const ev = Math.min(1, c.evidence);
-				const rest = 0.11 + 0.016 * Math.sin(t * 0.5 + c.x);
+				const on = c.answered ? 1 : 0;
+				const rest = 0.11;
 				// in the watcher's field the cells are seen: each body distinct in plain light
 				const fd = Math.hypot(c.x - watcher.x, c.y - watcher.y) / FIELD;
-				const seen = fd < 1 ? 0.3 * (1 - fd ** 6) : 0;
+				const seen = fd < 1 ? 0.3 * (1 - fd ** 6) * watcher.a : 0;
 				ctx.fillStyle = rgba(
-					mix(mix(PRIMARY, BIOLUM, 0.5 * ev), WHITE, 0.5 * seen),
-					rest + 0.3 * ev + seen
+					mix(mix(PRIMARY, BIOLUM, 0.7 * on), WHITE, 0.5 * seen),
+					rest + 0.3 * on + seen
 				);
 				footprint(c, 1);
 				ctx.fill();
@@ -684,10 +667,10 @@
 			if (!w || !w.whole || Math.hypot(pt[0] - w.x, pt[1] - w.y) > R * 1.02) return null;
 			return w;
 		}
-		// one tap, one change, at the one strength; the instrument answers it once the well has
+		// one tap, one change, strong enough to be answered at once; the instrument follows it once the well has
 		function put(w) {
 			if (clock0 < 0) clock0 = tNow;
-			release(w, DOSE, tNow, 0.25, true);
+			release(w, DOSE_HAND, tNow, 0, true);
 		}
 		// a click is a tap on every device, and never a scroll
 		function onClick(ev) {
@@ -712,7 +695,7 @@
 			still = true;
 			stillMode.set(true);
 			clock0 = 0;
-			schedule(ARRIVAL, NAMED.T1, DOSE);
+			schedule(ARRIVAL, NAMED.T1, DOSE_FIRST);
 			let t = 0;
 			for (let i = 0; i < 60 * 24; i++) {
 				t = i / 60;
@@ -743,7 +726,7 @@
 				if (arrived && clock0 < 0) {
 					clock0 = t;
 					// the instrument's one change on arrival: this is where a change goes in, and what it does
-					schedule(t + ARRIVAL, NAMED.T1, DOSE);
+					schedule(t + ARRIVAL, NAMED.T1, DOSE_FIRST);
 				}
 				stepProcess(t);
 				if (visible) render(t);

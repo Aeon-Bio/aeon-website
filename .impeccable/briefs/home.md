@@ -10,7 +10,7 @@ Every audience arrives not knowing what the instrument is, and most arrive scept
 
 ## Map (experiential qualities)
 
-Atmosphere: the card's room, unchanged. Invitation: the first change goes in as you arrive, and the instrument carries on; nothing is asked. Resonance: a plate, wells, a control row, a dose series read as the wells themselves with their beads; anyone who runs assays recognises their world without a label, anyone else reads it by physics. Tension and resolution: a bead falls (commitment) → cells light over seconds (unfolding) → the next bead is sized from that answer (consummation), three times over in the first half minute. Presence: the instrument follows what you did, if you did anything.
+Atmosphere: the card's room, unchanged. Invitation: the first change goes in as you arrive, and the instrument carries on; nothing is asked. Resonance: a plate, wells, a control row, a dose series read as the wells themselves with their beads; anyone who runs assays recognises their world without a label, anyone else reads it by physics. Tension and resolution: a bead falls (commitment) → the well lights within a second (unfolding) → the next bead is sized from that answer (consummation), three times over in the first ten seconds. At rest nothing moves; a tap is answered inside half a second with about half the well lighting. Presence: the instrument follows what you did, if you did anything.
 
 ## Direction contract
 

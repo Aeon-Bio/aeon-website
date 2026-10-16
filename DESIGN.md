@@ -50,3 +50,5 @@ Primary button: biolum fill, deep-space text, 2px radius, mono uppercase, 44px m
 ## Copy register
 
 Short declaratives; the thing named after the light has shown it; no sentences that conclude for the reader; no marketing adjectives; the stage said once ("in design"). Japanese copy in the card's register (体言止め, no imperatives, katakana names).
+
+Stillness (2026-10-16): at rest the page's figures do not move. No patrol, no ambient flicker, no shimmer; the only motion is a cause and its effect, and an effect follows its cause inside a second so the two are held in one span of attention. Results persist in place after they happen. The user's ruling: "I still feel like I'm waiting for something to happen but nobody is this patient. there's a lot of things moving without my interaction."

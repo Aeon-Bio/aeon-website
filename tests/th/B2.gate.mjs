@@ -20,15 +20,16 @@ test('the process is physical and heterogeneous, not a CSS loop or a uniform wav
 	assert.match(source, /function kernel\(/, 'an answer has kinetics');
 	assert.match(source, /quiet: rnd\(\) < /, 'some cells never answer');
 	assert.match(source, /thr: Math\.pow\(rnd\(\)/, 'thresholds are drawn per cell, not per well');
-	assert.match(source, /caused: false/, 'spontaneous flashes exist and are not evidence');
+	assert.doesNotMatch(source, /caused: false|PATROL|Math\.sin\(t/, 'at rest the plate is still: no spontaneous flashes, no patrol, no shimmer');
 	assert.doesNotMatch(source, /@keyframes|animation:/, 'no CSS loop');
 });
 
 test('the gesture is one tap at one strength, the same on every device; nothing to hold, hover or learn', () => {
 	const { source } = compileSvelte(FILE);
 	assert.match(source, /addEventListener\('click'/, 'a click is a tap, and never a scroll');
-	assert.match(source, /const DOSE = /, 'one strength for every change that starts');
-	assert.match(source, /release\(w, DOSE, tNow/, 'the tap puts it in at that strength');
+	assert.match(source, /const DOSE_HAND = /, 'one strength for every tap');
+	assert.match(source, /release\(w, DOSE_HAND, tNow, 0, true\)/, 'the tap puts it in at that strength, at once');
+	assert.match(source, /const FRONT_T = 1\.0/, 'the change crosses the well within a second');
 	assert.doesNotMatch(source, /pointerdown|pointermove|keydown|HOLD_T|BASE\b|crosshair/, 'no press-and-hold, no hover state, no keyboard grammar');
 	assert.doesNotMatch(source, /PASS_T|hover steer|scrollY|wheel/, 'no hover-dispense, no scroll camera');
 	assert.doesNotMatch(source, /caption|m\.beats/, 'no captions over the plate');
@@ -42,7 +43,7 @@ test('the view never moves and the instrument answers only an answer', () => {
 	assert.match(source, /function follow\(/, 'the instrument follows an answered well');
 	assert.match(source, /nextDose\(w\.dose, w\.point\.f\)/, 'the next strength is chosen from the fraction that answered');
 	assert.match(source, /const SETTLE = /, 'an answer is read after it has settled');
-	assert.match(source, /schedule\(t \+ ARRIVAL, NAMED\.T1, DOSE\)/, 'one change of its own on arrival, at the same strength as a tap');
+	assert.match(source, /schedule\(t \+ ARRIVAL, NAMED\.T1, DOSE_FIRST\)/, 'one weak change of its own on arrival');
 	assert.match(source, /!o\.doses\.length/, 'a well is dosed once by the instrument; untouched wells stay untouched');
 });
 
