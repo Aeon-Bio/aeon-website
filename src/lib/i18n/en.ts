@@ -22,18 +22,13 @@ export const en = {
 		h2a: 'One person’s cell.',
 		h2b: 'Asked, and kept.',
 		// the sentence that names what is on the screen, beside it
-		lede: 'Something arrives. The cell answers in light. The next question comes to the same cell, alive. It is never thrown away to be read.',
+		lede: 'Something arrives. The cell answers in light. The next question goes to the same cell. Nothing is destroyed to be read.',
 		// where this points, within one scroll of the figure
-		horizon: 'Where this points: a hospital asking a person’s own cells before it treats them.'
+		horizon: 'Where this points: a hospital that asks a person’s own cells before it treats them.'
 	},
 	record: {
-		// the one line under the figure: how many times the cell has been asked
-		none: 'Not yet asked.',
-		one: 'Asked once. The same cell.',
-		two: 'Asked twice. The same cell, alive.',
-		many: 'Asked {n} times. The same cell, alive.',
-		// reduced motion: the still exposure's one sentence
-		still: 'Asked three times. The same cell, alive.'
+		// reduced motion only: the figure is one still, so one sentence says what it would have shown
+		still: 'Asked three times. The same cell.'
 	},
 	readout: {
 		h2a: 'What comes back is an answer.',

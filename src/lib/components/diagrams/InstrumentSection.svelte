@@ -12,13 +12,13 @@
   plate, no chart, no bead to decode: a body, a drop, light.
   Material as the mark's: fields and points of light that add, no outlines; the cell is a
   body known by its lit edge, the drop a solid bead with one point of the room's light on it,
-  the answer the cells' own colour. The count beside the figure is written to cell.js.
-  Reduced motion: one still, the cell lit by its third answer; the count line says so.
+  the answer the cells' own colour.
+  Reduced motion: one still, the cell lit by its third answer; one sentence beside it says so.
 -->
 <script>
 	import { onMount } from 'svelte';
 	import { useMessages } from '$lib/i18n';
-	import { asked, resetCell, stillMode } from './cell.js';
+	import { stillMode } from './cell.js';
 	const m = useMessages();
 
 	const PRIMARY = [76, 201, 240];
@@ -60,7 +60,6 @@
 
 	onMount(() => {
 		if (!canvas || !stage) return;
-		resetCell();
 		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -151,7 +150,6 @@
 			ripples.push({ t0: t, th: d.th, A: 0.05 * (0.5 + d.dose) });
 			answers.push({ t0: t + 0.12, th: d.th, dose: d.dose });
 			count++;
-			asked.set(count);
 			nextAt = t + (count < 3 ? AGAIN : REST);
 		}
 		function step(t) {

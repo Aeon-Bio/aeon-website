@@ -42,15 +42,15 @@ test('the instrument asks three times on arrival, a little, too much, between, a
 	assert.match(source, /const AGAIN = /, 'the next question follows the answer');
 	assert.match(source, /const REST = /, 'then it keeps asking, slower');
 	assert.match(source, /nextAt = t \+ ARRIVAL/, 'the first question comes as the visitor arrives');
-	assert.equal(typeof cellMod.asked.subscribe, 'function', 'the count is a store');
+	assert.equal(typeof cellMod.stillMode.subscribe, 'function', 'reduced motion is a store');
 });
 
-test('the words name it: one person, one cell, asked and kept; the count counts asks; the horizon sits beside the figure', () => {
+test('the words name it once: one person, one cell, asked and kept; no count line in motion; the horizon sits beside the figure', () => {
 	assert.equal(en.dish.h2a, 'One person’s cell.');
 	assert.equal(en.dish.h2b, 'Asked, and kept.');
-	assert.match(en.dish.lede, /never thrown away to be read/, 'the lede says what the difference is');
+	assert.match(en.dish.lede, /Nothing is destroyed to be read/, 'the lede says what the difference is, once');
 	assert.match(en.dish.horizon, /hospital/, 'the horizon sits beside the figure');
-	assert.match(en.record.many, /\{n\}/, 'the count line carries the number');
+	assert.deepEqual(Object.keys(en.record), ['still'], 'no count line: the figure shows the asking; one sentence only under reduced motion');
 	assert.ok(!('beats' in en) && !('result' in en.readout), 'no beats, no row result');
 	assert.match(en.a11y.figure, /Tap or click the cell/, 'the figure description says how to act');
 	assert.match(en.a11y.put, /Ask/, 'the keyboard button is named');

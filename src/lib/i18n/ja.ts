@@ -21,15 +21,11 @@ export const ja: Messages = {
 	dish: {
 		h2a: 'ひとりの人の、細胞がひとつ。',
 		h2b: 'たずねて、手放さない。',
-		lede: '何かが届く。細胞は、光で答える。次の問いは、同じ細胞に。生きたまま。測るために壊されることは、ない。',
+		lede: '何かが届く。細胞は、光で答える。次の問いも、同じ細胞に。測るために壊すことは、ない。',
 		horizon: 'この先にあるのは、治療の前に、その人自身の細胞にたずねる病院。'
 	},
 	record: {
-		none: 'まだ、たずねていない。',
-		one: '一度、たずねた。同じ細胞。',
-		two: '二度、たずねた。同じ細胞が、生きたまま。',
-		many: '{n}回、たずねた。同じ細胞が、生きたまま。',
-		still: '三度、たずねた。同じ細胞が、生きたまま。'
+		still: '三度、たずねた。同じ細胞。'
 	},
 	readout: {
 		h2a: '返ってくるのは、答え。',
@@ -186,17 +182,12 @@ export const nativeCheck: readonly { key: string; note: string; open?: boolean }
 	},
 	{
 		key: 'dish.lede',
-		note: '何かが届く / 光で答える / 生きたまま / 測るために壊されることは、ない: confirm the last clause reads as a plain fact about destructive assays, not as a boast.',
+		note: '何かが届く / 光で答える / 次の問いも、同じ細胞に / 測るために壊すことは、ない: confirm the last clause reads as a plain fact about endpoint assays, not as a boast.',
 		open: true
 	},
 	{
 		key: 'dish.horizon',
 		note: '治療の前に、その人自身の細胞にたずねる病院。: the horizon; confirm it does not read as a clinic selling unproven therapy (再生医療等安全性確保法 context).',
-		open: true
-	},
-	{
-		key: 'record.many',
-		note: '{n}回、たずねた。同じ細胞が、生きたまま。: one line at 390; confirm 回 and the 体言止め close.',
 		open: true
 	},
 	{

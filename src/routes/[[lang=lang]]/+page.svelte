@@ -3,7 +3,7 @@
 	import PartnershipInquiry from '$lib/components/forms/PartnershipInquiry.svelte';
 	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
-	import { asked, stillMode } from '$lib/components/diagrams/cell.js';
+	import { stillMode } from '$lib/components/diagrams/cell.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
 	import ViewportGradient from '$lib/components/ViewportGradient.svelte';
 	import { reveal } from '$lib/actions/reveal';
@@ -26,16 +26,6 @@
 	let showContact = false;
 	let showUpdates = false;
 
-	/** the one line under the figure: how many times the cell has been asked */
-	$: countLine = $stillMode
-		? m.record.still
-		: $asked === 0
-			? m.record.none
-			: $asked === 1
-				? m.record.one
-				: $asked === 2
-					? m.record.two
-					: m.record.many.replace('{n}', String($asked));
 </script>
 
 <svelte:head>
@@ -93,7 +83,7 @@
 				>
 			</h2>
 			<p class="bench-lede" use:reveal={{ delay: 90 }}>{m.dish.lede}</p>
-			<p class="bench-count" aria-live="polite">{countLine}</p>
+			{#if $stillMode}<p class="bench-count">{m.record.still}</p>{/if}
 			<p class="horizon bench-horizon" use:reveal={{ delay: 150 }}>{m.dish.horizon}</p>
 		</div>
 		<div class="bench-plate">
