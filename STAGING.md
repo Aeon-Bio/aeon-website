@@ -51,6 +51,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh`
 - Checked: `/` and `/ja` serve the distilled copy and no count line; gates 32/32 with the build
 
+## Deployment 1903e188 (2026-10-16)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree reset to `wip/2026-10-15-ask-the-plate`
+- Source commit: 54b053f (heading: "Asked, and asked again."; lede three sentences)
+- Deployed by: `bash scripts/deploy-staging.sh`
+- Checked: `/` and `/ja` serve the new heading; gates 32/32 with the build
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
