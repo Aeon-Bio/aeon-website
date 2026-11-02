@@ -50,11 +50,7 @@ export const ja: Messages = {
 		bio: [
 			{ t: 'カリフォルニア大学サンタクルーズ校で生体工学・認知科学・神経科学を学ぶ。' },
 			{ t: 'Gladstone 研究所', href: 'https://gladstone.org' },
-			{ t: ' と ' },
-			{ t: 'Answer ALS', href: 'https://www.answerals.org' },
-			{ t: ' で 1 万人超のゲノムから' },
-			{ t: '変異を探索', href: 'https://github.com/ejmockler/case-control-genomics' },
-			{ t: '。Gyori 研では、論文が本当に「これが原因だ」と言っているのかを問う' },
+			{ t: ' の、ロボティック顕微鏡を生み出した研究室に 2 年間在籍。Gyori 研では、論文が本当に「これが原因だ」と言っているのかを問う' },
 			{ t: 'ビリーフモデル', href: 'https://github.com/gyorilab/indra-belief-model' },
 			{ t: 'を開発。' }
 		]

@@ -51,13 +51,9 @@ export const en = {
 		github: 'Eric Jing Mockler on GitHub',
 		scholar: 'Eric Jing Mockler on Google Scholar',
 		bio: [
-			{ t: 'Bioengineering, cognitive science, neuroscience at UC Santa Cruz. ' },
-			{ t: 'Variant discovery', href: 'https://github.com/ejmockler/case-control-genomics' },
-			{ t: ' across 10,000+ genomes at ' },
-			{ t: 'Gladstone', href: 'https://gladstone.org' },
-			{ t: ' and ' },
-			{ t: 'Answer ALS', href: 'https://www.answerals.org' },
-			{ t: '. With the Gyori lab, ' },
+			{ t: 'Bioengineering, cognitive science, neuroscience at UC Santa Cruz. Two years at ' },
+			{ t: 'Gladstone Institutes', href: 'https://gladstone.org' },
+			{ t: ' in the lab that invented robotic microscopy. With the Gyori lab, ' },
 			{ t: 'the belief model', href: 'https://github.com/gyorilab/indra-belief-model' },
 			{ t: ': does the paper actually say this causes that.' }
 		]
