@@ -78,7 +78,7 @@ export const en = {
 	cta: {
 		line: 'If you run a wet lab, or hold perturbation data, write.',
 		write: 'Write to us',
-		follow: 'Follow'
+		call: 'Book a call'
 	},
 	colophon: {
 		text: 'Open hardware under CERN-OHL-S-2.0 · ',
@@ -91,6 +91,7 @@ export const en = {
 	modal: {
 		write: 'Write to us',
 		follow: 'Follow',
+		call: 'Book a call with Eric',
 		close: 'Close modal'
 	},
 	form: {
@@ -131,6 +132,14 @@ export const en = {
 			'There is no product to demo yet. What we can offer is a conversation about how you measure whether your cells work, and what is slow about it.',
 		close: 'Close',
 		another: 'Write another'
+	},
+	call: {
+		kobe: 'In Kobe it is ',
+		yours: 'slots show in your time zone',
+		reading: 'Reading the calendar',
+		slow: 'The calendar is slow to arrive',
+		open: 'Open in a new tab',
+		frame: "Eric's calendar, for booking a video call"
 	},
 	follow: {
 		title: 'Follow the build',

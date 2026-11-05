@@ -50,7 +50,9 @@ export const ja: Messages = {
 		bio: [
 			{ t: 'カリフォルニア大学サンタクルーズ校で生体工学・認知科学・神経科学を学ぶ。' },
 			{ t: 'Gladstone 研究所', href: 'https://gladstone.org' },
-			{ t: ' の、ロボティック顕微鏡を生み出した研究室に 2 年間在籍。Gyori 研では、論文が本当に「これが原因だ」と言っているのかを問う' },
+			{
+				t: ' の、ロボティック顕微鏡を生み出した研究室に 2 年間在籍。Gyori 研では、論文が本当に「これが原因だ」と言っているのかを問う'
+			},
 			{ t: 'ビリーフモデル', href: 'https://github.com/gyorilab/indra-belief-model' },
 			{ t: 'を開発。' }
 		]
@@ -75,7 +77,7 @@ export const ja: Messages = {
 	cta: {
 		line: 'ウェットラボをお持ちの方、摂動データをお持ちの方、ぜひご連絡ください。',
 		write: 'お問い合わせ',
-		follow: '開発のお知らせを受け取る'
+		call: '通話を予約する'
 	},
 	colophon: {
 		text: 'CERN-OHL-S-2.0 のオープンハードウェア · ',
@@ -87,6 +89,7 @@ export const ja: Messages = {
 	modal: {
 		write: 'お問い合わせ',
 		follow: '開発のお知らせを受け取る',
+		call: 'Ericとの通話を予約',
 		close: '閉じる'
 	},
 	form: {
@@ -126,6 +129,14 @@ export const ja: Messages = {
 			'まだお見せできる製品はありません。お聞きしたいのは、細胞の状態をいまどう測っているか、どこに時間がかかっているか、です。',
 		close: '閉じる',
 		another: 'もう一通書く'
+	},
+	call: {
+		kobe: '神戸の現在時刻 ',
+		yours: '枠はあなたのタイムゾーンで表示されます',
+		reading: 'カレンダーを読み込んでいます',
+		slow: 'カレンダーの読み込みに時間がかかっています',
+		open: '新しいタブで開く',
+		frame: 'Ericのカレンダー（ビデオ通話の予約）'
 	},
 	follow: {
 		title: '開発のお知らせを受け取る',

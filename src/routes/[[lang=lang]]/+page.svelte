@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import PartnershipInquiry from '$lib/components/forms/PartnershipInquiry.svelte';
-	import EmailCapture from '$lib/components/forms/EmailCapture.svelte';
+	import BookCall from '$lib/components/forms/BookCall.svelte';
 	import InstrumentSection from '$lib/components/diagrams/InstrumentSection.svelte';
 	import { stillMode } from '$lib/components/diagrams/cell.js';
 	import AeonMarkLive from '$lib/images/AeonMarkLive.svelte';
@@ -24,8 +24,7 @@
 	const SHOW_CONTACT = true;
 
 	let showContact = false;
-	let showUpdates = false;
-
+	let showCall = false;
 </script>
 
 <svelte:head>
@@ -207,8 +206,7 @@
 				<p>{m.cta.line}</p>
 				<div class="cta-group left">
 					<button class="cta-primary" on:click={() => (showContact = true)}>{m.cta.write}</button>
-					<button class="cta-secondary" on:click={() => (showUpdates = true)}>{m.cta.follow}</button
-					>
+					<button class="cta-secondary" on:click={() => (showCall = true)}>{m.cta.call}</button>
 				</div>
 			</div>
 		{/if}
@@ -228,8 +226,8 @@
 	<PartnershipInquiry on:close={() => (showContact = false)} />
 </Modal>
 
-<Modal bind:isOpen={showUpdates} title={m.modal.follow} maxWidth="500px">
-	<EmailCapture on:close={() => (showUpdates = false)} />
+<Modal bind:isOpen={showCall} title={m.modal.call} maxWidth="880px">
+	<BookCall />
 </Modal>
 
 <style>
@@ -649,7 +647,6 @@
 		color: var(--ink-50);
 	}
 
-
 	/* narrow or upright: the words above, the cell below them, the count under it */
 	@media (max-width: 63.99rem), (orientation: portrait) {
 		.bench {
@@ -695,7 +692,6 @@
 			font-size: 0.95rem !important;
 			line-height: 1.5 !important;
 		}
-
 
 		.readout-grid {
 			grid-template-columns: minmax(0, 1fr);

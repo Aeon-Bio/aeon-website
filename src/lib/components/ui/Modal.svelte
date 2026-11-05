@@ -31,7 +31,7 @@
 		// Tab trapping
 		if (event.key === 'Tab' && isOpen && modalContent) {
 			const focusableElements = modalContent.querySelectorAll(
-				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+				'button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])'
 			);
 			const firstElement = focusableElements[0] as HTMLElement;
 			const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
@@ -185,6 +185,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 1rem;
 		padding: 1.5rem 2rem 0;
 		flex-shrink: 0;
 	}
@@ -194,6 +195,8 @@
 		font-weight: 600;
 		color: var(--aeon-biolum);
 		margin: 0;
+		min-width: 0;
+		text-wrap: balance;
 	}
 
 	.close-button {
@@ -246,6 +249,10 @@
 
 		.modal-header {
 			padding: 1rem 1.5rem 0;
+		}
+
+		.modal-title {
+			font-size: 1.2rem;
 		}
 
 		.modal-body {
