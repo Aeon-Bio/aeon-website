@@ -58,6 +58,13 @@
 - Deployed by: `bash scripts/deploy-staging.sh`
 - Checked: `/` and `/ja` serve the new heading; gates 32/32 with the build
 
+## Deployment d0be35c7 (2026-11-05)
+
+- Pages project: aeon-website-staging, direct upload from the `staging` worktree fast-forwarded to `main`
+- Source commit: 5b61d76 (Book a call replaces Follow: Eric's Google appointment schedule embedded in the modal)
+- Deployed by: `bash scripts/deploy-staging.sh`; production deployed by the push of 5b61d76 to `main`
+- Checked: `/` and `/ja` on staging and aeon.science serve "Book a call" / 通話を予約する and no Follow button; clean build in the staging worktree
+
 ## Live check (2026-10-08T15:54:04Z)
 
 Root URL returned HTTP 200 and the body contains the hero line verbatim:
